@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8" />
+    <title>業務効率化ツール</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', q='20250705120') }}">
+</head>
+<body>
+    <h1>業務効率化ツール</h1>
+    <form action="/convert" method="post">
+        <div class="main-grid">
+            <!-- 左半分：出発期間+粗利率 -->
+            <div class="left-half">
+                <label>出発期間+粗利率（5列分のデータ）</label>
+                <textarea class ="lefttext" name="departure_rate" rows="18" required></textarea>
+            </div>
+
+            <!-- 右上：施設番号+施設名 -->
+            <div class="right-top">
+                <label>施設番号+施設名（2列分のデータ）</label>
+                <textarea class = "righttext" name="facility" rows="9" required></textarea>
+            </div>
+
+            <!-- 右下：販売期間と空港 -->
+            <div class="right-bottom">
+                <label>販売期間(from)</label>
+                <input type="text" name="sale_from" placeholder="YYYY/MM/DD または YYYYMMDD" required>
+
+                <label>販売期間(to)</label>
+                <input type="text" name="sale_to" placeholder="YYYY/MM/DD または YYYYMMDD" required>
+
+                <label>発空港</label>
+                <input type="text" name="airport" placeholder="例: HND" required>
+
+                <label>参加者合計人数</label>
+                <div class="radio-group-horizontal">
+                    <label><input type="radio" name="participants" value="1"> 一人</label>
+                    <label><input type="radio" name="participants" value="2"> 二人以上</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- 変換ボタン -->
+        <div class="submit-container">
+            <button type="submit">CSVに変換</button>
+        </div>
+    </form>
+</body>
+</html>
