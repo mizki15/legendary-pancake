@@ -4,8 +4,9 @@ import csv
 import os
 from dotenv import load_dotenv
 import requests
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 import time
+import zoneinfo
 
 # .env読み込み
 load_dotenv()
@@ -13,6 +14,7 @@ load_dotenv()
 app = Flask(__name__)
 
 youbi_list = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
+JST = zoneinfo.ZoneInfo("Asia/Tokyo")
 
 def convert_date_to_slash_format(date_str):
     """YYYYMMDD または YYYY/MM/DD を YYYY/MM/DD に変換"""
@@ -149,7 +151,7 @@ def transform_data_for_csv(data_dict):
             new_dict["粗利率1"] = rate[2]
             new_dict["粗利率2"] = rate[3]
             new_dict["粗利率3"] = rate[4]
-            new_dict["時間"] = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+            new_dict["時間"] = datetime.now(JST).strftime("%Y/%m/%d %H:%M:%S")
 
             for youbi in youbi_list:
                 tmp = new_dict.copy()
@@ -202,3 +204,4 @@ def convert():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
