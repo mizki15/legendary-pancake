@@ -85,7 +85,7 @@ def make_row_list_from_dict(data_dict):
         data_dict.get("粗利率1", ""),
         data_dict.get("粗利率2", ""),
         data_dict.get("粗利率3", ""),
-        "A"
+        "Ａ"
     ]
 
 def transform_data_for_csv(data_dict):
