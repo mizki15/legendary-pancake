@@ -54,7 +54,6 @@ def get_data_from_api(facility_num, facility_name):
         middle_class_code = hotel[2]["hotelDetailInfo"]["middleClassCode"]
         small_class_code = hotel[2]["hotelDetailInfo"]["smallClassCode"]
 
-        # 施設名の比較（念のためstripで前後の空白を除去して比較することを推奨）
         if facility_name.strip() == hotel_name.strip():
             return {
                 "施設番号": facility_num,
@@ -91,6 +90,34 @@ def make_row_list_from_dict(data_dict):
         "Ａ"
     ]
 
+# === 追加した関数 ===
+def get_active_days(start_date_str, end_date_str):
+    """期間内に含まれる曜日コードの集合を返す"""
+    try:
+        start_date = datetime.strptime(start_date_str, "%Y/%m/%d")
+        end_date = datetime.strptime(end_date_str, "%Y/%m/%d")
+    except ValueError:
+        return set() # 日付変換エラーの場合は空集合
+
+    # 期間が7日以上の場合は全ての曜日が含まれる
+    if (end_date - start_date).days >= 6:
+        return set(youbi_list)
+
+    active_days = set()
+    current_date = start_date
+    
+    # Pythonのweekday(): 0=月, 1=火 ... 5=土, 6=日
+    # youbi_listのインデックス: 0=SUN, 1=MON ... 6=SAT
+    # 対応用マップ
+    weekday_map = {0: "MON", 1: "TUE", 2: "WED", 3: "THU", 4: "FRI", 5: "SAT", 6: "SUN"}
+
+    while current_date <= end_date:
+        wd = current_date.weekday()
+        active_days.add(weekday_map[wd])
+        current_date += timedelta(days=1)
+    
+    return active_days
+
 def transform_data_for_csv(data_dict):
     """すべてのデータをCSV形式に変換"""
     errors = []
@@ -123,9 +150,6 @@ def transform_data_for_csv(data_dict):
     row_list = []
 
     for line in facilities_raw:
-        # === 修正箇所 ===
-        # maxsplit=1 を指定することで、最初の空白（施設番号と施設名の間）でのみ分割します。
-        # これにより、施設名の中にスペースが含まれていても正しく1つの文字列として扱われます。
         parts = line.strip().split(maxsplit=1) 
         
         if len(parts) < 2:
@@ -146,6 +170,9 @@ def transform_data_for_csv(data_dict):
                 errors.append(f"出発期間の日付形式が不正です: {' '.join(rate[:2])}")
                 continue
 
+            # === 変更箇所: 期間内の曜日を取得 ===
+            active_days_in_period = get_active_days(dep_from, dep_to)
+
             new_dict = api_result.copy()
             new_dict["販売期間(from)"] = hanbai_from
             new_dict["販売期間(to)"] = hanbai_to
@@ -159,9 +186,11 @@ def transform_data_for_csv(data_dict):
             new_dict["時間"] = datetime.now(JST).strftime("%Y/%m/%d %H:%M:%S")
 
             for youbi in youbi_list:
-                tmp = new_dict.copy()
-                tmp["曜日"] = youbi
-                row_list.append(make_row_list_from_dict(tmp))
+                # === 変更箇所: 対象の曜日が含まれている場合のみ行を作成 ===
+                if youbi in active_days_in_period:
+                    tmp = new_dict.copy()
+                    tmp["曜日"] = youbi
+                    row_list.append(make_row_list_from_dict(tmp))
 
     if errors:
         return {"error": "\n".join(errors)}
@@ -186,7 +215,6 @@ def convert():
     result = transform_data_for_csv(data_dict)
 
     if "error" in result:
-        # エラー表示を見やすく改行を<br>に置換
         return f"<h1>エラー:</h1><h2>{result['error'].replace(chr(10), '<br>')}</h2>", 400
 
     csv_rows = result["rows"]
