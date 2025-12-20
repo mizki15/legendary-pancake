@@ -54,7 +54,8 @@ def get_data_from_api(facility_num, facility_name):
         middle_class_code = hotel[2]["hotelDetailInfo"]["middleClassCode"]
         small_class_code = hotel[2]["hotelDetailInfo"]["smallClassCode"]
 
-        if facility_name == hotel_name:
+        # 施設名の比較（念のためstripで前後の空白を除去して比較することを推奨）
+        if facility_name.strip() == hotel_name.strip():
             return {
                 "施設番号": facility_num,
                 "施設名": hotel_name,
@@ -122,7 +123,11 @@ def transform_data_for_csv(data_dict):
     row_list = []
 
     for line in facilities_raw:
-        parts = line.strip().split()
+        # === 修正箇所 ===
+        # maxsplit=1 を指定することで、最初の空白（施設番号と施設名の間）でのみ分割します。
+        # これにより、施設名の中にスペースが含まれていても正しく1つの文字列として扱われます。
+        parts = line.strip().split(maxsplit=1) 
+        
         if len(parts) < 2:
             errors.append(f"施設番号と施設名の形式が不正です: {line}")
             continue
@@ -163,10 +168,6 @@ def transform_data_for_csv(data_dict):
 
     return {"rows": row_list}
 
-
-
-
-
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -185,7 +186,8 @@ def convert():
     result = transform_data_for_csv(data_dict)
 
     if "error" in result:
-        return f"<h1>エラー:</h1><h2>{result['error']}</h2>", 400
+        # エラー表示を見やすく改行を<br>に置換
+        return f"<h1>エラー:</h1><h2>{result['error'].replace(chr(10), '<br>')}</h2>", 400
 
     csv_rows = result["rows"]
 
@@ -204,4 +206,3 @@ def convert():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
-
