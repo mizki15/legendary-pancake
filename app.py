@@ -198,7 +198,7 @@ def convert():
     output.seek(0)
 
     return send_file(
-        io.BytesIO(output.getvalue().encode("utf-8-sig")),
+        io.BytesIO(output.getvalue().encode("shift_jis", errors="replace")),
         mimetype="text/csv",
         as_attachment=True,
         download_name="converted.csv",
