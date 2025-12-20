@@ -90,25 +90,19 @@ def make_row_list_from_dict(data_dict):
         "Ａ"
     ]
 
-# === 追加した関数 ===
 def get_active_days(start_date_str, end_date_str):
     """期間内に含まれる曜日コードの集合を返す"""
     try:
         start_date = datetime.strptime(start_date_str, "%Y/%m/%d")
         end_date = datetime.strptime(end_date_str, "%Y/%m/%d")
     except ValueError:
-        return set() # 日付変換エラーの場合は空集合
+        return set()
 
-    # 期間が7日以上の場合は全ての曜日が含まれる
     if (end_date - start_date).days >= 6:
         return set(youbi_list)
 
     active_days = set()
     current_date = start_date
-    
-    # Pythonのweekday(): 0=月, 1=火 ... 5=土, 6=日
-    # youbi_listのインデックス: 0=SUN, 1=MON ... 6=SAT
-    # 対応用マップ
     weekday_map = {0: "MON", 1: "TUE", 2: "WED", 3: "THU", 4: "FRI", 5: "SAT", 6: "SUN"}
 
     while current_date <= end_date:
@@ -141,7 +135,14 @@ def transform_data_for_csv(data_dict):
         errors.append("販売期間(from)の日付形式が不正です")
     if not hanbai_to:
         errors.append("販売期間(to)の日付形式が不正です")
-    if ninzu not in ["1", "2"]:
+
+    # === 変更箇所: 人数オプションの判定 ===
+    target_ninzu_list = []
+    if ninzu == "全て":
+        target_ninzu_list = ["1", "2"]
+    elif ninzu in ["1", "2"]:
+        target_ninzu_list = [ninzu]
+    else:
         errors.append("参加人数オプションが選択されていません")
 
     if errors:
@@ -170,27 +171,27 @@ def transform_data_for_csv(data_dict):
                 errors.append(f"出発期間の日付形式が不正です: {' '.join(rate[:2])}")
                 continue
 
-            # === 変更箇所: 期間内の曜日を取得 ===
             active_days_in_period = get_active_days(dep_from, dep_to)
 
-            new_dict = api_result.copy()
-            new_dict["販売期間(from)"] = hanbai_from
-            new_dict["販売期間(to)"] = hanbai_to
-            new_dict["出発期間(from)"] = dep_from
-            new_dict["出発期間(to)"] = dep_to
-            new_dict["発空港"] = hatsu_airport
-            new_dict["参加人数オプション"] = ninzu
-            new_dict["粗利率1"] = rate[2]
-            new_dict["粗利率2"] = rate[3]
-            new_dict["粗利率3"] = rate[4]
-            new_dict["時間"] = datetime.now(JST).strftime("%Y/%m/%d %H:%M:%S")
+            # === 変更箇所: 人数のループを追加 ===
+            for current_ninzu in target_ninzu_list:
+                new_dict = api_result.copy()
+                new_dict["販売期間(from)"] = hanbai_from
+                new_dict["販売期間(to)"] = hanbai_to
+                new_dict["出発期間(from)"] = dep_from
+                new_dict["出発期間(to)"] = dep_to
+                new_dict["発空港"] = hatsu_airport
+                new_dict["参加人数オプション"] = current_ninzu  # 現在ループ中の人数を設定
+                new_dict["粗利率1"] = rate[2]
+                new_dict["粗利率2"] = rate[3]
+                new_dict["粗利率3"] = rate[4]
+                new_dict["時間"] = datetime.now(JST).strftime("%Y/%m/%d %H:%M:%S")
 
-            for youbi in youbi_list:
-                # === 変更箇所: 対象の曜日が含まれている場合のみ行を作成 ===
-                if youbi in active_days_in_period:
-                    tmp = new_dict.copy()
-                    tmp["曜日"] = youbi
-                    row_list.append(make_row_list_from_dict(tmp))
+                for youbi in youbi_list:
+                    if youbi in active_days_in_period:
+                        tmp = new_dict.copy()
+                        tmp["曜日"] = youbi
+                        row_list.append(make_row_list_from_dict(tmp))
 
     if errors:
         return {"error": "\n".join(errors)}
