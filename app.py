@@ -241,3 +241,8 @@ if __name__ == "__main__":
 @app.route("/rocket")
 def rocket():
     return render_template("rocket.html")
+
+#rocket_mobile
+@app.route("/rocket_mobile")
+def rocket_mobile():
+    return render_template("rocket_mobile.html")
