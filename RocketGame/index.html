@@ -92,16 +92,16 @@ const minimapCtx = minimapCanvas.getContext('2d');
 /* -------------------------
    定数（ゲームスケール）
    ------------------------- */
-const G = 10;                      // 重力スケール（ゲーム調整）
+const G = 9;                      // 重力スケール（ゲーム調整）
 const EARTH_MASS = 5000;
 const EARTH_RADIUS = 800;
 const EARTH_ROTATION_SPEED = 0.005; // 地球自転（ゲーム内）
-const EARTH_SAFE_LANDING_SPEED = 2.0; // 地球の安全着地相対速度
+const EARTH_SAFE_LANDING_SPEED = 3.0; // 地球の安全着地相対速度
 
 const MOON_MASS = 5000/8;
 const MOON_RADIUS = 200;
 const MOON_INITIAL_DISTANCE = 3000;
-const MOON_ORBIT_PERIOD = 50000;
+const MOON_ORBIT_PERIOD = 40000;
 const MOON_ORBIT_ECCENTRICITY = 0.1;
 
 const ROCKET_THRUST = 0.15;
