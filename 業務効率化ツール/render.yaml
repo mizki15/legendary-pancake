@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: legendary-pancake
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: RAKUTEN_APP_ID
+        value: YOUR_APP_ID
+      - key: RAKUTEN_AFFILIATE_ID
+        value: YOUR_AFF_ID
