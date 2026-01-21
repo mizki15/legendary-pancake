@@ -92,11 +92,11 @@ const minimapCtx = minimapCanvas.getContext('2d');
 /* -------------------------
    定数（ゲームスケール）
    ------------------------- */
-const G = 9;                      // 重力スケール（ゲーム調整）
+const G = 6;                      // 重力スケール（ゲーム調整）
 const EARTH_MASS = 5000;
 const EARTH_RADIUS = 800;
 const EARTH_ROTATION_SPEED = 0.005; // 地球自転（ゲーム内）
-const EARTH_SAFE_LANDING_SPEED = 3.0; // 地球の安全着地相対速度
+const EARTH_SAFE_LANDING_SPEED = 1.0; // 地球の安全着地相対速度
 
 const MOON_MASS = 5000/8;
 const MOON_RADIUS = 200;
@@ -104,9 +104,9 @@ const MOON_INITIAL_DISTANCE = 3000;
 const MOON_ORBIT_PERIOD = 40000;
 const MOON_ORBIT_ECCENTRICITY = 0.1;
 
-const ROCKET_THRUST = 0.15;
+const ROCKET_THRUST = 0.05;
 const ROTATION_SPEED = 0.02;
-const FUEL_CONSUMPTION = 0.3;
+const FUEL_CONSUMPTION = 1.5;
 const ROCKET_RADIUS = 10;
 
 /* -------------------------
@@ -125,7 +125,7 @@ const moon  = { x:0, y:0, r: MOON_RADIUS, m: MOON_MASS, color: '#BDC3C7' };
 
 const rocket = {
     x:0, y:0, vx:0, vy:0, angle:0,
-    fuel:200, maxFuel:200, radius: ROCKET_RADIUS,
+    fuel:1000, maxFuel:1000, radius: ROCKET_RADIUS,
     active:false,   // 動作中か（飛行中か）
     landed:false    // 着地中か
 };
@@ -440,11 +440,11 @@ function drawRocket() {
     // ===== 本体（丸っこい）=====
     ctx.fillStyle = "#f5f5f5";
     ctx.beginPath();
-    ctx.ellipse(0, 0, 8, 14, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, 0, 5, 11, 0, 0, Math.PI * 2);
     ctx.fill();
 
     // ===== 先端（赤い帽子）=====
-    ctx.fillStyle = "#e74c3c";
+    ctx.fillStyle = "#ff000083";
     ctx.beginPath();
     ctx.moveTo(0, -18);
     ctx.quadraticCurveTo(10, -6, 0, -4);
