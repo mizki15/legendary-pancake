@@ -118,7 +118,7 @@ let camera = { x:0, y:0 };
 let stars = [];
 let keys = {};
 let gameOver = false;
-let moonOrbitAngle = Math.random() * Math.PI * 2;
+let moonOrbitAngle = Math.random() * Math.PI;
 
 const earth = { x:0, y:0, r: EARTH_RADIUS, m: EARTH_MASS, color: '#2E86C1' };
 const moon  = { x:0, y:0, r: MOON_RADIUS, m: MOON_MASS, color: '#BDC3C7' };
@@ -197,7 +197,7 @@ function resetGame(){
     keys = {};
 
     // 月を初期化
-    moonOrbitAngle = Math.random() * Math.PI * 2;
+    moonOrbitAngle = Math.random() * Math.PI;
     updateMoonPosition();
 
     camera.x = -rocket.x + width/2;
