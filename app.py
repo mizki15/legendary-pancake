@@ -242,7 +242,17 @@ if __name__ == "__main__":
 def rocket():
     return render_template("rocket.html")
 
+#rocket_orbit
+@app.route("/rocket_orbit")
+def rocket_orbit():
+    return render_template("rocket_orbit.html")
+
 #rocket_mobile
 @app.route("/rocket_mobile")
 def rocket_mobile():
     return render_template("rocket_mobile.html")
+
+#rocket_mobile_orbit
+@app.route("/rocket_mobile_orbit")
+def rocket_mobile_orbit():
+    return render_template("rocket_mobile_orbit.html")
