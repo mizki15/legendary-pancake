@@ -1,0 +1,590 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<title>Rocket Game - Mobile (Trajectory)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1.0,user-scalable=no" />
+<style>
+  :root{
+    --bg:#050505;
+    --ui-bg: rgba(0,0,0,0.6);
+    --accent: #00aaff;
+    --accent-2: #0088cc;
+    --danger: #ff6666;
+    --hud-size: 16px;
+  }
+  html,body{ height:100%; margin:0; background:var(--bg); color:#fff; font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "メイリオ", sans-serif; -webkit-tap-highlight-color: transparent; }
+  canvas{ display:block; touch-action: none; } /* disable default gestures on canvas */
+  #ui-layer{
+    position:absolute; left:8px; right:8px; top:8px; display:flex; gap:8px; align-items:flex-start; pointer-events:none; z-index:50;
+  }
+  .hud-block{
+    pointer-events:auto;
+    background: var(--ui-bg);
+    padding:8px 10px; border-radius:10px; border:1px solid rgba(255,255,255,0.03);
+    display:flex; flex-direction:column; gap:6px; min-width:84px;
+    font-size: var(--hud-size); line-height:1.1;
+  }
+  .hud-text {font-weight:600; color:#eee}
+  #minimap-container{ width:120px; height:120px; border-radius:8px; overflow:hidden; border:1px solid var(--accent); background:rgba(0,0,0,0.3); }
+  #message-overlay{
+    position:absolute; left:12px; right:12px; top:50%; transform:translateY(-50%);
+    z-index:60; min-height:120px; background: rgba(0,20,50,0.98); padding:18px; border-radius:12px; border:2px solid var(--accent);
+    display:none; color:#ddd; text-align:center;
+  }
+  #msg-title{ font-size:20px; margin:0 0 8px; color:var(--accent); }
+  #msg-desc{ margin:0; font-size:15px; color:#dfeffb; }
+  .big-btn { margin-top:12px; display:inline-block; padding:10px 14px; border-radius:8px; background:var(--accent); color:white; border:none; font-weight:700; }
+  .big-btn:active{ background:var(--accent-2); }
+
+  /* bottom touch controls */
+  #touch-controls{
+    position: absolute; left:0; right:0; bottom:8px; display:flex; justify-content:space-between; padding:0 8px; z-index:55; pointer-events:none;
+  }
+  .control-side{ pointer-events:auto; display:flex; gap:12px; align-items:flex-end; }
+  .btn{
+    width:78px; height:78px; border-radius:50%; background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.06);
+    display:flex; align-items:center; justify-content:center; color:white; font-weight:800; font-size:20px; user-select:none;
+    -webkit-user-select:none; touch-action:none;
+  }
+  .btn:active{ transform: scale(0.96); }
+  #btn-thrust{ width:92px; height:92px; font-size:18px; background: linear-gradient(180deg,#ff8a00,#ffbb33); color:#111; border: none; box-shadow: 0 6px 18px rgba(0,0,0,0.4);}
+
+  /* small screens adjust */
+  @media (max-width:380px){
+    :root{ --hud-size:14px; }
+    .btn{ width:64px; height:64px; font-size:18px; }
+    #btn-thrust{ width:80px; height:80px; }
+    #minimap-container{ width:100px; height:100px; }
+  }
+
+  /* fullscreen hint */
+  #start-screen{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:70; pointer-events:auto;
+    background: linear-gradient(0deg, rgba(0,0,0,0.6), rgba(0,0,0,0.15));
+    flex-direction:column; gap:12px; padding:18px;
+  }
+  #start-screen .start-btn{ padding:12px 18px; background:var(--accent); border-radius:10px; font-weight:800; color:#fff; border:none; }
+  #start-screen .hint{ color:#cfeaff; font-size:14px; text-align:center; max-width:280px; }
+  .error-msg{ color:var(--danger) !important; font-weight:800; }
+</style>
+</head>
+<body>
+  <canvas id="gameCanvas"></canvas>
+
+  <div id="ui-layer">
+    <div class="hud-block" id="hud-left">
+      <div class="hud-text" id="hud-fuel">FUEL: 0</div>
+      <div class="hud-text" id="hud-vel">VEL: 0</div>
+    </div>
+
+    <div style="flex:1"></div>
+
+    <div class="hud-block" id="hud-right" style="align-items:flex-end;">
+      <div class="hud-text" id="hud-earth">DIST (Earth): 0</div>
+      <div class="hud-text" id="hud-moon">DIST (Moon): 0</div>
+      <div style="height:8px"></div>
+      <div id="minimap-container"><canvas id="minimap-canvas"></canvas></div>
+    </div>
+  </div>
+
+  <div id="touch-controls">
+    <div class="control-side" style="padding-left:6px;">
+      <div id="btn-left" class="btn" aria-label="left">◀</div>
+      <div id="btn-right" class="btn" aria-label="right">▶</div>
+    </div>
+    <div class="control-side" style="padding-right:6px; justify-content:flex-end;">
+      <div id="btn-thrust" class="btn" aria-label="thrust">▲</div>
+    </div>
+  </div>
+
+  <div id="message-overlay" role="dialog" aria-live="polite">
+    <h1 id="msg-title">Loading...</h1>
+    <p id="msg-desc">Please wait.</p>
+    <div>
+      <button id="restart-btn" class="big-btn" onclick="resetGame()">再挑戦</button>
+    </div>
+  </div>
+
+  <div id="start-screen">
+    <div class="hint">タップして開始。</div>
+    <button id="btn-start" class="start-btn">Start / 全画面</button>
+    <div style="font-size:12px; color:#cfeaff; opacity:0.9">Controls: 左/右で回転、上で噴射。</div>
+  </div>
+
+<script>
+/* -------------------------
+   モバイル最適化版 + 軌跡 (Trajectory)
+   ------------------------- */
+
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d', { alpha: false });
+
+const minimapCanvas = document.getElementById('minimap-canvas');
+const minimapCtx = minimapCanvas.getContext('2d');
+
+let DPR = Math.max(window.devicePixelRatio || 1, 1);
+let width = 0, height = 0;
+let camera = {x:0, y:0};
+let keys = {};
+let gameOver = false;
+let stars = [];
+let starCount = 400; 
+let moonOrbitAngle = Math.random() * Math.PI * 2;
+
+// Game constants
+const G = 6;
+const EARTH_MASS = 5000;
+const EARTH_RADIUS = 800;
+const EARTH_ROTATION_SPEED = 0.005;
+
+const MOON_MASS = 5000/8;
+const MOON_RADIUS = 200;
+const MOON_INITIAL_DISTANCE = 3000;
+const MOON_ORBIT_PERIOD = 40000;
+const MOON_ORBIT_ECCENTRICITY = 0.1;
+
+const ROCKET_THRUST = 0.05;
+const ROTATION_SPEED = 0.02;
+const FUEL_CONSUMPTION = 0.5;
+const ROCKET_RADIUS = 10;
+
+// ★ 軌跡設定
+const TRAJECTORY_MAX_POINTS = 1500; // モバイル用に少し控えめ
+const TRAJECTORY_INTERVAL = 4;
+let trajectory = [];
+let frameCount = 0;
+
+const earth = { x:0, y:0, r: EARTH_RADIUS, m: EARTH_MASS, color: '#2E86C1' };
+const moon  = { x:0, y:0, r: MOON_RADIUS, m: MOON_MASS, color: '#BDC3C7' };
+
+const rocket = { x:0, y:0, vx:0, vy:0, angle:0, fuel:1000, maxFuel:1000, radius: ROCKET_RADIUS, active:false, landed:true };
+
+function setCanvasSize(){
+  DPR = Math.max(window.devicePixelRatio || 1, 1);
+  width = window.innerWidth;
+  height = window.innerHeight;
+
+  canvas.style.width = width + 'px';
+  canvas.style.height = height + 'px';
+  canvas.width = Math.round(width * DPR);
+  canvas.height = Math.round(height * DPR);
+
+  const mmW = Math.min(150, Math.floor(width * 0.22));
+  minimapCanvas.style.width = mmW + 'px';
+  minimapCanvas.style.height = mmW + 'px';
+  minimapCanvas.width = Math.round(mmW * DPR);
+  minimapCanvas.height = Math.round(mmW * DPR);
+
+  // 描画スケール統一
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  minimapCtx.setTransform(DPR, 0, 0, DPR, 0, 0);
+}
+window.addEventListener('resize', () => { setCanvasSize(); createStars(); });
+
+/* -------------------------
+   stars
+   ------------------------- */
+function createStars(){
+  if (width < 420) starCount = 220;
+  else if (width < 700) starCount = 350;
+  else starCount = 600;
+
+  stars = [];
+  for(let i=0;i<starCount;i++){
+    stars.push({ x:(Math.random()-0.5)*12000, y:(Math.random()-0.5)*12000, size: Math.random()*1.6 });
+  }
+}
+
+/* -------------------------
+   helpers
+   ------------------------- */
+function getDistance(a,b){ return Math.hypot(a.x - b.x, a.y - b.y); }
+
+/* -------------------------
+   moon pos
+   ------------------------- */
+function updateMoonPosition(){
+  moonOrbitAngle += (2*Math.PI / MOON_ORBIT_PERIOD);
+  const a = MOON_INITIAL_DISTANCE;
+  const e = MOON_ORBIT_ECCENTRICITY;
+  const r_moon = a*(1-e*e) / (1 + e*Math.cos(moonOrbitAngle));
+  moon.x = earth.x + r_moon * Math.cos(moonOrbitAngle);
+  moon.y = earth.y + r_moon * Math.sin(moonOrbitAngle);
+}
+
+/* -------------------------
+   reset / init
+   ------------------------- */
+function resetGame(){
+  rocket.vx = 0; rocket.vy = 0;
+  rocket.x = 0;
+  rocket.y = -earth.r - rocket.radius + 5;
+  rocket.angle = Math.atan2(rocket.y - earth.y, rocket.x - earth.x);
+  rocket.fuel = rocket.maxFuel;
+  rocket.active = false; rocket.landed = true;
+  gameOver = false;
+  keys = {};
+  
+  // 軌跡リセット
+  trajectory = [];
+  frameCount = 0;
+
+  moonOrbitAngle = Math.random() * Math.PI * 2;
+  updateMoonPosition();
+  camera.x = -rocket.x + width/2; camera.y = -rocket.y + height/2;
+  document.getElementById('message-overlay').style.display = 'none';
+}
+
+/* -------------------------
+   collision
+   ------------------------- */
+function checkCollision(){
+  if (rocket.landed) return;
+
+  const dEarth = getDistance(rocket, earth);
+  if (dEarth < earth.r + rocket.radius){
+    const relSpeed = Math.hypot(rocket.vx, rocket.vy);
+    endGame("Mission Failed", `地球に激突しました。速度: ${relSpeed.toFixed(1)}`);
+    return;
+  }
+
+  const dMoon = getDistance(rocket, moon);
+  if (dMoon < moon.r + rocket.radius){
+    const speed = Math.hypot(rocket.vx, rocket.vy);
+    if (speed < 3) endGame("Success!", "月面着陸成功！おめでとうございます。");
+    else endGame("Mission Failed", `月面に激突しました。速度: ${speed.toFixed(1)} (安全速度: 3.0未満)`);
+  }
+}
+
+/* -------------------------
+   gravity
+   ------------------------- */
+function applyGravity(body){
+  const dx = body.x - rocket.x, dy = body.y - rocket.y;
+  const distSq = dx*dx + dy*dy;
+  const dist = Math.sqrt(distSq);
+  if (dist < 1) return;
+  const force = G * body.m / distSq;
+  rocket.vx += force * (dx/dist);
+  rocket.vy += force * (dy/dist);
+}
+
+/* -------------------------
+   physics update
+   ------------------------- */
+function updatePhysics(){
+  if (gameOver) return;
+  frameCount++;
+  updateMoonPosition();
+
+  if (rocket.landed){
+    rocket.angle = Math.atan2(rocket.y - earth.y, rocket.x - earth.x);
+    if ((keys['ArrowUp'] || keys['TouchUp']) && rocket.fuel > 0){
+      const lift = rocket.radius + 2;
+      const nx = Math.cos(rocket.angle), ny = Math.sin(rocket.angle);
+      rocket.x += nx * lift; rocket.y += ny * lift;
+      rocket.vx += nx * ROCKET_THRUST * 4; rocket.vy += ny * ROCKET_THRUST * 4;
+      rocket.active = true; rocket.landed = false;
+      rocket.fuel = Math.max(0, rocket.fuel - FUEL_CONSUMPTION * 4);
+    }
+    return;
+  }
+
+  if (rocket.active){
+    if (keys['ArrowLeft'] || keys['TouchLeft']) rocket.angle -= ROTATION_SPEED;
+    if (keys['ArrowRight'] || keys['TouchRight']) rocket.angle += ROTATION_SPEED;
+    if ((keys['ArrowUp'] || keys['TouchUp']) && rocket.fuel > 0){
+      rocket.vx += Math.cos(rocket.angle) * ROCKET_THRUST;
+      rocket.vy += Math.sin(rocket.angle) * ROCKET_THRUST;
+      rocket.fuel -= FUEL_CONSUMPTION;
+    }
+  }
+
+  // gravity
+  applyGravity(earth);
+  applyGravity(moon);
+
+  // integrate
+  rocket.x += rocket.vx;
+  rocket.y += rocket.vy;
+
+  // ★ 軌跡記録
+  if (!rocket.landed && frameCount % TRAJECTORY_INTERVAL === 0) {
+      trajectory.push({x: rocket.x, y: rocket.y});
+      if (trajectory.length > TRAJECTORY_MAX_POINTS) trajectory.shift();
+  }
+
+  checkCollision();
+
+  if (rocket.fuel < 0) rocket.fuel = 0;
+}
+
+/* -------------------------
+   drawing
+   ------------------------- */
+function drawBody(body){
+  if (body === earth){
+    const grad = ctx.createRadialGradient(body.x - body.r * 0.3, body.y - body.r * 0.3, body.r * 0.2, body.x, body.y, body.r);
+    grad.addColorStop(0, "#5dade2"); grad.addColorStop(0.5, "#2874a6"); grad.addColorStop(1, "#0b3d91");
+    ctx.fillStyle = grad;
+    ctx.beginPath(); ctx.arc(body.x, body.y, body.r, 0, Math.PI*2); ctx.fill();
+
+    ctx.strokeStyle = "rgba(120,180,255,0.25)"; ctx.lineWidth = 10; ctx.beginPath();
+    ctx.arc(body.x, body.y, body.r + 5, 0, Math.PI*2); ctx.stroke(); ctx.lineWidth = 1;
+    return;
+  }
+  if (body === moon){
+    const grad = ctx.createRadialGradient(body.x - body.r * 0.4, body.y - body.r * 0.4, body.r * 0.2, body.x, body.y, body.r);
+    grad.addColorStop(0, "#eeeeee"); grad.addColorStop(1, "#9e9e9e");
+    ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(body.x, body.y, body.r, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = "rgba(0,0,0,0.15)";
+    for (let i=0;i<6;i++){
+      const a=(i/6)*Math.PI*2; const r=body.r*0.5;
+      ctx.beginPath(); ctx.arc(body.x + Math.cos(a)*r, body.y + Math.sin(a)*r, body.r*0.1, 0, Math.PI*2); ctx.fill();
+    }
+    return;
+  }
+  ctx.fillStyle = body.color || "#fff"; ctx.beginPath(); ctx.arc(body.x, body.y, body.r,0,Math.PI*2); ctx.fill();
+}
+
+function drawRocket(){
+  ctx.save();
+  ctx.translate(rocket.x, rocket.y);
+  ctx.rotate(rocket.angle + Math.PI/2);
+
+  ctx.fillStyle = "#f5f5f5";
+  ctx.beginPath(); ctx.ellipse(0,0,5,11,0,0,Math.PI*2); ctx.fill();
+
+  ctx.fillStyle = "#ff000083";
+  ctx.beginPath(); ctx.moveTo(0,-18); ctx.quadraticCurveTo(10,-6,0,-4); ctx.quadraticCurveTo(-10,-6,0,-18); ctx.fill();
+
+  ctx.fillStyle = "#5dade2"; ctx.beginPath(); ctx.arc(0,-2,3.5,0,Math.PI*2); ctx.fill();
+
+  ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 1.5; ctx.stroke();
+
+  ctx.fillStyle = "#c0392b";
+  ctx.beginPath(); ctx.moveTo(-6,6); ctx.lineTo(-14,12); ctx.lineTo(-6,10); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(6,6); ctx.lineTo(14,12); ctx.lineTo(6,10); ctx.closePath(); ctx.fill();
+
+  if ((rocket.active && (keys['ArrowUp'] || keys['TouchUp'])) && rocket.fuel > 0){
+    const flameLength = 12 + Math.random() * 6;
+    ctx.fillStyle = "rgba(255,170,50,0.9)";
+    ctx.beginPath(); ctx.moveTo(-3,14); ctx.quadraticCurveTo(0,14+flameLength,3,14); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = "rgba(255,240,180,0.9)";
+    ctx.beginPath(); ctx.moveTo(-1.5,14); ctx.quadraticCurveTo(0,14+flameLength*0.6,1.5,14); ctx.closePath(); ctx.fill();
+  }
+
+  ctx.restore();
+}
+
+// ★ 軌跡描画
+function drawTrajectory() {
+    if (trajectory.length < 2) return;
+    ctx.save();
+    ctx.translate(camera.x, camera.y);
+    ctx.strokeStyle = "rgba(100, 255, 100, 0.4)";
+    ctx.lineWidth = 2;
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(trajectory[0].x, trajectory[0].y);
+    for (let i = 1; i < trajectory.length; i++) {
+        ctx.lineTo(trajectory[i].x, trajectory[i].y);
+    }
+    ctx.stroke();
+    ctx.restore();
+}
+
+function draw(){
+  // camera lerp
+  const targetCamX = -rocket.x + width/2;
+  const targetCamY = -rocket.y + height/2;
+  if (isFinite(targetCamX) && isFinite(targetCamY)){
+    camera.x += (targetCamX - camera.x) * 0.12;
+    camera.y += (targetCamY - camera.y) * 0.12;
+  }
+
+  // background
+  ctx.fillStyle = '#050505';
+  ctx.fillRect(0,0,width,height);
+
+  ctx.save();
+  ctx.translate(camera.x, camera.y);
+
+  // stars (simple)
+  ctx.fillStyle = 'white';
+  for (let s of stars){
+    const sx = s.x + camera.x, sy = s.y + camera.y;
+    if (sx > -80 && sx < width + 80 && sy > -80 && sy < height + 80){
+      ctx.globalAlpha = Math.random()*0.6 + 0.25;
+      ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI*2); ctx.fill();
+    }
+  }
+  ctx.globalAlpha = 1.0;
+  ctx.restore(); // restore before trajectory
+
+  // ★ 軌跡を描画
+  drawTrajectory();
+
+  // Bodies
+  ctx.save();
+  ctx.translate(camera.x, camera.y);
+  drawBody(earth); drawBody(moon); drawRocket();
+  
+  // 速度ベクトル
+  ctx.strokeStyle = 'rgba(255, 111, 0, 0.36)';
+  ctx.beginPath(); ctx.moveTo(rocket.x, rocket.y); ctx.lineTo(rocket.x + rocket.vx * 30, rocket.y + rocket.vy * 30); ctx.stroke();
+
+  ctx.restore();
+
+  updateUI();
+  drawMinimap();
+  drawTargetArrows();
+}
+
+/* -------------------------
+   UI / minimap
+   ------------------------- */
+function updateUI(){
+  const speed = Math.hypot(rocket.vx, rocket.vy).toFixed(1);
+  const distEarth = Math.max(0, Math.hypot(rocket.x-earth.x, rocket.y-earth.y) - earth.r - rocket.radius).toFixed(0);
+  const distMoon  = Math.max(0, Math.hypot(rocket.x-moon.x, rocket.y-moon.y) - moon.r - rocket.radius).toFixed(0);
+
+  const fuelEl = document.getElementById('hud-fuel');
+  fuelEl.innerText = `FUEL: ${Math.floor(rocket.fuel)}`;
+  fuelEl.style.color = rocket.fuel < 200 ? 'red' : '#eee';
+  document.getElementById('hud-vel').innerText = `VEL: ${speed} m/s`;
+  document.getElementById('hud-earth').innerText = `DIST (Earth): ${distEarth} px`;
+  document.getElementById('hud-moon').innerText = `DIST (Moon): ${distMoon} px`;
+}
+
+function drawMinimap(){
+  const mm = minimapCanvas;
+  // Canvasの論理サイズ(DPR考慮なし)でクリア
+  minimapCtx.clearRect(0,0,mm.width/DPR, mm.height/DPR);
+  const scale = 0.01;
+  const cx = mm.width/DPR/2;
+  const cy = mm.height/DPR/2;
+
+  // ★ ミニマップ軌跡
+  if (trajectory.length > 1) {
+      minimapCtx.strokeStyle = "rgba(100, 255, 100, 0.6)";
+      minimapCtx.lineWidth = 1;
+      minimapCtx.beginPath();
+      minimapCtx.moveTo(cx + (trajectory[0].x - earth.x)*scale, cy + (trajectory[0].y - earth.y)*scale);
+      for (let i = 1; i < trajectory.length; i++) {
+          minimapCtx.lineTo(cx + (trajectory[i].x - earth.x)*scale, cy + (trajectory[i].y - earth.y)*scale);
+      }
+      minimapCtx.stroke();
+  }
+
+  minimapCtx.fillStyle = 'white';
+  minimapCtx.beginPath(); minimapCtx.arc(cx + (rocket.x - earth.x)*scale, cy + (rocket.y - earth.y)*scale, 2, 0, Math.PI*2); minimapCtx.fill();
+
+  minimapCtx.fillStyle = earth.color;
+  minimapCtx.beginPath(); minimapCtx.arc(cx, cy, earth.r*scale, 0, Math.PI*2); minimapCtx.fill();
+
+  minimapCtx.fillStyle = moon.color;
+  minimapCtx.beginPath(); minimapCtx.arc(cx + (moon.x - earth.x)*scale, cy + (moon.y - earth.y)*scale, moon.r*scale, 0, Math.PI*2); minimapCtx.fill();
+}
+
+/* -------------------------
+   target arrows
+   ------------------------- */
+function drawTargetArrows(){
+  if (!isFinite(rocket.x) || !isFinite(moon.x)) return;
+  const arrowSize = 18; const margin = 36;
+  const rocketScreenX = rocket.x + camera.x; const rocketScreenY = rocket.y + camera.y;
+  const radius = Math.max(60, Math.min(width, height) * 0.42 - margin - arrowSize);
+
+  function drawArrowTo(tx, ty, color){
+    const targetScreenX = tx + camera.x, targetScreenY = ty + camera.y;
+    if (targetScreenX > 0 && targetScreenX < width && targetScreenY > 0 && targetScreenY < height) return;
+    const dx = tx - rocket.x, dy = ty - rocket.y;
+    const angle = Math.atan2(dy, dx);
+    const arrowX = rocketScreenX + Math.cos(angle) * radius;
+    const arrowY = rocketScreenY + Math.sin(angle) * radius;
+
+    ctx.save(); ctx.translate(arrowX, arrowY); ctx.rotate(angle);
+    ctx.fillStyle = color; ctx.beginPath(); ctx.moveTo(arrowSize,0); ctx.lineTo(0,-arrowSize/3); ctx.lineTo(0,arrowSize/3); ctx.closePath(); ctx.fill();
+    ctx.restore();
+  }
+
+  drawArrowTo(moon.x, moon.y, moon.color);
+  drawArrowTo(earth.x, earth.y, earth.color);
+}
+
+/* -------------------------
+   endGame overlay
+   ------------------------- */
+function endGame(title, desc){
+  if (gameOver) return;
+  gameOver = true;
+  const titleEl = document.getElementById('msg-title');
+  titleEl.innerText = title;
+  titleEl.className = (title === "Success!") ? "" : "error-msg";
+  document.getElementById('msg-desc').innerText = desc;
+  document.getElementById('message-overlay').style.display = 'block';
+}
+
+/* -------------------------
+   main loop
+   ------------------------- */
+function loop(){
+  updatePhysics();
+  draw();
+  requestAnimationFrame(loop);
+}
+
+/* -------------------------
+   input
+   ------------------------- */
+window.addEventListener('keydown', (e)=>{ if (e.code==='ArrowUp' || e.code==='ArrowLeft' || e.code==='ArrowRight'){ keys[e.code]=true; e.preventDefault(); }});
+window.addEventListener('keyup', (e)=>{ if (e.code==='ArrowUp' || e.code==='ArrowLeft' || e.code==='ArrowRight'){ keys[e.code]=false; e.preventDefault(); }});
+
+function bindButton(el, keyName){
+  let active = false;
+  const start = (e) => {
+    e.preventDefault();
+    active = true; keys[keyName] = true;
+  };
+  const end = (e) => {
+    e.preventDefault();
+    active = false; keys[keyName] = false;
+  };
+  el.addEventListener('pointerdown', start);
+  window.addEventListener('pointerup', end);
+  el.addEventListener('pointercancel', end);
+  el.addEventListener('lostpointercapture', end);
+  el.addEventListener('touchstart', (e)=>e.preventDefault(), {passive:false});
+}
+
+bindButton(document.getElementById('btn-left'), 'TouchLeft');
+bindButton(document.getElementById('btn-right'), 'TouchRight');
+bindButton(document.getElementById('btn-thrust'), 'TouchUp');
+
+/* -------------------------
+   helpers / startup
+   ------------------------- */
+document.getElementById('btn-start').addEventListener('click', async ()=>{
+  try {
+    const elem = document.documentElement;
+    if (elem.requestFullscreen) await elem.requestFullscreen();
+    else if (elem.webkitRequestFullscreen) await elem.webkitRequestFullscreen();
+  } catch(e){}
+  document.getElementById('start-screen').style.display = 'none';
+  setCanvasSize(); createStars(); resetGame();
+});
+
+document.getElementById('message-overlay').addEventListener('click', (e)=>{
+  if (e.target.id === 'message-overlay') document.getElementById('message-overlay').style.display = 'none';
+});
+
+setCanvasSize();
+createStars();
+resetGame();
+loop();
+
+</script>
+</body>
+</html>
