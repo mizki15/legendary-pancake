@@ -281,7 +281,7 @@ def txtstore_save():
 
     try:
         res = requests.post(
-            "https://script.google.com/macros/s/AKfycbw3F5IrZAb1udux5Cae36gPFISKHRG-v6wB8X94zn5l7dfcUe0LioAduKjSuCkCAf-R/exec",
+            "https://script.google.com/macros/s/AKfycbwms2TFCe_m-uHQsaJUZ3SQbWKddtFm413BSNblBAKwxP2faJkz47DAYx2Vwb2zXL2p/exec",
             data={"text": text},
             timeout=5
         )
@@ -290,6 +290,7 @@ def txtstore_save():
         return f"保存失敗: {e}", 500
 
     return "保存しました（外部）"
+
 
 
 
