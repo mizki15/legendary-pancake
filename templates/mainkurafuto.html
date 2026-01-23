@@ -1,0 +1,277 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>MiniCraft Stable</title>
+<style>
+  body { margin:0; overflow:hidden; background:#000; }
+  #crosshair{
+    position:fixed; left:50%; top:50%;
+    width:16px; height:16px;
+    transform:translate(-50%,-50%);
+    pointer-events:none; z-index:10;
+  }
+  #crosshair:before,#crosshair:after{
+    content:""; position:absolute; background:white;
+  }
+  #crosshair:before{ left:0; top:7px; width:16px; height:2px; }
+  #crosshair:after{ top:0; left:7px; width:2px; height:16px; }
+</style>
+</head>
+<body>
+<div id="crosshair"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script>
+// =====================
+// 基本
+// =====================
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x87ceeb);
+
+const camera = new THREE.PerspectiveCamera(75, innerWidth/innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(innerWidth, innerHeight);
+document.body.appendChild(renderer.domElement);
+
+scene.add(new THREE.AmbientLight(0xffffff,0.6));
+const sun = new THREE.DirectionalLight(0xffffff,0.8);
+sun.position.set(50,100,50);
+scene.add(sun);
+
+// =====================
+// 定数
+// =====================
+const CHUNK_SIZE = 16;
+const RENDER_DISTANCE = 1;
+const MAX_REACH = 4.5;
+
+const PLAYER_HEIGHT = 1.6;
+const PLAYER_RADIUS = 0.3;
+
+// 物理（★ジャンプ低め）
+const gravity = -0.01;
+const jumpPower = 0.26;   // ← 約1.5ブロック
+const speed = 0.05;
+
+// =====================
+// ブロック
+// =====================
+const geo = new THREE.BoxGeometry(1,1,1);
+const mats = {
+  grass:new THREE.MeshStandardMaterial({color:0x55aa55}),
+  dirt:new THREE.MeshStandardMaterial({color:0x8b4513}),
+  wood:new THREE.MeshStandardMaterial({color:0x7a4a2e}),
+  leaf:new THREE.MeshStandardMaterial({color:0x228b22})
+};
+
+const blocks = [];
+const chunks = new Map();
+const key = (x,z)=>`${x},${z}`;
+
+// =====================
+// 地形生成
+// =====================
+function heightNoise(x,z){
+  return Math.floor(
+    3 +
+    Math.sin(x*0.15)*2 +
+    Math.cos(z*0.15)*2
+  );
+}
+
+function addBlock(x,y,z,mat){
+  const b = new THREE.Mesh(geo,mat);
+  b.position.set(x,y,z);
+  scene.add(b);
+  blocks.push(b);
+  return b;
+}
+
+function generateTree(x,y,z){
+  for(let i=0;i<4;i++) addBlock(x,y+i,z,mats.wood);
+  for(let dx=-2;dx<=2;dx++)
+    for(let dz=-2;dz<=2;dz++)
+      for(let dy=3;dy<=5;dy++)
+        if(Math.abs(dx)+Math.abs(dz)<4)
+          addBlock(x+dx,y+dy,z+dz,mats.leaf);
+}
+
+function generateChunk(cx,cz){
+  const k = key(cx,cz);
+  if(chunks.has(k)) return;
+
+  const list=[];
+  for(let x=0;x<CHUNK_SIZE;x++){
+    for(let z=0;z<CHUNK_SIZE;z++){
+      const wx=cx*CHUNK_SIZE+x;
+      const wz=cz*CHUNK_SIZE+z;
+      const h=heightNoise(wx,wz);
+      for(let y=0;y<=h;y++){
+        list.push(addBlock(wx,y-1,wz,y===h?mats.grass:mats.dirt));
+      }
+      if(Math.random()<0.02) generateTree(wx,h,wz);
+    }
+  }
+  chunks.set(k,list);
+}
+
+let lastCX=null,lastCZ=null;
+function updateChunks(px,pz){
+  const cx=Math.floor(px/CHUNK_SIZE);
+  const cz=Math.floor(pz/CHUNK_SIZE);
+  if(cx===lastCX && cz===lastCZ) return;
+  lastCX=cx; lastCZ=cz;
+
+  for(let x=-RENDER_DISTANCE;x<=RENDER_DISTANCE;x++)
+    for(let z=-RENDER_DISTANCE;z<=RENDER_DISTANCE;z++)
+      generateChunk(cx+x,cz+z);
+
+  for(const [k,list] of chunks){
+    const [x,z]=k.split(",").map(Number);
+    if(Math.abs(x-cx)>RENDER_DISTANCE || Math.abs(z-cz)>RENDER_DISTANCE){
+      list.forEach(b=>{
+        scene.remove(b);
+        blocks.splice(blocks.indexOf(b),1);
+      });
+      chunks.delete(k);
+    }
+  }
+}
+
+// =====================
+// プレイヤー
+// =====================
+const player={
+  pos:new THREE.Vector3(0,10,5),
+  velY:0,
+  yaw:0,pitch:0,
+  onGround:false
+};
+
+// 入力
+const keys={};
+addEventListener("keydown",e=>keys[e.key.toLowerCase()]=true);
+addEventListener("keyup",e=>keys[e.key.toLowerCase()]=false);
+
+renderer.domElement.addEventListener("click",()=>{
+  renderer.domElement.requestPointerLock();
+});
+addEventListener("mousemove",e=>{
+  if(document.pointerLockElement!==renderer.domElement) return;
+  player.yaw-=e.movementX*0.002;
+  player.pitch-=e.movementY*0.002;
+  player.pitch=Math.max(-Math.PI/2,Math.min(Math.PI/2,player.pitch));
+});
+
+// =====================
+// 当たり判定
+// =====================
+function groundCheck(){
+  player.onGround=false;
+  for(const b of blocks){
+    if(Math.abs(b.position.x-player.pos.x)>1) continue;
+    if(Math.abs(b.position.z-player.pos.z)>1) continue;
+
+    const dy=player.pos.y-b.position.y;
+    if(dy<=PLAYER_HEIGHT && dy>0){
+      player.pos.y=b.position.y+PLAYER_HEIGHT;
+      player.velY=0;
+      player.onGround=true;
+    }
+  }
+}
+
+function collideXZ(next){
+  const minY = player.pos.y - 0.1;
+  const maxY = player.pos.y + PLAYER_HEIGHT;
+
+  for(const b of blocks){
+    if(b.position.y+0.5<minY) continue;
+    if(b.position.y-0.5>maxY) continue;
+
+    const dx=Math.abs(next.x-b.position.x);
+    const dz=Math.abs(next.z-b.position.z);
+
+    if(dx<0.5+PLAYER_RADIUS &&
+       dz<0.5+PLAYER_RADIUS){
+      return true;
+    }
+  }
+  return false;
+}
+
+function tryMove(vec){
+  const nx=player.pos.clone(); nx.x+=vec.x;
+  if(!collideXZ(nx)) player.pos.x=nx.x;
+
+  const nz=player.pos.clone(); nz.z+=vec.z;
+  if(!collideXZ(nz)) player.pos.z=nz.z;
+}
+
+// =====================
+// 破壊・設置（浮かない）
+// =====================
+const raycaster=new THREE.Raycaster();
+addEventListener("mousedown",e=>{
+  raycaster.setFromCamera(new THREE.Vector2(0,0),camera);
+  const hit=raycaster.intersectObjects(blocks);
+  if(!hit.length||hit[0].distance>MAX_REACH) return;
+
+  const target=hit[0].object;
+  const n=hit[0].face.normal;
+
+  if(e.button===0){
+    scene.remove(target);
+    blocks.splice(blocks.indexOf(target),1);
+  }
+
+  if(e.button===2){
+    const x=target.position.x+n.x;
+    const y=target.position.y+n.y;
+    const z=target.position.z+n.z;
+
+    if(Math.abs(x-player.pos.x)<0.6 &&
+       Math.abs(z-player.pos.z)<0.6 &&
+       y<player.pos.y+PLAYER_HEIGHT &&
+       y+1>player.pos.y) return;
+
+    addBlock(x,y,z,mats.grass);
+  }
+});
+addEventListener("contextmenu",e=>e.preventDefault());
+
+// =====================
+// ループ
+// =====================
+function animate(){
+  requestAnimationFrame(animate);
+
+  updateChunks(player.pos.x,player.pos.z);
+
+  const dir=new THREE.Vector3(Math.sin(player.yaw),0,Math.cos(player.yaw));
+  const right=new THREE.Vector3(Math.sin(player.yaw-Math.PI/2),0,Math.cos(player.yaw-Math.PI/2));
+
+  if(keys.w) tryMove(dir.clone().multiplyScalar(-speed));
+  if(keys.s) tryMove(dir.clone().multiplyScalar(speed));
+  if(keys.d) tryMove(right.clone().multiplyScalar(-speed));
+  if(keys.a) tryMove(right.clone().multiplyScalar(speed));
+
+  if(keys[" "]&&player.onGround){
+    player.velY=jumpPower;
+    player.onGround=false;
+  }
+
+  player.velY+=gravity;
+  player.pos.y+=player.velY;
+  groundCheck();
+
+  camera.position.copy(player.pos);
+  camera.rotation.set(player.pitch,player.yaw,0,"YXZ");
+  renderer.render(scene,camera);
+}
+animate();
+</script>
+</body>
+</html>
