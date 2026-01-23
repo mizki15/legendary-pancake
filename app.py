@@ -292,6 +292,13 @@ def txtstore_save():
     return "保存しました（外部）"
 
 
+#mainkurafuto
+@app.route("/mainkurafuto")
+def mainkurafuto():
+    return render_template("mainkurafuto.html")
 
-
+#keiba
+@app.route("/keiba")
+def keiba():
+    return render_template("keiba.html")
 
