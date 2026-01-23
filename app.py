@@ -270,23 +270,21 @@ def rocket_mobile_orbit():
 # =========================
 # txt store
 # =========================
-
-TXT_SAVE_DIR = "txt_saved"
-TXT_SAVE_FILE = os.path.join(TXT_SAVE_DIR, "stored_text.txt")
-
-os.makedirs(TXT_SAVE_DIR, exist_ok=True)
-
-@app.route("/txtstore")
-def txtstore():
-    return render_template("txtstore.html")
-
 @app.route("/txtstore/save", methods=["POST"])
 def txtstore_save():
     text = request.form.get("text", "")
 
-    with open(TXT_SAVE_FILE, "w", encoding="utf-8") as f:
-        f.write(text)
+    try:
+        res = requests.post(
+            "GASのURLをここに",
+            data={"text": text},
+            timeout=5
+        )
+        res.raise_for_status()
+    except Exception as e:
+        return f"保存失敗: {e}", 500
 
-    return "<h2>保存しました</h2><a href='/txtstore'>戻る</a>"
+    return "保存しました（外部）"
+
 
 
