@@ -1,0 +1,193 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>競馬ゲーム</title>
+
+<style>
+body {
+  font-family: sans-serif;
+  background:#eef;
+}
+
+#money {
+  font-size:18px;
+  margin-bottom:8px;
+}
+
+#track {
+  position: relative;
+  width: 800px;
+  height: 400px;
+  background: #4caf50;
+  border: 6px solid #555;
+  border-radius: 200px;
+  margin-top:10px;
+  overflow: hidden;
+}
+
+/* ゴールライン */
+#goal {
+  position: absolute;
+  right: 60px;
+  top: 0;
+  width: 6px;
+  height: 100%;
+  background: repeating-linear-gradient(
+    white 0px,
+    white 10px,
+    black 10px,
+    black 20px
+  );
+}
+
+.horse {
+  position: absolute;
+  font-size: 14px;
+  white-space: nowrap;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🏇 競馬ゲーム（右回り・芝・2400m）</h1>
+
+<div id="money">所持金：100000円</div>
+
+<div>
+  賭ける馬：
+  <select id="betHorse"></select>
+  賭け金：
+  <input type="number" id="betMoney" value="100" min="100">
+  <button onclick="startRace()">レース開始</button>
+</div>
+
+<div id="odds"></div>
+
+<div id="track">
+  <div id="goal"></div>
+</div>
+
+<script>
+const DISTANCE = 2400;
+let money = 100000;
+let racing = false;
+
+// 楕円設定
+const CENTER_X = 400;
+const CENTER_Y = 200;
+const RADIUS_X = 300;
+const RADIUS_Y = 140;
+
+const horses = [
+  { id:0, name:"サクラライト", color:"red",    base:1.0 },
+  { id:1, name:"ブルーウィンド", color:"blue", base:0.95 },
+  { id:2, name:"グリーンフラッシュ", color:"green", base:1.05 },
+  { id:3, name:"オレンジキング", color:"orange", base:0.9 },
+  { id:4, name:"パープルスター", color:"purple", base:1.0 }
+];
+
+const track = document.getElementById("track");
+const select = document.getElementById("betHorse");
+const oddsDiv = document.getElementById("odds");
+
+function setupRace(){
+  track.querySelectorAll(".horse").forEach(h=>h.remove());
+  select.innerHTML = "";
+  oddsDiv.innerHTML = "<h3>オッズ</h3>";
+
+  horses.forEach((h,i)=>{
+    // 調子
+    const r = Math.random();
+    if(r < 0.3){ h.cond="不調"; h.rate=0.9; }
+    else if(r < 0.7){ h.cond="普通"; h.rate=1.0; }
+    else { h.cond="好調"; h.rate=1.1; }
+
+    h.pos = 0;
+
+    h.odds = Math.max(1.2,(1/(h.base*h.rate))*3).toFixed(1);
+
+    select.innerHTML +=
+      `<option value="${h.id}">
+        ${h.name}（${h.cond} ${h.odds}倍）
+      </option>`;
+
+    oddsDiv.innerHTML +=
+      `${h.name}：${h.odds}倍（${h.cond}）<br>`;
+
+    const el = document.createElement("div");
+    el.className = "horse";
+    el.style.color = h.color;
+    el.textContent = "🐎 " + h.name;
+    track.appendChild(el);
+    h.el = el;
+  });
+}
+
+function updateMoney(){
+  document.getElementById("money").textContent =
+    "所持金：" + money + "円";
+}
+
+function startRace(){
+  if(racing) return;
+
+  const bet = Number(select.value);
+  const betMoney = Number(document.getElementById("betMoney").value);
+
+  if(betMoney < 100 || betMoney > money){
+    alert("賭け金が不正です");
+    return;
+  }
+
+  money -= betMoney;
+  updateMoney();
+  racing = true;
+
+  const timer = setInterval(()=>{
+    horses.forEach(h=>{
+      h.pos += Math.random() * 25 * h.base * h.rate;
+
+      // 楕円トラック計算
+      const angle = (h.pos / DISTANCE) * Math.PI * 2;
+      const x = CENTER_X + Math.cos(angle) * RADIUS_X;
+      const y = CENTER_Y + Math.sin(angle) * RADIUS_Y;
+
+      h.el.style.left = x + "px";
+      h.el.style.top = y + "px";
+    });
+
+    const finished = horses.find(h=>h.pos >= DISTANCE);
+    if(finished){
+      clearInterval(timer);
+      racing = false;
+
+      horses.sort((a,b)=>b.pos-a.pos);
+      const winner = horses[0];
+
+      if(winner.id === bet){
+        const payout = Math.floor(betMoney * winner.odds);
+        money += payout;
+        alert(`🎉 的中！ 勝者：${winner.name}\n+${payout}円`);
+      } else {
+        alert(`💀 ハズレ… 勝者：${winner.name}`);
+      }
+
+      updateMoney();
+      setupRace();
+
+      if(money <= 0){
+        alert("GAME OVER");
+      }
+    }
+  },100);
+}
+
+setupRace();
+updateMoney();
+</script>
+
+</body>
+</html>
