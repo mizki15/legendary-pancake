@@ -198,9 +198,9 @@ def transform_data_for_csv(data_dict):
 
     return {"rows": row_list}
 
-@app.route("/")
+@app.route("/work_optimization")
 def index():
-    return render_template("index.html")
+    return render_template("work_optimization.html")
 
 @app.route("/convert", methods=["POST"])
 def convert():
@@ -280,3 +280,4 @@ def txtstore_save():
         f.write(text)
 
     return "<h2>保存しました</h2><a href='/txtstore'>戻る</a>"
+
