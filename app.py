@@ -240,10 +240,10 @@ def convert():
         as_attachment=True,
         download_name="converted.csv",
     )
-
+'''
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
-
+'''
 
 #rocket
 @app.route("/rocket")
@@ -270,13 +270,18 @@ def rocket_mobile_orbit():
 # =========================
 # txt store
 # =========================
+@app.route("/txtstore")
+def txtstore():
+    return render_template("txtstore.html")
+
+
 @app.route("/txtstore/save", methods=["POST"])
 def txtstore_save():
     text = request.form.get("text", "")
 
     try:
         res = requests.post(
-            "GASのURLをここに",
+            "https://script.google.com/macros/s/AKfycbw3F5IrZAb1udux5Cae36gPFISKHRG-v6wB8X94zn5l7dfcUe0LioAduKjSuCkCAf-R/exec",
             data={"text": text},
             timeout=5
         )
@@ -285,6 +290,7 @@ def txtstore_save():
         return f"保存失敗: {e}", 500
 
     return "保存しました（外部）"
+
 
 
 
