@@ -13,6 +13,14 @@ load_dotenv()
 
 app = Flask(__name__)
 
+#index
+@app.route("/")
+def index_top():
+    return render_template("index.html")
+
+
+
+
 youbi_list = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
 JST = zoneinfo.ZoneInfo("Asia/Tokyo")
 
@@ -280,4 +288,5 @@ def txtstore_save():
         f.write(text)
 
     return "<h2>保存しました</h2><a href='/txtstore'>戻る</a>"
+
 
