@@ -1,46 +1,197 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html>
 <head>
-    <meta charset="UTF-8" />
-    <title>業務効率化ツール</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', q='20250705120') }}">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta property='og:type' content='website'>
+  <meta property='og:title' content='MIZUKI NAKAJIMA'>
+  <meta property='og:url' content='URLが入る'>
+  <meta property='og:description' content='MIZUKI NAKAJIMA'>
+  <meta property="og:image" content="img/ogp.png">
+  <meta name="description" content="MIZUKI NAKAJIMA" />
+  <title>MIZUKI NAKAJIMA</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Material+Icons+Outlined" rel="stylesheet">
+  <link href="css/ress.css" media="all" rel="stylesheet" type="text/css" />
+  <link href="css/style.css" media="all" rel="stylesheet" type="text/css" />
+  <link rel="shortcut icon" href="img/favicon.ico" />
+  <link rel=”canonical” href=”URLが入る” />
 </head>
+
 <body>
-    <h1>業務効率化ツール</h1>
-    <form action="/convert" method="post">
-        <div class="main-grid">
-            <div class="left-half">
-                <label>出発期間+粗利率（5列分のデータ）</label>
-                <textarea class ="lefttext" name="departure_rate" rows="18" required></textarea>
-            </div>
+  <div class="wrapper">
 
-            <div class="right-top">
-                <label>施設番号+施設名（2列分のデータ）</label>
-                <textarea class = "righttext" name="facility" rows="9" required></textarea>
-            </div>
+    <!-- header -->
+    <header class="header ">
+      <div class="container">
+        <h1 class="header-logo">
+          <a href=".">MIZUKI NAKAJIMA</a>
+        </h1>
+        <nav class="gnav">
+          <ul class="gnav-list">
+            <li class="gnav-item"><a href="#works">WORKS</a></li>
+            <li class="gnav-item"><a href="#contact">CONTACT</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <!-- /header -->
 
-            <div class="right-bottom">
-                <label>販売期間(from)</label>
-                <input type="text" name="sale_from" placeholder="YYYY/MM/DD または YYYYMMDD" required>
+    <main class="content">
 
-                <label>販売期間(to)</label>
-                <input type="text" name="sale_to" placeholder="YYYY/MM/DD または YYYYMMDD" required>
-
-                <label>発空港</label>
-                <input type="text" name="airport" placeholder="例: HND" required>
-
-                <label>参加者合計人数</label>
-                <div class="radio-group-horizontal">
-                    <label><input type="radio" name="participants" value="1"> 一人</label>
-                    <label><input type="radio" name="participants" value="2"> 二人以上</label>
-                    <label><input type="radio" name="participants" value="全て"> 全て</label>
-                </div>
-            </div>
+      <!-- mv -->
+      <div class="mv">
+        <div class="mv-container">
+          <p class="mv-title">MIZUKI NAKAJIMA</p>
+          <p class="mv-subtitle">PROJECTS</p>
+          <p class="mv-text">
+            作成プロジェクトまとめ<br>
+          </p>
         </div>
+      </div>
+      <!-- /mv -->
 
-        <div class="submit-container">
-            <button type="submit">CSVに変換</button>
+      <!-- works -->
+      <section class="works section" id="works">
+        <div class="container">
+          <h2 class="title">WORKS</h2>
+          <div class="works-list">
+            <a class="works-item" href="https://nkjserver15.cloudfree.jp/project_naiso/?id=static/%E9%AA%A8%E7%B5%84%E3%81%BF.glb">
+              <div class="works-img"><img src="img/blender-3d.png" alt="" /></div>
+              <p class="works-name">骨組み</p>
+              <p class="works-info">創作展内装</p>
+            </a>
+            <a class="works-item" href="works-template.html">
+              <div class="works-img"><img src="img/blender-3d.png" alt="" /></div>
+              <p class="works-name">作品名が入る</p>
+              <p class="works-info">Design / Coding(Responsive) / WordPress</p>
+            </a>
+            <a class="works-item" href="works-template.html">
+              <div class="works-img"><img src="img/blender-3d.png" alt="" /></div>
+              <p class="works-name">作品名が入る</p>
+              <p class="works-info">Design</p>
+            </a>
+            <a class="works-item" href="works-template.html">
+              <div class="works-img"><img src="img/blender-3d.png" alt="" /></div>
+              <p class="works-name">作品名が入る</p>
+              <p class="works-info">Banner Design</p>
+            </a>
+            <a class="works-item" href="works-template.html">
+              <div class="works-img"><img src="img/blender-3d.png" alt="" /></div>
+              <p class="works-name">作品名が入る</p>
+              <p class="works-info">Banner Design</p>
+            </a>
+          </div>
         </div>
-    </form>
+      </section>
+      <!-- /works -->
+
+      <!-- skill --
+      <section class="skill section" id="skill">
+        <div class="container">
+          <h2 class="title">SKILL</h2>
+          <div class="skill-list">
+            <div class="skill-item">
+              <p class="skill-img"><img src="img/icon_skill.png" alt=""></p>
+              <div class="skill-body">
+                <h3 class="skill-name">HTML5/CSS3</h3>
+                <p class="skill-text">
+                  テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります。</p>
+              </div>
+            </div>
+            <div class="skill-item">
+              <p class="skill-img"><img src="img/icon_skill.png" alt=""></p>
+              <div class="skill-body">
+                <h3 class="skill-name">WordPress</h3>
+                <p class="skill-text">
+                  テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります。</p>
+              </div>
+            </div>
+            <div class="skill-item">
+              <p class="skill-img"><img src="img/icon_skill.png" alt=""></p>
+              <div class="skill-body">
+                <h3 class="skill-name">JavaScript</h3>
+                <p class="skill-text">
+                  テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります。</p>
+              </div>
+            </div>
+            <div class="skill-item">
+              <p class="skill-img"><img src="img/icon_skill.png" alt=""></p>
+              <div class="skill-body">
+                <h3 class="skill-name">Photoshop</h3>
+                <p class="skill-text">
+                  テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります。</p>
+              </div>
+            </div>
+            <div class="skill-item">
+              <p class="skill-img"><img src="img/icon_skill.png" alt=""></p>
+              <div class="skill-body">
+                <h3 class="skill-name">Illustrator</h3>
+                <p class="skill-text">
+                  テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります。</p>
+              </div>
+            </div>
+            <div class="skill-item">
+              <p class="skill-img"><img src="img/icon_skill.png" alt=""></p>
+              <div class="skill-body">
+                <h3 class="skill-name">XD</h3>
+                <p class="skill-text">
+                  テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      -- /skill -->
+
+      <!-- about --
+      <section class="about section" id="about">
+        <div class="container">
+          <h2 class="title">ABOUT</h2>
+          <div class="profile">
+            <p class="profile-img">
+              <img src="img/profile.jpg" alt="">
+            </p>
+            <div class="profile-body">
+              <p>
+                テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります。
+              </p>
+              <p>
+                テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります。
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+      -- /about -->
+
+      <!-- contact -->
+      <section class="contact section" id="contact">
+        <div class="container">
+          <h2 class="title">CONTACT</h2>
+          <p class="lead">
+            お問い合わせは、<br class="sp-only">メールにてお願いいたします。
+          </p>
+          <div class="contact-list">
+            <span class="contact-item">mizki228@icloud.com</span>
+          </div>
+        </div>
+      </section>
+      <!-- /contact -->
+      <div class="page-top" id="js-page-top">
+        <span class="material-icons-outlined">expand_less</span>
+      </div>
+    </main>
+
+    <!-- footer -->
+    <footer class="footer">
+      <div class="copyright">&copy;MIZUKI NAKAJIMA</div>
+    </footer>
+    <!-- /footer -->
+
+  </div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script type='text/javascript' src="js/script.js"></script>
 </body>
 </html>
