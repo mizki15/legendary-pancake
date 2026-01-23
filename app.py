@@ -256,3 +256,27 @@ def rocket_mobile():
 @app.route("/rocket_mobile_orbit")
 def rocket_mobile_orbit():
     return render_template("rocket_mobile_orbit.html")
+
+
+
+# =========================
+# txt store
+# =========================
+
+TXT_SAVE_DIR = "txt_saved"
+TXT_SAVE_FILE = os.path.join(TXT_SAVE_DIR, "stored_text.txt")
+
+os.makedirs(TXT_SAVE_DIR, exist_ok=True)
+
+@app.route("/txtstore")
+def txtstore():
+    return render_template("txtstore.html")
+
+@app.route("/txtstore/save", methods=["POST"])
+def txtstore_save():
+    text = request.form.get("text", "")
+
+    with open(TXT_SAVE_FILE, "w", encoding="utf-8") as f:
+        f.write(text)
+
+    return "<h2>保存しました</h2><a href='/txtstore'>戻る</a>"
