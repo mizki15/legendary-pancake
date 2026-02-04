@@ -24,7 +24,7 @@ if not os.path.exists(PROGRESS_FILE):
         json.dump({"index": 0}, f)
 
 
-@vocab_bp.route("/vocab")
+@vocab_bp.route("/")
 def vocab_page():
     return render_template("vocab.html")
 
