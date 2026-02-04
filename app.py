@@ -311,3 +311,6 @@ def keiba():
 
 from vocab.routes import vocab_bp
 app.register_blueprint(vocab_bp)
+
+if __name__ == "__main__":
+    app.run()
