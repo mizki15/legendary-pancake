@@ -11,7 +11,7 @@ vocab_bp = Blueprint(
 )
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-DATA_DIR = os.path.join(BASE_DIR, "data")
+DATA_DIR = os.path.join(BASE_DIR, "words_data")
 
 WORDS_FILE = os.path.join(DATA_DIR, "words.csv")
 PROGRESS_FILE = os.path.join(DATA_DIR, "vocab_progress.json")
