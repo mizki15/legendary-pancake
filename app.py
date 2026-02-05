@@ -8,6 +8,9 @@ from datetime import datetime, timezone, timedelta
 import time
 import zoneinfo
 
+# 1. study.py から study_bp をインポート
+from study import study_bp
+
 # .env読み込み
 load_dotenv()
 
@@ -303,3 +306,9 @@ def keiba():
     return render_template("keiba.html")
 
 
+
+# 2. Blueprintを登録
+app.register_blueprint(study_bp)
+
+if __name__ == '__main__':
+    app.run(debug=True)
