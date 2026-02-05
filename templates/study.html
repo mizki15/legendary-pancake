@@ -50,20 +50,28 @@
         }
 
         async function handleResult(status) {
-            if (!currentWord) return;
+    if (!currentWord) return;
 
-            await fetch('/api/submit', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    status: status,
-                    word_id: currentWord.id,
-                    current_index: currentWord.index
-                })
-            });
+    // --- ここから修正 ---
+    // 1. ローカルで仮の進捗データを作成
+    const nextData = {
+        status: status,
+        word_id: currentWord.id,
+        current_index: currentWord.index
+    };
 
-            loadWord();
-        }
+    // 2. 通信の完了を待たずに、先に次の単語のロードを開始する
+    // (await をつけずに実行する)
+    fetch('/api/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(nextData)
+    });
+
+    // 3. 即座に次の単語を表示
+    loadWord(); 
+    // --- ここまで修正 ---
+}
 
         loadWord();
     </script>
