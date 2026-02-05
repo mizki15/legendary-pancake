@@ -6,22 +6,17 @@
     <title>英単語学習</title>
     <style>
         body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f0f2f5; }
-        .card { background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 80%; max-width: 400px; text-align: center; }
-        .en { font-size: 2.5rem; font-weight: bold; margin-bottom: 1rem; }
-        /* 修正後のCSS */
+        .card { background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 80%; max-width: 400px; text-align: center; cursor: pointer; }
+        .en { font-size: 2.5rem; font-weight: bold; margin-bottom: 1rem; pointer-events: none; } /* 文字自体のクリックイベントを無効化しカード全体で反応させる */
         .jp { 
             font-size: 1.2rem; 
             color: #666; 
             margin-bottom: 2rem; 
-            opacity: 0;           /* 最初は透明 */
-            transition: opacity 0.2s; /* ふわっと表示させる */
+            opacity: 0; 
+            transition: opacity 0.2s; 
+            pointer-events: none;
         }
-        .jp.show { 
-            opacity: 1;           /* クラスがついたら表示 */
-        }
-        .card { 
-            cursor: pointer;      /* タップできることを示す */
-        }
+        .jp.show { opacity: 1; }
         .controls { display: flex; gap: 1rem; width: 80%; max-width: 400px; margin-top: 2rem; }
         button { flex: 1; padding: 1rem; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; color: white; transition: opacity 0.2s; }
         .btn-know { background-color: #4caf50; }
@@ -48,11 +43,16 @@
 
     // 最初に一度だけ全データをロード
     async function initApp() {
-        const res = await fetch('/api/get_all_data');
-        const data = await res.json();
-        allWords = data.words;
-        currentIndex = data.current_index;
-        renderWord();
+        try {
+            const res = await fetch('/api/get_all_data');
+            const data = await res.json();
+            allWords = data.words;
+            currentIndex = data.current_index;
+            renderWord();
+        } catch (e) {
+            document.getElementById('word-en').innerText = "エラーが発生しました";
+            console.error(e);
+        }
     }
 
     // 日本語を表示する関数
@@ -60,36 +60,29 @@
         document.getElementById('word-jp').classList.add('show');
     }
 
-    // 画面の表示を更新する関数（前回のものに1行追加）
+    // 画面の表示を更新する関数（1つに統合）
     function renderWord() {
+        const enElem = document.getElementById('word-en');
+        const jpElem = document.getElementById('word-jp');
+        const progElem = document.getElementById('progress-text');
+
+        // 1. 全て終了した場合
         if (currentIndex >= allWords.length) {
-            document.getElementById('word-en').innerText = "完了！";
-            document.getElementById('word-jp').innerText = "全ての単語をチェックしました";
-            document.getElementById('word-jp').classList.add('show'); // 完了時は表示
+            enElem.innerText = "完了！";
+            jpElem.innerText = "全ての単語をチェックしました";
+            jpElem.classList.add('show'); // 完了時は表示
+            progElem.innerText = "";
             return;
         }
 
-        // 次の単語を表示する前に日本語を隠す
-        document.getElementById('word-jp').classList.remove('show');
+        // 2. 次の単語を表示する前に「日本語を隠す」
+        jpElem.classList.remove('show');
 
+        // 3. データのセット
         const word = allWords[currentIndex];
-        document.getElementById('word-en').innerText = word.en;
-        document.getElementById('word-jp').innerText = word.jp;
-        document.getElementById('progress-text').innerText = `${currentIndex + 1} / ${allWords.length}`;
-    }
-
-    // 画面の表示を更新する関数（通信しないので爆速）
-    function renderWord() {
-        if (currentIndex >= allWords.length) {
-            document.getElementById('word-en').innerText = "完了！";
-            document.getElementById('word-jp').innerText = "全ての単語をチェックしました";
-            return;
-        }
-
-        const word = allWords[currentIndex];
-        document.getElementById('word-en').innerText = word.en;
-        document.getElementById('word-jp').innerText = word.jp;
-        document.getElementById('progress-text').innerText = `${currentIndex + 1} / ${allWords.length}`;
+        enElem.innerText = word.en;
+        jpElem.innerText = word.jp;
+        progElem.innerText = `${currentIndex + 1} / ${allWords.length}`;
     }
 
     async function handleResult(status) {
@@ -108,7 +101,7 @@
             })
         });
 
-        // 2. 即座に次の単語へ（ローカルの変数を増やすだけ）
+        // 2. 即座に次の単語へ
         currentIndex++;
         renderWord();
     }
