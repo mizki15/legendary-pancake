@@ -6,7 +6,7 @@ from flask import Blueprint, render_template, jsonify, request
 study_bp = Blueprint('study', __name__)
 
 CSV_FILE = 'words.csv'
-GAS_URL = 'https://script.google.com/macros/s/AKfycbxP5DgHlp_5CjSird3b3rLBJfczItCkpbpIHI8ib8MLNDtu_r2GVipaJW3VY_P5Ut5t0g/exec'
+GAS_URL = 'https://script.google.com/macros/s/AKfycbyRk25abgQ2T8W-r7U9CJ9qJq5j79UqTtA0Aml7vTeEbKqYoTYNHj0yfGkJkSEqRGI-FQ/exec'
 
 def fetch_words():
     words = []
