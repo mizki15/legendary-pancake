@@ -54,3 +54,22 @@ def submit():
     requests.post(GAS_URL, json=payload)
     
     return jsonify({'status': 'ok'})
+
+
+@study_bp.route('/api/get_all_data')
+def get_all_data():
+    # 1. GASから進捗を取得
+    res = requests.get(GAS_URL)
+    current_index = res.json().get('index', 0)
+    
+    # 2. CSVを全読み込み
+    words = []
+    with open(CSV_FILE, 'r', encoding='utf-8') as f:
+        reader = csv.reader(f)
+        for row in reader:
+            words.append({'id': row[0], 'en': row[1], 'jp': row[2]})
+    
+    return jsonify({
+        'words': words,
+        'current_index': current_index
+    })
