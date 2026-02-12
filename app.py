@@ -8,27 +8,27 @@ from datetime import datetime, timezone, timedelta
 import time
 import zoneinfo
 
-# 1. study.py から study_bp をインポート
+# 1. 各Blueprintをインポート
 from study import study_bp
+from todai_listening import todai_bp  # <--- 追加
 
 # .env読み込み
 load_dotenv()
 
 app = Flask(__name__)
 
-#index
+# index
 @app.route("/")
 def index_top():
     return render_template("index.html")
 
-
-
-
+# =========================
+# 楽天API関連のロジック (既存コード維持)
+# =========================
 youbi_list = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
 JST = zoneinfo.ZoneInfo("Asia/Tokyo")
 
 def convert_date_to_slash_format(date_str):
-    """YYYYMMDD または YYYY/MM/DD を YYYY/MM/DD に変換"""
     if "/" in date_str and len(date_str) == 10:
         return date_str
     try:
@@ -38,7 +38,6 @@ def convert_date_to_slash_format(date_str):
         return None
 
 def get_data_from_api(facility_num, facility_name):
-    """楽天APIから施設情報を取得"""
     time.sleep(0.1)
     app_id = os.getenv("RAKUTEN_APP_ID")
     affiliate_id = os.getenv("RAKUTEN_AFFILIATE_ID")
@@ -79,7 +78,6 @@ def get_data_from_api(facility_num, facility_name):
         return {"error": f"APIエラー: {str(e)}"}
 
 def make_row_list_from_dict(data_dict):
-    """CSV1行分に整形"""
     return [
         data_dict.get("施設番号", ""),
         data_dict.get("施設名", ""),
@@ -102,7 +100,6 @@ def make_row_list_from_dict(data_dict):
     ]
 
 def get_active_days(start_date_str, end_date_str):
-    """期間内に含まれる曜日コードの集合を返す"""
     try:
         start_date = datetime.strptime(start_date_str, "%Y/%m/%d")
         end_date = datetime.strptime(end_date_str, "%Y/%m/%d")
@@ -124,7 +121,6 @@ def get_active_days(start_date_str, end_date_str):
     return active_days
 
 def transform_data_for_csv(data_dict):
-    """すべてのデータをCSV形式に変換"""
     errors = []
     facilities_raw = data_dict["施設番号"].strip().splitlines()
     rate_lines_raw = data_dict["出発期間+粗利率"].strip().splitlines()
@@ -147,7 +143,6 @@ def transform_data_for_csv(data_dict):
     if not hanbai_to:
         errors.append("販売期間(to)の日付形式が不正です")
 
-    # === 変更箇所: 人数オプションの判定 ===
     target_ninzu_list = []
     if ninzu == "全て":
         target_ninzu_list = ["1", "2"]
@@ -184,7 +179,6 @@ def transform_data_for_csv(data_dict):
 
             active_days_in_period = get_active_days(dep_from, dep_to)
 
-            # === 変更箇所: 人数のループを追加 ===
             for current_ninzu in target_ninzu_list:
                 new_dict = api_result.copy()
                 new_dict["販売期間(from)"] = hanbai_from
@@ -192,7 +186,7 @@ def transform_data_for_csv(data_dict):
                 new_dict["出発期間(from)"] = dep_from
                 new_dict["出発期間(to)"] = dep_to
                 new_dict["発空港"] = hatsu_airport
-                new_dict["参加人数オプション"] = current_ninzu  # 現在ループ中の人数を設定
+                new_dict["参加人数オプション"] = current_ninzu 
                 new_dict["粗利率1"] = rate[2]
                 new_dict["粗利率2"] = rate[3]
                 new_dict["粗利率3"] = rate[4]
@@ -243,45 +237,34 @@ def convert():
         as_attachment=True,
         download_name="converted.csv",
     )
-'''
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
-'''
 
-#rocket
+# =========================
+# その他のルート (既存コード維持)
+# =========================
+
 @app.route("/rocket")
 def rocket():
     return render_template("rocket.html")
 
-#rocket_orbit
 @app.route("/rocket_orbit")
 def rocket_orbit():
     return render_template("rocket_orbit.html")
 
-#rocket_mobile
 @app.route("/rocket_mobile")
 def rocket_mobile():
     return render_template("rocket_mobile.html")
 
-#rocket_mobile_orbit
 @app.route("/rocket_mobile_orbit")
 def rocket_mobile_orbit():
     return render_template("rocket_mobile_orbit.html")
 
-
-
-# =========================
-# txt store
-# =========================
 @app.route("/txtstore")
 def txtstore():
     return render_template("txtstore.html")
 
-
 @app.route("/txtstore/save", methods=["POST"])
 def txtstore_save():
     text = request.form.get("text", "")
-
     try:
         res = requests.post(
             "https://script.google.com/macros/s/AKfycbwms2TFCe_m-uHQsaJUZ3SQbWKddtFm413BSNblBAKwxP2faJkz47DAYx2Vwb2zXL2p/exec",
@@ -291,24 +274,21 @@ def txtstore_save():
         res.raise_for_status()
     except Exception as e:
         return f"保存失敗: {e}", 500
-
     return "保存しました（外部）"
 
-
-#mainkurafuto
 @app.route("/mainkurafuto")
 def mainkurafuto():
     return render_template("mainkurafuto.html")
 
-#keiba
 @app.route("/keiba")
 def keiba():
     return render_template("keiba.html")
 
-
-
-# 2. Blueprintを登録
+# =========================
+# Blueprint 登録
+# =========================
 app.register_blueprint(study_bp)
+app.register_blueprint(todai_bp) # <--- 追加
 
 if __name__ == '__main__':
     app.run(debug=True)
