@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>音源結合ツール（東大リスニング向け）</title>
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Noto Sans JP"; padding:20px; max-width:900px; margin:auto; }
+    label{ display:block; margin-top:12px; }
+    .row { display:flex; gap:10px; align-items:center; }
+    input[type="range"]{ width:200px; }
+    .small { font-size:0.9em; color:#555; }
+    .result { margin-top:18px; }
+  </style>
+</head>
+<body>
+  <h2>音源結合ツール（3つの .mp3 → 1つの音源）</h2>
+  <form id="form" enctype="multipart/form-data" method="post" action="/combine">
+    <label>ファイル1 (例: (A) 講義)
+      <input type="file" name="file1" accept="audio/*" required />
+    </label>
+    <label>ファイル2 (例: (B) 議論)
+      <input type="file" name="file2" accept="audio/*" required />
+    </label>
+    <label>ファイル3 (例: (C) 補足)
+      <input type="file" name="file3" accept="audio/*" required />
+    </label>
+
+    <div style="margin-top:10px;">
+      <div class="row">
+        <div>
+          <label>再生速度ファイル1: <span id="s1val">1.00</span>x</label>
+          <input type="range" id="speed1" name="speed1" min="0.5" max="1.5" step="0.01" value="1.0" />
+        </div>
+        <div>
+          <label>再生速度ファイル2: <span id="s2val">1.00</span>x</label>
+          <input type="range" id="speed2" name="speed2" min="0.5" max="1.5" step="0.01" value="1.0" />
+        </div>
+        <div>
+          <label>再生速度ファイル3: <span id="s3val">1.00</span>x</label>
+          <input type="range" id="speed3" name="speed3" min="0.5" max="1.5" step="0.01" value="1.0" />
+        </div>
+      </div>
+    </div>
+
+    <label class="small">ポーズ（秒）
+      <div class="row">
+        <div>ファイル1 → ファイル2: <input type="number" name="pause12" value="30" min="0" step="1" /></div>
+        <div>ファイル2 → ファイル3: <input type="number" name="pause23" value="60" min="0" step="1" /></div>
+      </div>
+    </label>
+
+    <label class="small">
+      <input type="checkbox" name="degrade" id="degrade" /> 意図的に音質を落とす（演習用）
+      <select name="degrade_level">
+        <option value="low">低（強めに劣化）</option>
+        <option value="high">中（少し劣化）</option>
+      </select>
+    </label>
+
+    <label class="small">
+      目標の長さ（分）：
+      <input type="number" name="target_minutes" value="30" min="0" step="1" />
+      <label><input type="checkbox" name="loop_enabled" checked /> 指定時間までループして延長する</label>
+    </label>
+
+    <div style="margin-top:12px;">
+      <button type="submit">結合してダウンロード</button>
+    </div>
+  </form>
+
+  <div class="result" id="result"></div>
+
+  <script>
+    // UI helpers
+    const s1 = document.getElementById("speed1"), s2 = document.getElementById("speed2"), s3 = document.getElementById("speed3");
+    s1.oninput = ()=> document.getElementById("s1val").innerText = parseFloat(s1.value).toFixed(2);
+    s2.oninput = ()=> document.getElementById("s2val").innerText = parseFloat(s2.value).toFixed(2);
+    s3.oninput = ()=> document.getElementById("s3val").innerText = parseFloat(s3.value).toFixed(2);
+
+    const form = document.getElementById("form");
+    const result = document.getElementById("result");
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      result.innerHTML = "処理中…（サーバーで結合・エンコードします）";
+      const fd = new FormData(form);
+      try {
+        const resp = await fetch("/combine", {
+          method: "POST",
+          body: fd
+        });
+        if (!resp.ok) {
+          const txt = await resp.text();
+          result.innerHTML = `<div style="color:red">エラー: ${txt}</div>`;
+          return;
+        }
+        const blob = await resp.blob();
+        const url = URL.createObjectURL(blob);
+        result.innerHTML = `
+          <div>結合完了 — 下のプレイヤーで確認できます。</div>
+          <audio controls src="${url}"></audio>
+          <div><a href="${url}" download="combined.mp3">combined.mp3 をダウンロード</a></div>
+        `;
+      } catch (err) {
+        result.innerHTML = `<div style="color:red">通信エラー: ${err}</div>`;
+      }
+    };
+  </script>
+</body>
+</html>
