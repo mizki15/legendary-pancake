@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>スマホ傾き検知</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding-top: 50px; background-color: #f0f0f0; }
+        .card { background: white; padding: 20px; border-radius: 15px; display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        button { padding: 15px 30px; font-size: 1.2rem; cursor: pointer; border-radius: 10px; border: none; background: #007bff; color: white; }
+        .data { margin-top: 20px; font-size: 1.5rem; color: #333; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1>ジャイロセンサー</h1>
+        <button id="start_btn">センサーを開始する</button>
+        
+        <div class="data">
+            <p>左右 (gamma): <span id="val_gamma">0</span>°</p>
+            <p>前後 (beta): <span id="val_beta">0</span>°</p>
+            <p>方位 (alpha): <span id="val_alpha">0</span>°</p>
+        </div>
+    </div>
+
+    <script>
+        const btn = document.getElementById('start_btn');
+
+        btn.addEventListener('click', function() {
+            // iOS 13+ のための権限リクエスト
+            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission()
+                    .then(permissionState => {
+                        if (permissionState === 'granted') {
+                            window.addEventListener('deviceorientation', updateGravity);
+                            btn.style.display = 'none';
+                        } else {
+                            alert('許可が拒否されました');
+                        }
+                    })
+                    .catch(console.error);
+            } else {
+                // AndroidやPCなど（権限リクエスト不要な場合）
+                window.addEventListener('deviceorientation', updateGravity);
+                btn.style.display = 'none';
+            }
+        });
+
+        function updateGravity(event) {
+            // 値を取得して画面に表示
+            document.getElementById('val_alpha').textContent = Math.floor(event.alpha);
+            document.getElementById('val_beta').textContent = Math.floor(event.beta);
+            document.getElementById('val_gamma').textContent = Math.floor(event.gamma);
+        }
+    </script>
+</body>
+</html>
