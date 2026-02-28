@@ -292,3 +292,21 @@ app.register_blueprint(todai_bp) # <--- 追加
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+
+
+
+
+
+
+
+
+
+
+@app.route("/pingpong")
+def pingpong():
+    return render_template("pingpong.html")
+
+
+
