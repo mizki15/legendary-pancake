@@ -296,7 +296,7 @@ function enableMouseFallback() {
   document.addEventListener('mousemove', (ev) => {
     // 画面上での位置を -bounds..bounds にマップ
     const nx = (ev.clientX / window.innerWidth) * 2 - 1;
-    const ny = -((ev.clientY / window.innerHeight) * 2 - 1);
+    const ny = ((ev.clientY / window.innerHeight) * 2 - 1);
     paddle.position.x = nx * (bounds.x - paddleSize.x/2 - 0.2);
     paddle.position.y = ny * (bounds.y - paddleSize.y/2 - 0.5);
   });
