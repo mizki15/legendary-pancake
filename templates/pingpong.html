@@ -3,56 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>スマホ傾き検知</title>
+    <title>iPhone Motion Sync</title>
     <style>
-        body { font-family: sans-serif; text-align: center; padding-top: 50px; background-color: #f0f0f0; }
-        .card { background: white; padding: 20px; border-radius: 15px; display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        button { padding: 15px 30px; font-size: 1.2rem; cursor: pointer; border-radius: 10px; border: none; background: #007bff; color: white; }
-        .data { margin-top: 20px; font-size: 1.5rem; color: #333; }
+        body { margin: 0; overflow: hidden; background-color: #111; font-family: sans-serif; }
+        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; color: #0f0; }
+        .stat { position: absolute; padding: 10px; background: rgba(0,0,0,0.5); font-size: 12px; }
+        .top-left { top: 0; left: 0; }
+        .top-right { top: 0; right: 0; }
+        .bottom-left { bottom: 0; left: 0; }
+        .bottom-right { bottom: 0; right: 0; }
+        #start-btn { 
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            padding: 20px; font-size: 18px; z-index: 100; cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h1>ジャイロセンサー</h1>
-        <button id="start_btn">センサーを開始する</button>
-        
-        <div class="data">
-            <p>左右 (gamma): <span id="val_gamma">0</span>°</p>
-            <p>前後 (beta): <span id="val_beta">0</span>°</p>
-            <p>方位 (alpha): <span id="val_alpha">0</span>°</p>
-        </div>
+    <button id="start-btn">センサーを開始して3D表示</button>
+
+    <div id="overlay">
+        <div class="stat top-left" id="gyro-alpha">Alpha (Z): 0</div>
+        <div class="stat top-right" id="gyro-beta">Beta (X): 0</div>
+        <div class="stat bottom-left" id="gyro-gamma">Gamma (Y): 0</div>
+        <div class="stat bottom-right" id="accel">Accel (m/s²): 0, 0, 0</div>
     </div>
 
-    <script>
-        const btn = document.getElementById('start_btn');
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-        btn.addEventListener('click', function() {
-            // iOS 13+ のための権限リクエスト
-            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-                DeviceOrientationEvent.requestPermission()
-                    .then(permissionState => {
-                        if (permissionState === 'granted') {
-                            window.addEventListener('deviceorientation', updateGravity);
-                            btn.style.display = 'none';
-                        } else {
-                            alert('許可が拒否されました');
-                        }
-                    })
-                    .catch(console.error);
-            } else {
-                // AndroidやPCなど（権限リクエスト不要な場合）
-                window.addEventListener('deviceorientation', updateGravity);
-                btn.style.display = 'none';
+    <script>
+        let scene, camera, renderer, cube;
+        const btn = document.getElementById('start-btn');
+
+        // 1. 3Dシーンのセットアップ
+        function initThree() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            // スマホっぽい形の直方体を作成
+            const geometry = new THREE.BoxGeometry(2, 4, 0.5);
+            const material = new THREE.MeshNormalMaterial(); // 向きがわかりやすい色
+            cube = new THREE.Mesh(geometry, material);
+            scene.add(cube);
+
+            camera.position.z = 5;
+
+            function animate() {
+                requestAnimationFrame(animate);
+                renderer.render(scene, camera);
             }
+            animate();
+        }
+
+        // 2. センサー開始の処理
+        btn.addEventListener('click', async () => {
+            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                const response = await DeviceOrientationEvent.requestPermission();
+                if (response !== 'granted') return;
+            }
+            
+            btn.style.display = 'none'; // ボタンを隠す
+            initThree(); // 3D開始
+
+            // ジャイロ（回転）の取得
+            window.addEventListener('deviceorientation', (e) => {
+                document.getElementById('gyro-alpha').innerText = `Alpha: ${e.alpha.toFixed(1)}`;
+                document.getElementById('gyro-beta').innerText = `Beta: ${e.beta.toFixed(1)}`;
+                document.getElementById('gyro-gamma').innerText = `Gamma: ${e.gamma.toFixed(1)}`;
+
+                // オブジェクトに反映 (度をラジアンに変換)
+                if (cube) {
+                    cube.rotation.x = e.beta * (Math.PI / 180);
+                    cube.rotation.y = e.gamma * (Math.PI / 180);
+                    cube.rotation.z = e.alpha * (Math.PI / 180);
+                }
+            });
+
+            // 加速度の取得
+            window.addEventListener('devicemotion', (e) => {
+                const acc = e.acceleration;
+                document.getElementById('accel').innerText = 
+                    `Accel: ${acc.x.toFixed(1)}, ${acc.y.toFixed(1)}, ${acc.z.toFixed(1)}`;
+            });
         });
 
-        function updateGravity(event) {
-            // 値を取得して画面に表示
-            document.getElementById('val_alpha').textContent = Math.floor(event.alpha);
-            document.getElementById('val_beta').textContent = Math.floor(event.beta);
-            document.getElementById('val_gamma').textContent = Math.floor(event.gamma);
-        }
+        // 画面リサイズ対応
+        window.addEventListener('resize', () => {
+            if (camera) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+        });
     </script>
 </body>
 </html>
