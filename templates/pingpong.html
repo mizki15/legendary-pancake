@@ -3,64 +3,73 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover" />
-<title>Tilt Paddle — Ball Return Game</title>
+<title>Tilt Gravity Paddle — 傾けて滑らせるブロック</title>
 <style>
-  body { margin:0; overflow:hidden; background:#111; color:#0f0; font-family:system-ui, sans-serif; }
-  #ui {
-    position:fixed; left:0; top:0; padding:10px; pointer-events:none; z-index:20;
-    color:#0f0; font-size:13px;
-  }
+  html,body { height:100%; margin:0; background:#070707; color:#bfffbf; font-family: system-ui, "Helvetica Neue", Arial; overflow:hidden; }
+  #ui { position:fixed; left:8px; top:8px; z-index:30; font-size:13px; color:#bfffbf; background:rgba(0,0,0,0.25); padding:8px; border-radius:6px; }
   #startBtn {
     position:fixed; left:50%; top:50%; transform:translate(-50%,-50%);
-    z-index:30; padding:16px 22px; font-size:18px; background:#222; color:#0f0;
-    border:2px solid #0f0; border-radius:8px; cursor:pointer;
+    z-index:40; padding:14px 18px; font-size:18px; background:#0b0b0b; color:#bfffbf;
+    border:2px solid #2aff7f; border-radius:10px; cursor:pointer;
   }
-  #hint { position:fixed; left:10px; bottom:10px; color:#aaa; font-size:12px; pointer-events:none; }
+  #hint { position:fixed; left:10px; bottom:10px; font-size:12px; color:#9aa; z-index:30; }
+  canvas { display:block; }
 </style>
 </head>
 <body>
 
 <div id="ui">
   <div id="score">Score: 0</div>
-  <div id="lives">Lives: 3</div>
-  <div id="gyro">α: 0, β: 0, γ: 0</div>
-  <div id="acc">acc: 0, 0, 0</div>
+  <div id="gyro">α: 0 β: 0 γ: 0</div>
+  <div id="acc">gx,gy: 0, 0</div>
+  <div id="params">gravityScale: <span id="gscale">0.9</span> damping: <span id="damp">0.96</span></div>
 </div>
 
-<button id="startBtn">センサーを開始してゲームを始める</button>
-<div id="hint">スマホを傾けてパドル（画面中央の縦長板）を左右上下に動かし、落ちてくるボールを打ち返そう。画面タップでサーブ。</div>
+<button id="startBtn">センサーを開始（iOS は許可が必要）</button>
+<div id="hint">端末を傾けるとブロックがその方向へ滑ります。画面タップでボールをサーブ/リセット。</div>
 
-<!-- three.js CDN (r128 と同じ系列) -->
+<!-- three.js r128 -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
 <script>
-/* =========================
-   変数・設定
-   ========================= */
+/*
+  Tilt Gravity Paddle Game
+  - パドル（ブロック）は「重力ベクトルによる加速度」を受けて滑ります
+  - deviceorientation の beta/gamma から重力分力を計算（より直感的で安定）
+  - devicemotion の加速度情報が欲しい場合のフォールバックも入れています
+*/
+
 let scene, camera, renderer;
 let paddle, ball;
-let paddleSize = { x: 2.0, y: 3.5, z: 0.3 };
-let paddlePos = new THREE.Vector3(0, -2.0, -4.0); // パドル固定 z 位置
-let ballRadius = 0.25;
-let ballPos = new THREE.Vector3(0, 0, 0);
-let ballVel = new THREE.Vector3(0, -0.4, -6.0); // 初期は動かない（serveで動く）
-let lastTime = null;
-let paddlePrevPos = paddlePos.clone();
-let paddleVel = new THREE.Vector3();
-let score = 0;
-let lives = 3;
-let allowServe = true;
-let gravity = 0.0; // 必要なら微小な重力を入れても良い
-let restitution = 0.95; // 反発係数
-let bounds = { x: 4.5, y: 6.0, frontZ: 6.0, backZ: -8.0 };
-let usingDevice = false;
-let gyro = { alpha:0, beta:0, gamma:0 };
-let accelText = '0,0,0';
-let collidedLastFrame = false;
+const paddleSize = { x: 2.4, y: 1.2, z: 0.4 };
+let paddlePos = new THREE.Vector3(0, -2.0, -3.5);
+let paddleVel = new THREE.Vector3(0,0,0);
+let paddleAcc = new THREE.Vector3(0,0,0);
 
-/* =========================
-   Three.js 初期化
-   ========================= */
+const ballRadius = 0.24;
+let ballPos = new THREE.Vector3(0, 0, 0);
+let ballVel = new THREE.Vector3(0, 0, 0);
+
+let lastTime = null;
+let score = 0;
+
+const bounds = { x: 4.8, y: 5.5, frontZ: 6.0, backZ: -8.0 };
+
+// 物理パラメータ（調整可）
+let gravityScale = 0.9;   // 実効重力（感度）
+let damping = 0.96;       // パドルの摩擦（速度の減衰）
+let ballDamping = 0.995;
+
+let usingDeviceOrientation = false;
+let latestAlpha = 0, latestBeta = 0, latestGamma = 0;
+
+// UI 要素
+const uiGyro = document.getElementById('gyro');
+const uiAcc = document.getElementById('acc');
+const uiScore = document.getElementById('score');
+document.getElementById('gscale').innerText = gravityScale.toFixed(2);
+document.getElementById('damp').innerText = damping.toFixed(2);
+
 function initThree() {
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
@@ -68,312 +77,288 @@ function initThree() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-  // 環境ライト
-  const light = new THREE.DirectionalLight(0xffffff, 0.9);
-  light.position.set(5,10,7);
-  scene.add(light);
-  scene.add(new THREE.AmbientLight(0x404040, 0.8));
+  // ライト
+  const dir = new THREE.DirectionalLight(0xffffff, 0.95);
+  dir.position.set(5, 10, 7);
+  scene.add(dir);
+  scene.add(new THREE.AmbientLight(0x606060, 0.6));
 
-  // 床（見た目）と奥壁（参考）
+  // 背景のグリッド（任意）
+  const gridMat = new THREE.LineBasicMaterial({color:0x1a1a1a});
   const grid = new THREE.GridHelper(20, 20, 0x222222, 0x111111);
   grid.rotation.x = Math.PI/2;
-  grid.position.set(0,0,0);
-  // scene.add(grid); // 見た目をすっきりさせたい場合は外す
+  // scene.add(grid);
 
-  // パドル（板）
+  // パドル（ブロック）
   const paddleGeo = new THREE.BoxGeometry(paddleSize.x, paddleSize.y, paddleSize.z);
-  const paddleMat = new THREE.MeshPhongMaterial({color:0x0088ff, shininess:60, opacity:0.9, transparent:true});
+  const paddleMat = new THREE.MeshPhongMaterial({color:0x2a9df4, shininess:80});
   paddle = new THREE.Mesh(paddleGeo, paddleMat);
   paddle.position.copy(paddlePos);
   scene.add(paddle);
 
   // ボール
-  const ballGeo = new THREE.SphereGeometry(ballRadius, 32, 24);
-  const ballMat = new THREE.MeshPhongMaterial({color:0xffcc00, shininess:80});
+  const ballGeo = new THREE.SphereGeometry(ballRadius, 24, 18);
+  const ballMat = new THREE.MeshPhongMaterial({color:0xffc857, shininess:80});
   ball = new THREE.Mesh(ballGeo, ballMat);
-  ball.position.copy(ballPos);
+  resetBall();
   scene.add(ball);
 
-  // 目印（カメラ位置）
-  camera.position.set(0, 0, 10);
-  camera.lookAt(new THREE.Vector3(0,0,0));
-  window.addEventListener('resize', onWindowResize);
+  // 床（視覚）
+  const floorGeo = new THREE.PlaneGeometry(20, 20, 16, 16);
+  const floorMat = new THREE.MeshPhongMaterial({color:0x0b0b0b, side: THREE.DoubleSide});
+  const floor = new THREE.Mesh(floorGeo, floorMat);
+  floor.rotation.x = Math.PI/2;
+  floor.position.z = 0;
+  floor.position.y = -3.5;
+  // scene.add(floor);
 
+  camera.position.set(0, 0, 10);
+  camera.lookAt(0, 0, 0);
+
+  window.addEventListener('resize', onWindowResize);
   requestAnimationFrame(loop);
 }
 
-/* =========================
-   画面サイズ変更
-   ========================= */
 function onWindowResize() {
-  if (!camera || !renderer) return;
   camera.aspect = window.innerWidth/window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-/* =========================
-   メインループ（物理＋描画）
-   ========================= */
+// 物理アップデートと描画
 function loop(ts) {
   if (!lastTime) lastTime = ts;
-  const dt = Math.min((ts - lastTime) / 1000, 0.05); // 秒、安定化
+  const dt = Math.min((ts - lastTime)/1000, 0.05);
   lastTime = ts;
 
-  // パドル位置は gyro または マウスで更新済み（下のイベントで変更）
-  // パドル速度
-  paddleVel.copy(paddle.position).sub(paddlePrevPos).divideScalar(Math.max(dt, 1e-6));
-  paddlePrevPos.copy(paddle.position);
+  // --- パドル：加速度 -> 速度 -> 位置 ---
+  // paddleAcc が device のイベントで設定される（下で）
+  // ここでは dt を考慮して積分
+  // 速度更新（v = v + a * dt）
+  paddleVel.addScaledVector(paddleAcc, dt);
 
-  // ボール物理
-  // 重力（必要なら）
-  ballVel.y -= gravity * dt;
+  // 摩擦（damping）を時間刻みに適用
+  paddleVel.multiplyScalar(Math.pow(damping, dt*60)); // フレームレートに依存しないように補正
 
   // 位置更新
-  ball.position.addScaledVector(ballVel, dt);
+  paddle.position.addScaledVector(paddleVel, dt * 60); // scale factor to tune feel
 
-  // 壁との反射（x,y）
+  // 境界制限（X,Y）
+  paddle.position.x = THREE.MathUtils.clamp(paddle.position.x,
+    -bounds.x + paddleSize.x/2, bounds.x - paddleSize.x/2);
+  paddle.position.y = THREE.MathUtils.clamp(paddle.position.y,
+    -bounds.y + paddleSize.y/2, bounds.y - paddleSize.y/2);
+
+  // パドルの見た目の回転を少し付けて傾きを表現（視覚効果）
+  // パドルは端末の傾きに合わせてゆっくり回転
+  paddle.rotation.x += ( -latestBeta * Math.PI/180 * 0.25 - paddle.rotation.x) * 0.08;
+  paddle.rotation.z += ( -latestGamma * Math.PI/180 * 0.25 - paddle.rotation.z) * 0.08;
+
+  // --- ボール：簡易物理（重力の影響を受ける） ---
+  // ボールにも同じ平面内での重力分力を少し与えて転がる感じにする
+  // ここでは重力を z 軸方向に使わない（カメラ奥行きを活かすため簡易化）
+  // ボール速度に軽い加速度を足す（paddleAcc を逆向きにかけることで、台を傾けた時にボールが転がる）
+  const ballGravityEffect = 0.8;
+  ballVel.addScaledVector(paddleAcc.clone().multiplyScalar(ballGravityEffect), dt*60);
+
+  // ボール摩擦
+  ballVel.multiplyScalar(Math.pow(ballDamping, dt*60));
+  ball.position.addScaledVector(ballVel, dt * 60);
+
+  // ボールの壁当たり反射（X,Y）
   if (ball.position.x > bounds.x - ballRadius) {
     ball.position.x = bounds.x - ballRadius;
-    ballVel.x *= -restitution;
+    ballVel.x *= -0.85;
   } else if (ball.position.x < -bounds.x + ballRadius) {
     ball.position.x = -bounds.x + ballRadius;
-    ballVel.x *= -restitution;
+    ballVel.x *= -0.85;
   }
   if (ball.position.y > bounds.y - ballRadius) {
     ball.position.y = bounds.y - ballRadius;
-    ballVel.y *= -restitution;
+    ballVel.y *= -0.85;
   } else if (ball.position.y < -bounds.y + ballRadius) {
     ball.position.y = -bounds.y + ballRadius;
-    ballVel.y *= -restitution;
+    ballVel.y *= -0.85;
   }
 
-  // パドルとの衝突判定（球-矩形(箱)）
-  // 箱の法線（ワールド座標）
-  const localNormal = new THREE.Vector3(0, 0, 1); // ボックスの正面（ローカル）
-  const normal = localNormal.clone().applyQuaternion(paddle.quaternion).normalize();
-
-  // 点と平面の距離
+  // z方向：パドルの前後で当たりを判定（球-箱簡易）
+  // パドルの面（正面Z）に対する距離で衝突判定
+  const normal = new THREE.Vector3(0,0,1).applyQuaternion(paddle.quaternion).normalize();
   const rel = ball.position.clone().sub(paddle.position);
   const distToPlane = rel.dot(normal);
-
-  // 衝突の候補: 距離が半幅以内（球半径）
-  let collisionNow = false;
+  let collided = false;
   if (Math.abs(distToPlane) <= ballRadius + 0.02) {
-    // 最近接点（球の中心を平面に投影）
-    const proj = ball.position.clone().sub(normal.clone().multiplyScalar(distToPlane));
-    // proj をパドルのローカル空間に変換して矩形内かチェック
-    const invMat = new THREE.Matrix4().copy(paddle.matrixWorld).invert();
-    const projLocal = proj.clone().applyMatrix4(invMat);
-    // パドルの半幅
-    const hx = paddleSize.x / 2;
-    const hy = paddleSize.y / 2;
-    if (projLocal.x >= -hx - 1e-3 && projLocal.x <= hx + 1e-3 &&
-        projLocal.y >= -hy - 1e-3 && projLocal.y <= hy + 1e-3) {
-      collisionNow = true;
+    // 近接点がパドルの範囲内かチェック（ローカル座標）
+    const inv = new THREE.Matrix4().copy(paddle.matrixWorld).invert();
+    const projLocal = ball.position.clone().applyMatrix4(inv);
+    const hx = paddleSize.x/2 + 0.02, hy = paddleSize.y/2 + 0.02;
+    if (projLocal.x >= -hx && projLocal.x <= hx && projLocal.y >= -hy && projLocal.y <= hy) {
+      collided = true;
     }
   }
-
-  if (collisionNow && !collidedLastFrame && ball.position.z > paddle.position.z - 2.0) {
-    // 衝突応答：法線で反射 + パドルの速度を少しボールに加える
+  if (collided && ball.position.z > paddle.position.z - 0.5) {
+    // 反射応答：法線反転 + パドルの速度の影響を加える
     const vDotN = ballVel.dot(normal);
-    const reflect = normal.clone().multiplyScalar(-(1 + restitution) * vDotN);
-    ballVel.add(reflect);
-    // パドルの動きの影響（打ち返しの方向を変える）
-    ballVel.add(paddleVel.clone().multiplyScalar(0.35));
-    // 軽いランダム性（ゲーム性向上）
-    ballVel.add(new THREE.Vector3(
-      (Math.random() - 0.5) * 0.6,
-      (Math.random() - 0.5) * 0.6,
-      0
-    ));
-    // スコア増加
-    score += 1;
-    document.getElementById('score').innerText = 'Score: ' + score;
-    // 触覚フィードバック（サポートがあれば）
-    if (navigator.vibrate) navigator.vibrate(20);
+    ballVel.add(normal.clone().multiplyScalar(-(1.6) * vDotN)); // 反発
+    ballVel.add(paddleVel.clone().multiplyScalar(0.6)); // パドル速度を伝える
+    // スコア
+    score++;
+    uiScore.innerText = 'Score: ' + score;
+    if (navigator.vibrate) navigator.vibrate(12);
   }
 
-  collidedLastFrame = collisionNow;
-
-  // ボールがパドルよりさらに奥（プレイヤー側を越えた）場合はミス
-  if (ball.position.z < paddle.position.z - 1.5) {
-    // ミス処理
-    lives -= 1;
-    document.getElementById('lives').innerText = 'Lives: ' + lives;
-    // リセットかゲームオーバー
-    if (lives <= 0) {
-      alert('ゲームオーバー！ スコア: ' + score);
-      resetGame();
-    } else {
-      // 落ちたらボールを初期位置に戻す（サーブ待ち）
-      resetBall();
-    }
+  // ball が手前に落ちたらリセット
+  if (ball.position.z < paddle.position.z - 3.0) {
+    resetBall();
   }
 
-  // 前方（画面奥）に行きすぎたら手前に戻す（ループさせる）
-  if (ball.position.z > bounds.frontZ) {
-    ball.position.z = bounds.frontZ;
-    ballVel.z *= -restitution;
-  }
-
-  // 描画更新（メッシュ）
-  // 既に ball.position と paddle.position を直接操作しているためそのまま描画
   renderer.render(scene, camera);
-
   requestAnimationFrame(loop);
 }
 
-/* =========================
-   センサー／入力処理
-   ========================= */
+// サーバー（サーブ）やリセット関係
+function resetBall() {
+  ball.position.set(0, 1.2, 2.6);
+  ballVel.set(0, 0, 0);
+}
 
-function enableDeviceSensors() {
-  // iOS の場合、DeviceOrientationEvent.requestPermission() が必要
-  if (typeof DeviceOrientationEvent !== 'undefined' &&
-      typeof DeviceOrientationEvent.requestPermission === 'function') {
-    DeviceOrientationEvent.requestPermission().then(response => {
-      if (response === 'granted') {
-        window.addEventListener('deviceorientation', onDeviceOrientation);
-        window.addEventListener('devicemotion', onDeviceMotion);
-        usingDevice = true;
+// ========================
+// センサー入力処理
+// ========================
+
+// デバイスの角度（beta,gamma）を元に、平面上の重力分力を計算して paddleAcc に設定
+function handleOrientationAngles(alpha, beta, gamma) {
+  // alpha, beta, gamma は degrees
+  latestAlpha = alpha || 0;
+  latestBeta = beta || 0;
+  latestGamma = gamma || 0;
+
+  uiGyro.innerText = `α:${latestAlpha.toFixed(1)} β:${latestBeta.toFixed(1)} γ:${latestGamma.toFixed(1)}`;
+
+  // beta: front-back tilt (-180..180) (正なら前に倒れる)
+  // gamma: left-right tilt (-90..90) (正なら右に倒れる)
+  // 重力 9.8 を使って平面上の分力を近似
+  const g = 9.8;
+  const betaRad = latestBeta * Math.PI/180;
+  const gammaRad = latestGamma * Math.PI/180;
+
+  // 平面上の加速度成分（x:左右, y:上下）を計算
+  // 実験的に符号・向きを調整（端末向きにより逆になることがあるので必要なら反転）
+  const gx = g * Math.sin(gammaRad);      // 右に傾けると正
+  const gy = -g * Math.sin(betaRad);      // 前に倒す（beta正）と -y 方向（スクリーン上では下が正）に動かす -> 符号調整
+
+  // 実効加速度（感度調整）
+  paddleAcc.x = gx * gravityScale;
+  paddleAcc.y = gy * gravityScale;
+  // z は使わない
+
+  uiAcc.innerText = `gx,gy: ${paddleAcc.x.toFixed(2)}, ${paddleAcc.y.toFixed(2)}`;
+}
+
+// devicemotion fallback: accelerationIncludingGravity をそのまま平面に使う（デバイス依存）
+function handleMotionEvent(e) {
+  const a = e.accelerationIncludingGravity;
+  if (!a) return;
+  // a.x: right-positive, a.y: up-positive (device coord), a.z: toward sky-positive (device coord)
+  // ここでは a.x を左右、a.y を上下に使う（端末向きにより要調整）
+  const gx = a.x || 0;
+  const gy = a.y || 0;
+  paddleAcc.x = gx * gravityScale * 0.9;
+  paddleAcc.y = -gy * gravityScale * 0.9;
+  uiAcc.innerText = `accIncl: ${paddleAcc.x.toFixed(2)}, ${paddleAcc.y.toFixed(2)}`;
+}
+
+// iOS の許可とイベント登録
+async function enableSensors() {
+  // iOS 13+ の対応
+  try {
+    if (typeof DeviceOrientationEvent !== 'undefined' &&
+        typeof DeviceOrientationEvent.requestPermission === 'function') {
+      const res = await DeviceOrientationEvent.requestPermission();
+      if (res === 'granted') {
+        window.addEventListener('deviceorientation', (ev) => {
+          usingDeviceOrientation = true;
+          handleOrientationAngles(ev.alpha ?? 0, ev.beta ?? 0, ev.gamma ?? 0);
+        }, true);
+        window.addEventListener('devicemotion', (ev) => {
+          handleMotionEvent(ev);
+        }, true);
       } else {
-        alert('センサーの許可が必要です。代わりにタッチ／マウスで操作してください。');
+        // 許可拒否ならマウスフォールバック
         enableMouseFallback();
       }
-    }).catch(err => {
-      console.error(err);
-      enableMouseFallback();
-    });
-  } else {
-    // Android や デスクトップ（許可不要なケース）
-    window.addEventListener('deviceorientation', onDeviceOrientation);
-    window.addEventListener('devicemotion', onDeviceMotion);
-    usingDevice = true;
+    } else {
+      // iOS 以外（Android 等）は許可不要なことが多い
+      window.addEventListener('deviceorientation', (ev) => {
+        usingDeviceOrientation = true;
+        handleOrientationAngles(ev.alpha ?? 0, ev.beta ?? 0, ev.gamma ?? 0);
+      }, true);
+      window.addEventListener('devicemotion', (ev) => {
+        handleMotionEvent(ev);
+      }, true);
+    }
+  } catch (err) {
+    console.warn('Sensor permission error:', err);
+    enableMouseFallback();
   }
 }
 
-// DeviceOrientation のイベントでパドル位置を更新（β: 前後傾き, γ: 左右傾き）
-function onDeviceOrientation(e) {
-  // e.alpha/beta/gamma が null の場合があるのでガード
-  const alpha = e.alpha ?? gyro.alpha;
-  const beta  = e.beta  ?? gyro.beta;
-  const gamma = e.gamma ?? gyro.gamma;
-  gyro.alpha = alpha; gyro.beta = beta; gyro.gamma = gamma;
-
-  document.getElementById('gyro').innerText =
-    `α:${alpha.toFixed(1)} β:${beta.toFixed(1)} γ:${gamma.toFixed(1)}`;
-
-  // マッピング：gamma -> x 軸、beta -> y 軸（微調整可）
-  // スマホ向き（縦持ち）を想定。必要なら係数を調整してください。
-  const maxTiltX = 35; // deg
-  const maxTiltY = 35;
-  // 正規化
-  let nx = Math.max(-1, Math.min(1, gamma / maxTiltX));
-  let ny = Math.max(-1, Math.min(1, beta / maxTiltY));
-
-  // 位置反転やオフセットは端末向きによって調整が必要な場合あり
-  const targetX = nx * (bounds.x - paddleSize.x/2 - 0.2);
-  const targetY = ny * (bounds.y - paddleSize.y/2 - 0.5);
-
-  // 滑らかに補間
-  paddle.position.x += (targetX - paddle.position.x) * 0.25;
-  paddle.position.y += (targetY - paddle.position.y) * 0.25;
-}
-
-// DeviceMotion で加速度を表示（任意）
-function onDeviceMotion(e) {
-  const a = e.acceleration ?? e.accelerationIncludingGravity;
-  if (!a) return;
-  accelText = `${(a.x||0).toFixed(2)}, ${(a.y||0).toFixed(2)}, ${(a.z||0).toFixed(2)}`;
-  document.getElementById('acc').innerText = 'acc: ' + accelText;
-}
-
-/* =========================
-   マウス／タッチのフォールバック（デバッグ用）
-   ========================= */
+// マウス / タッチフォールバック（PC や許可拒否時）
 function enableMouseFallback() {
   document.addEventListener('mousemove', (ev) => {
-    // 画面上での位置を -bounds..bounds にマップ
+    // 画面上の位置を -bounds..bounds にマップしてパドル加速度とする（直接位置でなく加速度寄せにする）
     const nx = (ev.clientX / window.innerWidth) * 2 - 1;
-    const ny = ((ev.clientY / window.innerHeight) * 2 - 1);
-    paddle.position.x = nx * (bounds.x - paddleSize.x/2 - 0.2);
-    paddle.position.y = ny * (bounds.y - paddleSize.y/2 - 0.5);
+    const ny = -((ev.clientY / window.innerHeight) * 2 - 1);
+    const targetX = nx * (bounds.x - paddleSize.x/2);
+    const targetY = ny * (bounds.y - paddleSize.y/2);
+    // 簡易的に加速度目標を作る
+    paddleAcc.x = (targetX - paddle.position.x) * 2.8;
+    paddleAcc.y = (targetY - paddle.position.y) * 2.8;
+    uiAcc.innerText = `mouse-acc: ${paddleAcc.x.toFixed(2)}, ${paddleAcc.y.toFixed(2)}`;
   });
-  // タッチ移動
   document.addEventListener('touchmove', (ev) => {
     if (ev.touches.length === 0) return;
     const t = ev.touches[0];
     const nx = (t.clientX / window.innerWidth) * 2 - 1;
     const ny = -((t.clientY / window.innerHeight) * 2 - 1);
-    paddle.position.x = nx * (bounds.x - paddleSize.x/2 - 0.2);
-    paddle.position.y = ny * (bounds.y - paddleSize.y/2 - 0.5);
+    const targetX = nx * (bounds.x - paddleSize.x/2);
+    const targetY = ny * (bounds.y - paddleSize.y/2);
+    paddleAcc.x = (targetX - paddle.position.x) * 2.8;
+    paddleAcc.y = (targetY - paddle.position.y) * 2.8;
   }, {passive:true});
 }
 
-/* =========================
-   サーブ / リセット
-   ========================= */
-function serveBall() {
-  if (!allowServe) return;
-  // サーブはボールをプレイヤー側（プラッドより前）に置いて手前から奥へ落とす
-  ball.position.set(
-    paddle.position.x,
-    paddle.position.y + 2.0,
-    paddle.position.z + 5.0
-  );
-  // ランダム性を持たせて奥に向かって落とす（z負方向）
-  ballVel.set(
-    (Math.random() - 0.5) * 1.2,
-    (Math.random() - 0.2) * 1.2,
-    -6.0 - Math.random() * 1.5
-  );
-  allowServe = false;
-}
-
-function resetBall() {
-  allowServe = true;
-  // ボールを視野の手前に戻す（サーブ待ち）
-  ball.position.set(0, 2.0, 3.0);
-  ballVel.set(0, 0, 0);
-}
-
-function resetGame() {
-  score = 0;
-  lives = 3;
-  document.getElementById('score').innerText = 'Score: ' + score;
-  document.getElementById('lives').innerText = 'Lives: ' + lives;
-  resetBall();
-}
-
-/* =========================
-   UI / スタート処理
-   ========================= */
+// UI ボタン
 document.getElementById('startBtn').addEventListener('click', async () => {
   document.getElementById('startBtn').style.display = 'none';
   initThree();
-  // センサーを使えるようにする
-  enableDeviceSensors();
-  // マウスフォールバック（スマホで使うときはタッチで使える）
+  await enableSensors();
   enableMouseFallback();
-  // 初期ボールを置く
-  resetBall();
 });
 
-// 画面タップでサーブ（またはボールを再配置）
+// 画面タップでボールを前方にサーブ（またはリセット）
 window.addEventListener('touchstart', (ev) => {
-  // タップが UI のボタンと被っている時は無視
-  serveBall();
+  // シンプルにサーブ
+  ball.position.set(paddle.position.x, paddle.position.y + 1.2, paddle.position.z + 4.0);
+  ballVel.set((Math.random()-0.5)*1.2, (Math.random()-0.3)*1.0, -1.5 - Math.random()*3.0);
 }, {passive:true});
-window.addEventListener('mousedown', (ev) => {
-  serveBall();
+window.addEventListener('mousedown', () => {
+  ball.position.set(paddle.position.x, paddle.position.y + 1.2, paddle.position.z + 4.0);
+  ballVel.set((Math.random()-0.5)*1.2, (Math.random()-0.3)*1.0, -1.5 - Math.random()*3.0);
 });
 
-/* =========================
-   初期表示用の変数（まだセンサー開始していない場合に備える）
-   ========================= */
-document.getElementById('gyro').innerText = 'α: 0 β: 0 γ: 0';
-document.getElementById('acc').innerText = 'acc: 0,0,0';
+// キーボードでパラメータ調整（デバッグ用）
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowUp') { gravityScale = Math.min(2.5, gravityScale + 0.05); document.getElementById('gscale').innerText = gravityScale.toFixed(2); }
+  if (e.key === 'ArrowDown') { gravityScale = Math.max(0.05, gravityScale - 0.05); document.getElementById('gscale').innerText = gravityScale.toFixed(2); }
+  if (e.key === 'ArrowRight') { damping = Math.min(0.999, damping + 0.005); document.getElementById('damp').innerText = damping.toFixed(2); }
+  if (e.key === 'ArrowLeft') { damping = Math.max(0.85, damping - 0.005); document.getElementById('damp').innerText = damping.toFixed(2); }
+});
+
+// 初期化クリックがなされていない場合でも UI は見えるようにしておく
+uiGyro.innerText = 'α: 0 β: 0 γ: 0';
+uiAcc.innerText = 'gx,gy: 0, 0';
+uiScore.innerText = 'Score: ' + score;
 
 </script>
 </body>
