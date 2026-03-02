@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
 # Blueprintの定義
-rakuten_bp = Blueprint('rakuten', __name__)
+work_optimize1_bp = Blueprint('work_optimize1', __name__)
 
 # .envの読み込み（個別のファイルでも念のため実行）
 load_dotenv()
@@ -197,11 +197,11 @@ def transform_data_for_csv(data_dict):
 # ルート（Blueprint用）
 # =========================
 
-@rakuten_bp.route("/work_optimization")
+@work_optimize1_bp.route("/work_optimization")
 def index():
     return render_template("work_optimization.html")
 
-@rakuten_bp.route("/convert", methods=["POST"])
+@work_optimize1_bp.route("/convert", methods=["POST"])
 def convert():
     data_dict = {
         "出発期間+粗利率": request.form.get("departure_rate", ""),
