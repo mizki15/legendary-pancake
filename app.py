@@ -2,11 +2,11 @@ from flask import Flask, render_template
 from dotenv import load_dotenv
 
 # 1. 各Blueprintをインポート
-from study import study_bp
-from todai_listening import todai_bp
-from rakuten import rakuten_bp
-from rocket import rocket_bp
-from misc import misc_bp
+from routes.study import study_bp
+from routes.todai_listening import todai_bp
+from routes.rakuten import rakuten_bp
+from routes.rocket import rocket_bp
+from routes.misc import misc_bp
 
 # .env読み込み
 load_dotenv()
@@ -30,3 +30,4 @@ app.register_blueprint(misc_bp)
 if __name__ == '__main__':
     # 開発環境ではdebug=True
     app.run(debug=True)
+
