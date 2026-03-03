@@ -197,9 +197,9 @@ def transform_data_for_csv(data_dict):
 # ルート（Blueprint用）
 # =========================
 
-@work_optimize1_bp.route("/work_optimization")
+@work_optimize1_bp.route("/work_optimize1")
 def index():
-    return render_template("work_optimization.html")
+    return render_template("work_optimize1.html")
 
 @work_optimize1_bp.route("/convert", methods=["POST"])
 def convert():
