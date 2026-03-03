@@ -2,32 +2,50 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8" />
-    <title>業務効率化ツール</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', q='20250705120') }}">
+    <title>業務効率化ツール2 (フライト)</title>
+    <link rel="stylesheet" href="css/style.css?1">
 </head>
 <body>
-    <h1>業務効率化ツール</h1>
+    <h1>業務効率化ツール2 (フライト)</h1>
     <form action="/convert" method="post">
         <div class="main-grid">
             <div class="left-half">
-                <label>出発期間+粗利率（5列分のデータ）</label>
-                <textarea class ="lefttext" name="departure_rate" rows="18" required></textarea>
-            </div>
+                <label>便番号</label>
+                <textarea class ="lefttext" name="flight_number" rows="18" required></textarea>
 
-            <div class="right-top">
-                <label>施設番号+施設名（2列分のデータ）</label>
-                <textarea class = "righttext" name="facility" rows="9" required></textarea>
-            </div>
+                <label style="margin-top:1em; display:block;">路線</label>
+                <div class="route-horizontal" style="margin-bottom:1em;">
+                    <label><input type="radio" name="routes" value="往路"> 往路</label>
+                    <label><input type="radio" name="routes" value="復路"> 復路</label>
+                </div>
+		    </div>
 
-            <div class="right-bottom">
-                <label>販売期間(from)</label>
-                <input type="text" name="sale_from" placeholder="YYYY/MM/DD または YYYYMMDD" required>
 
-                <label>販売期間(to)</label>
-                <input type="text" name="sale_to" placeholder="YYYY/MM/DD または YYYYMMDD" required>
+            <div class="right-half">
+                <div class="flight-period-box">
+                    <label>販売期間</label>
+                    <div class="flight-period-inline">
+                        <input type="text" name="sale_from" placeholder="YYYY/MM/DD または YYYYMMDD" required>
+                        <span style="margin:0 0.7em;">～</span>
+                        <input type="text" name="sale_to" placeholder="YYYY/MM/DD または YYYYMMDD" required>
+                    </div>
+                </div>
 
-                <label>発空港</label>
+                
+                <div class="flight-period-box">
+                    <label>搭乗期間</label>
+                    <div class="flight-period-inline">
+                        <input type="text" name="flight_from" placeholder="YYYY/MM/DD または YYYYMMDD" required>
+                        <span style="margin:0 0.7em;">～</span>
+                        <input type="text" name="flight_to" placeholder="YYYY/MM/DD または YYYYMMDD" required>
+                    </div>
+                </div>
+
+                <label>発空港コード</label>
                 <input type="text" name="airport" placeholder="例: HND" required>
+
+                <label>日数</label>
+                <input class = "day-input" min="1" type="number" name="day"  required>
 
                 <label>参加者合計人数</label>
                 <div class="radio-group-horizontal">
@@ -39,8 +57,74 @@
         </div>
 
         <div class="submit-container">
-            <button type="submit">CSVに変換</button>
+        <div class="day-table-container" style="margin-bottom: 1em; margin-top: 0em;">
+            <label>利益率　　(全曜日☑の場合は日曜日の値を参照)</label>
+            <div style="display: flex; justify-content: center;">
+            <table class="day-table" style="margin-top: 0.5em; border-collapse: collapse; min-width: 0; text-align: center; font-size: 0.95em;">
+                <thead>
+                    <tr>
+                        <th style="padding:2px 6px; border-right: 1.5px solid #e0e0e0; border-bottom: 1.5px solid #e0e0e0;">年齢層</th>
+                        <th style="padding:2px 6px; border-right: 1.5px solid #e0e0e0; border-bottom: 1.5px solid #e0e0e0;">全曜日適用</th>
+                        <th style="padding:2px 6px; border-bottom: 1.5px solid #e0e0e0;">日</th>
+                        <th style="padding:2px 6px; border-bottom: 1.5px solid #e0e0e0;">月</th>
+                        <th style="padding:2px 6px; border-bottom: 1.5px solid #e0e0e0;">火</th>
+                        <th style="padding:2px 6px; border-bottom: 1.5px solid #e0e0e0;">水</th>
+                        <th style="padding:2px 6px; border-bottom: 1.5px solid #e0e0e0;">木</th>
+                        <th style="padding:2px 6px; border-bottom: 1.5px solid #e0e0e0;">金</th>
+                        <th style="padding:2px 6px; border-bottom: 1.5px solid #e0e0e0;">土</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding:2px 6px; border-right: 1.5px solid #e0e0e0;">大人</td>
+                        <td style="padding:2px 6px; border-right: 1.5px solid #e0e0e0;"><input type="checkbox" name="profit_margin[]" value="adult_allweek"></td>
+                        <td style="padding:2px 6px;"><input type="number" name="profit_margin[]" min="0" step="1" value="0" inputmode="numeric" pattern="[0-9]*" style="width:4em; font-size: 1em; "></td>
+                        <td style="padding:2px 6px;"><input type="number" name="profit_margin[]" min="0" step="1" value="0" inputmode="numeric" pattern="[0-9]*" style="width:4em; font-size: 1em; "></td>
+                        <td style="padding:2px 6px;"><input type="number" name="profit_margin[]" min="0" step="1" value="0" inputmode="numeric" pattern="[0-9]*" style="width:4em; font-size: 1em; "></td>
+                        <td style="padding:2px 6px;"><input type="number" name="profit_margin[]" min="0" step="1" value="0" inputmode="numeric" pattern="[0-9]*" style="width:4em; font-size: 1em; "></td>
+                        <td style="padding:2px 6px;"><input type="number" name="profit_margin[]" min="0" step="1" value="0" inputmode="numeric" pattern="[0-9]*" style="width:4em; font-size: 1em; "></td>
+                        <td style="padding:2px 6px;"><input type="number" name="profit_margin[]" min="0" step="1" value="0" inputmode="numeric" pattern="[0-9]*" style="width:4em; font-size: 1em; "></td>
+                        <td style="padding:2px 6px;"><input type="number" name="profit_margin[]" min="0" step="1" value="0" inputmode="numeric" pattern="[0-9]*" style="width:4em; font-size: 1em; "></td>
+                    </tr>
+                    <tr>
+                        <td style="padding:2px 6px; border-right: 1.5px solid #e0e0e0;">子供</td>
+                        <td style="padding:2px 6px; border-right: 1.5px solid #e0e0e0;"><input type="checkbox" name="profit_margin[]" value="child_allweek"></td>
+                        <td style="padding:2px 6px;"><input type="number" name="profit_margin[]" min="0" step="1" value="0" inputmode="numeric" pattern="[0-9]*" style="width:4em; font-size: 1em; "></td>
+                        <td style="padding:2px 6px;"><input type="number" name="profit_margin[]" min="0" step="1" value="0" inputmode="numeric" pattern="[0-9]*" style="width:4em; font-size: 1em; "></td>
+                        <td style="padding:2px 6px;"><input type="number" name="profit_margin[]" min="0" step="1" value="0" inputmode="numeric" pattern="[0-9]*" style="width:4em; font-size: 1em; "></td>
+                        <td style="padding:2px 6px;"><input type="number" name="profit_margin[]" min="0" step="1" value="0" inputmode="numeric" pattern="[0-9]*" style="width:4em; font-size: 1em; "></td>
+                        <td style="padding:2px 6px;"><input type="number" name="profit_margin[]" min="0" step="1" value="0" inputmode="numeric" pattern="[0-9]*" style="width:4em; font-size: 1em; "></td>
+                        <td style="padding:2px 6px;"><input type="number" name="profit_margin[]" min="0" step="1" value="0" inputmode="numeric" pattern="[0-9]*" style="width:4em; font-size: 1em; "></td>
+                        <td style="padding:2px 6px;"><input type="number" name="profit_margin[]" min="0" step="1" value="0" inputmode="numeric" pattern="[0-9]*" style="width:4em; font-size: 1em; "></td>
+                    </tr>
+                    <tr>
+                        <td style="padding:2px 6px; border-right: 1.5px solid #e0e0e0;">幼児</td>
+                        <td style="padding:2px 6px; border-right: 1.5px solid #e0e0e0;"><input type="checkbox" name="profit_margin[]" value="infant_allweek"></td>
+                        <td style="padding:2px 6px;"><input type="number" name="profit_margin[]" min="0" step="1" value="0" inputmode="numeric" pattern="[0-9]*" style="width:4em; font-size: 1em; "></td>
+                        <td style="padding:2px 6px;"><input type="number" name="profit_margin[]" min="0" step="1" value="0" inputmode="numeric" pattern="[0-9]*" style="width:4em; font-size: 1em; "></td>
+                        <td style="padding:2px 6px;"><input type="number" name="profit_margin[]" min="0" step="1" value="0" inputmode="numeric" pattern="[0-9]*" style="width:4em; font-size: 1em; "></td>
+                        <td style="padding:2px 6px;"><input type="number" name="profit_margin[]" min="0" step="1" value="0" inputmode="numeric" pattern="[0-9]*" style="width:4em; font-size: 1em; "></td>
+                        <td style="padding:2px 6px;"><input type="number" name="profit_margin[]" min="0" step="1" value="0" inputmode="numeric" pattern="[0-9]*" style="width:4em; font-size: 1em; "></td>
+                        <td style="padding:2px 6px;"><input type="number" name="profit_margin[]" min="0" step="1" value="0" inputmode="numeric" pattern="[0-9]*" style="width:4em; font-size: 1em; "></td>
+                        <td style="padding:2px 6px;"><input type="number" name="profit_margin[]" min="0" step="1" value="0" inputmode="numeric" pattern="[0-9]*" style="width:4em; font-size: 1em; "></td>
+                    </tr>
+                </tbody>
+            </table>
+            </div>
+        </div>
+        <button type="submit">CSVに変換</button>
         </div>
     </form>
 </body>
 </html>
+<script>
+// 利益率テーブルの数値欄をクリックしたら全選択
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('input[type="number"][name="profit_margin[]"]')
+        .forEach(function(input) {
+            input.addEventListener('focus', function(e) {
+                e.target.select();
+            });
+        });
+});
+</script>
