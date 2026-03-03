@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 # 1. 各Blueprintをインポート
 from routes.study import study_bp
 from routes.work_optimize1 import work_optimize1_bp
-from routes.work_optimize1 import work_optimize2_bp
+from routes.work_optimize2 import work_optimize2_bp
 from routes.rocket import rocket_bp
 from routes.misc import misc_bp
 
@@ -30,6 +30,7 @@ app.register_blueprint(misc_bp)
 if __name__ == '__main__':
     # 開発環境ではdebug=True
     app.run(debug=True)
+
 
 
 
