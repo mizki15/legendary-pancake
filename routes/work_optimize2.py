@@ -1,15 +1,32 @@
 from flask import Blueprint, request, send_file, render_template
-        print(k, '=>', v)
-    print('--- form end ---')
+import io
+import csv
+import zoneinfo
+from datetime import datetime
+from dotenv import load_dotenv
 
-    # textarea の便番号を行ごとに分割
-    flight_number_raw = request.form.get("flight_number", "")
-    flight_numbers = [f.strip() for f in flight_number_raw.splitlines() if f.strip()]
-    if not flight_numbers:
-        # 空でも1行の空文字列を出力する（必要に応じて変更）
-        flight_numbers = [""]
+# Blueprintの定義
+work_optimize2_bp = Blueprint('work_optimize2', __name__)
 
-    # 他の単純フィールド
+# .env の読み込み（念のため）
+load_dotenv()
+
+@work_optimize2_bp.route("/work_optimize2")
+def index():
+    return render_template("work_optimize2.html")
+
+@work_optimize2_bp.route("/convert", methods=["POST"])
+def convert():
+    """
+    修正点:
+    - チェックボックスは個別 name (profit_adult_allweek 等)
+    - 数値入力はそれぞれ profit_adult[], profit_child[], profit_infant[]
+    - 各配列は7要素になるように不足分は "0" でパディング
+    - allweek チェックが入っていれば日曜日(インデックス0)の値を7日分に展開
+    """
+
+    # ----- 基本情報 -----
+    flight_number = request.form.get("flight_number", "")
     route = request.form.get("routes", "")
     sale_from = request.form.get("sale_from", "")
     sale_to = request.form.get("sale_to", "")
@@ -19,62 +36,82 @@ from flask import Blueprint, request, send_file, render_template
     airport = request.form.get("airport", "")
     participants = request.form.get("participants", "")
 
-    participants_map = {"1": "1人", "2": "2人以上", "全て": "全て"}
-    participants_disp = participants_map.get(participants, participants)
+    # ----- 利益率（各年齢層ごとに7要素を期待） -----
+    def safe_getlist(name):
+        lst = request.form.getlist(name)
+        # 空文字や None の場合を避けるため文字列に揃える
+        return [ (v if v is not None else "") for v in lst ]
 
-    # 利益率グループを取得するヘルパー
-    def get_group(prefix):
-        # checkbox はチェック時に '1' が送られる想定
-        allweek = request.form.get(f"{prefix}_allweek")
-        keys = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]
-        vals = []
-        for k in keys:
-            v = request.form.get(f"{prefix}_{k}", "0")
-            v = v.strip() if isinstance(v, str) else v
-            if v == "":
-                v = "0"
-            vals.append(v)
-        if allweek:
-            # 全曜日適用なら日曜日の値を使う
-            return [vals[0]] * 7
-        return vals
+    adult_raw = safe_getlist("profit_adult[]")    # expected 7 items
+    child_raw = safe_getlist("profit_child[]")
+    infant_raw = safe_getlist("profit_infant[]")
 
-    adult_profits = get_group("adult")
-    child_profits = get_group("child")
-    infant_profits = get_group("infant")
+    # パディング: 足りなければ "0" で埋める（defensive）
+    def pad_to_7(lst):
+        out = list(lst[:7])
+        while len(out) < 7:
+            out.append("0")
+        return out
+
+    adult_raw = pad_to_7(adult_raw)
+    child_raw = pad_to_7(child_raw)
+    infant_raw = pad_to_7(infant_raw)
+
+    # 全曜日適用チェック（checkbox の value="1" を期待）
+    adult_allweek = request.form.get("profit_adult_allweek") == "1"
+    child_allweek = request.form.get("profit_child_allweek") == "1"
+    infant_allweek = request.form.get("profit_infant_allweek") == "1"
+
+    def expand_allweek(raw_list, allweek_flag):
+        if allweek_flag:
+            # 日曜日(フォーム上は最初の入力を日曜日にしている想定)
+            sun_value = raw_list[0] if len(raw_list) > 0 else "0"
+            return [sun_value] * 7
+        else:
+            return raw_list[:7]
+
+    adult_profits = expand_allweek(adult_raw, adult_allweek)
+    child_profits = expand_allweek(child_raw, child_allweek)
+    infant_profits = expand_allweek(infant_raw, infant_allweek)
 
     youbi_list = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
 
-    # 作成日時 (JST)
+    # 人数表記
+    participants_map = {"1": "1人", "2": "2人以上", "全て": "全て"}
+    participants_disp = participants_map.get(participants, participants)
+
+    # 作成日時 JST
     JST = zoneinfo.ZoneInfo("Asia/Tokyo")
     now_str = datetime.now(JST).strftime("%Y/%m/%d %H:%M:%S")
 
-    # CSV 生成: 各便×各曜日 の行を出力
+    # CSV 出力（Shift_JIS でダウンロード）
     output = io.StringIO()
     writer = csv.writer(output, quoting=csv.QUOTE_ALL)
 
     # ヘッダ（必要なら）
-    writer.writerow(["flight_number", "route", "sale_from", "sale_to", "flight_from", "flight_to", "day", "airport", "participants", "generated_at", "weekday", "adult_profit", "child_profit", "infant_profit"]) 
+    writer.writerow([
+        "便番号","路線","販売期間(From)","販売期間(To)",
+        "搭乗期間(From)","搭乗期間(To)","日数","発空港コード",
+        "参加者","作成日時","曜日","大人利益率","子供利益率","幼児利益率"
+    ])
 
-    for flight in flight_numbers:
-        for idx, youbi in enumerate(youbi_list):
-            writer.writerow([
-                flight,
-                route,
-                sale_from,
-                sale_to,
-                flight_from,
-                flight_to,
-                day,
-                airport,
-                participants_disp,
-                now_str,
-                youbi,
-                adult_profits[idx],
-                child_profits[idx],
-                infant_profits[idx],
-            ])
-
+    for idx, youbi in enumerate(youbi_list):
+        writer.writerow([
+            flight_number,
+            route,
+            sale_from,
+            sale_to,
+            flight_from,
+            flight_to,
+            day,
+            airport,
+            participants_disp,
+            now_str,
+            youbi,
+            adult_profits[idx],
+            child_profits[idx],
+            infant_profits[idx],
+        ])
     output.seek(0)
 
     return send_file(
