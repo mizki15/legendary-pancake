@@ -8,11 +8,11 @@
 <body>
     <h1>業務効率化ツール2 (フライト)</h1>
 
-    <form action="{{ url_for('work_optimize2.convert') }}" method="post">
+    <form id="convertForm" method="post">
         <div class="main-grid">
             <div class="left-half">
-                <label>便番号 (改行区切りで複数入力)</label>
-                <textarea class ="lefttext" name="flight_number" rows="18" required placeholder="例: NH123&#13;NH456"></textarea>
+                <label>便番号 (改行区切り)</label>
+                <textarea class ="lefttext" name="flight_number" rows="18" required></textarea>
 
                 <label style="margin-top:1em; display:block;">路線</label>
                 <div class="route-horizontal">
@@ -23,60 +23,97 @@
 
             <div class="right-half">
                 <div class="flight-period-box">
-                    <label>販売期間</label>
-                    <div class="flight-period-inline">
-                        <input type="text" name="sale_from" placeholder="YYYY/MM/DD" required>
-                        <span>～</span>
-                        <input type="text" name="sale_to" placeholder="YYYY/MM/DD" required>
-                    </div>
+                    <label>販売期間 / 搭乗期間</label>
+                    <input type="text" name="sale_from" placeholder="販売From" required>
+                    <input type="text" name="sale_to" placeholder="販売To" required>
+                    <input type="text" name="flight_from" placeholder="搭乗From" required>
+                    <input type="text" name="flight_to" placeholder="搭乗To" required>
                 </div>
-
-                <div class="flight-period-box">
-                    <label>搭乗期間</label>
-                    <div class="flight-period-inline">
-                        <input type="text" name="flight_from" placeholder="YYYY/MM/DD" required>
-                        <span>～</span>
-                        <input type="text" name="flight_to" placeholder="YYYY/MM/DD" required>
-                    </div>
-                </div>
-
-                <label>発空港コード</label>
-                <input type="text" name="airport" placeholder="HND" required>
-
-                <label>日数</label>
-                <input class="day-input" type="number" name="day" min="1" value="1" required>
-
-                <label>参加者合計人数</label>
-                <div class="radio-group-horizontal">
-                    <label><input type="radio" name="participants" value="1" required> 一人</label>
-                    <label><input type="radio" name="participants" value="2"> 二人以上</label>
-                    <label><input type="radio" name="participants" value="全て"> 全て</label>
-                </div>
+                <label>発空港</label><input type="text" name="airport" required>
+                <label>日数</label><input type="number" name="day" value="1" required>
+                <label>参加者</label>
+                <select name="participants">
+                    <option value="1">1人</option>
+                    <option value="2">2人以上</option>
+                    <option value="全て">全て</option>
+                </select>
             </div>
         </div>
 
         <div class="submit-container">
-            <label>利益率設定 (全適用チェック時は日曜日の値を使用)</label>
-            <table class="day-table" style="width:100%; border-collapse: collapse; margin-top:10px;">
-                <thead>
-                    <tr style="background:#f2f2f2;">
-                        <th>年齢層</th><th>全適用</th><th>日</th><th>月</th><th>火</th><th>水</th><th>木</th><th>金</th><th>土</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for type_en, type_ja in [('adult','大人'), ('child','子供'), ('infant','幼児')] %}
-                    <tr>
-                        <td style="padding:5px;">{{ type_ja }}</td>
-                        <td><input type="checkbox" name="profit_{{ type_en }}_allweek" value="1"></td>
-                        {% for i in range(7) %}
-                        <td><input type="number" name="profit_{{ type_en }}[]" value="0" style="width:3.5em;"></td>
-                        {% endfor %}
-                    </tr>
+            <table class="day-table">
+                {% for type in ['adult', 'child', 'infant'] %}
+                <tr>
+                    <td>{{ type }}</td>
+                    <td><input type="checkbox" name="profit_{{ type }}_allweek" value="1"></td>
+                    {% for i in range(7) %}
+                    <td><input type="number" name="profit_{{ type }}[]" value="0" style="width:3em;"></td>
                     {% endfor %}
-                </tbody>
+                </tr>
+                {% endfor %}
             </table>
-            <button type="submit" style="margin-top:30px; padding: 10px 40px; font-weight: bold; cursor: pointer;">CSVに変換してダウンロード</button>
+            <button type="submit" id="submitBtn" style="margin-top:20px; padding:10px 30px;">CSVに変換 (ブラウザコンソールを確認)</button>
         </div>
     </form>
+
+    <script>
+    document.getElementById('convertForm').addEventListener('submit', async function(e) {
+        e.preventDefault(); // 通常の送信を止める
+        
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.innerText = "処理中...";
+
+        console.log("--- [Browser Console] 処理開始 ---");
+
+        // 1. フォームデータの取得
+        const formData = new FormData(this);
+        console.log("送信データ内容:");
+        for (let [key, value] of formData.entries()) {
+            console.log(`  ${key}: ${value}`);
+        }
+
+        try {
+            // 2. サーバーへ送信
+            console.log("サーバーにリクエストを送信中...");
+            const response = await fetch("{{ url_for('work_optimize2.convert') }}", {
+                method: "POST",
+                body: formData
+            });
+
+            console.log(`HTTPステータス: ${response.status} ${response.statusText}`);
+
+            if (!response.ok) throw new Error("サーバーエラーが発生しました");
+
+            // 3. Blobとしてデータを受け取る
+            const blob = await response.blob();
+            console.log(`受信データサイズ: ${blob.size} バイト`);
+
+            if (blob.size === 0) {
+                console.error("警告: 受信したデータが0バイトです！サーバー側の生成処理に問題があります。");
+                alert("エラー: 0バイトのファイルが生成されました。");
+            } else {
+                // 4. ダウンロード処理
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = "converted.csv";
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+                console.log("ダウンロードを開始しました。");
+            }
+
+        } catch (error) {
+            console.error("エラー詳細:", error);
+            alert("通信エラーが発生しました。コンソールを確認してください。");
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "CSVに変換 (ブラウザコンソールを確認)";
+            console.log("--- [Browser Console] 処理終了 ---");
+        }
+    });
+    </script>
 </body>
 </html>
