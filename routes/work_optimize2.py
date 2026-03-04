@@ -14,10 +14,14 @@ def index():
 
 @work_optimize2_bp.route("/convert", methods=["POST"])
 def convert():
-    print("\n--- [Server Log] 変換処理開始 ---")
+    print("\n--- [Server Log] 処理開始 ---")
     
-    # フォームデータの取得
-    flight_number = request.form.get("flight_number", "")
+    # 1. データの取得
+    flight_number_raw = request.form.get("flight_number", "")
+    # 改行で分割し、空行を除外してリスト化
+    flight_numbers = [line.strip() for line in flight_number_raw.splitlines() if line.strip()]
+    if not flight_numbers: flight_numbers = [""]
+
     route = request.form.get("routes", "")
     sale_from = request.form.get("sale_from", "")
     sale_to = request.form.get("sale_to", "")
@@ -27,7 +31,7 @@ def convert():
     airport = request.form.get("airport", "")
     participants = request.form.get("participants", "")
 
-    # 利益率の取得（リスト形式）
+    # 利益率取得ロジック
     def get_profits(type_name):
         raw = request.form.getlist(f"profit_{type_name}[]")
         p = [(v if v else "0") for v in raw]
@@ -40,8 +44,7 @@ def convert():
     child_p = get_profits("child")
     infant_p = get_profits("infant")
 
-    # CSV生成
-    # io.StringIOの作成
+    # 2. CSVの書き込み
     output = io.StringIO()
     writer = csv.writer(output, quoting=csv.QUOTE_ALL)
 
@@ -52,37 +55,32 @@ def convert():
         "参加者","作成日時","曜日","大人利益率","子供利益率","幼児利益率"
     ])
 
-    # データ行（7曜日分）
     youbi_list = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
     JST = zoneinfo.ZoneInfo("Asia/Tokyo")
     now_str = datetime.now(JST).strftime("%Y/%m/%d %H:%M:%S")
 
-    for idx, youbi in enumerate(youbi_list):
-        writer.writerow([
-            flight_number, route, sale_from, sale_to,
-            flight_from, flight_to, day, airport,
-            participants, now_str, youbi,
-            adult_p[idx], child_p[idx], infant_p[idx]
-        ])
+    # 便番号 × 7曜日のループ
+    for f_num in flight_numbers:
+        for idx, youbi in enumerate(youbi_list):
+            writer.writerow([
+                f_num, route, sale_from, sale_to, flight_from, flight_to,
+                day, airport, participants, now_str, youbi,
+                adult_p[idx], child_p[idx], infant_p[idx]
+            ])
 
-    # --- 重要: ここからが0バイト対策 ---
-    
-    # 1. StringIOから全文字列を取得
-    csv_str = output.getvalue()
-    print(f"[Server Log] 生成された文字数: {len(csv_str)} 文字")
+    # --------------------------------------------------
+    # 【重要】重要：0バイト対策
+    # --------------------------------------------------
+    # 1. StringIOの中身をすべて取り出し、Shift_JISにエンコード
+    csv_data = output.getvalue().encode("shift_jis", errors="replace")
+    output.close() # StringIOはもう不要なので閉じる
 
-    # 2. Shift_JISに変換（バイナリ化）
-    csv_bytes = csv_str.encode("shift_jis", errors="replace")
-    print(f"[Server Log] 送信バイナリサイズ: {len(csv_bytes)} バイト")
+    print(f"[Server Log] 生成バイナリサイズ: {len(csv_data)} バイト")
 
-    # 3. BytesIOに包み直し、ポインタを先頭に戻す
-    mem_file = io.BytesIO(csv_bytes)
-    mem_file.seek(0) 
-
-    print("[Server Log] データを送信します。")
-    
+    # 2. バイナリデータをBytesIOにラップして送信
+    # この時、ポインタは自動的に先頭にセットされる
     return send_file(
-        mem_file,
+        io.BytesIO(csv_data),
         mimetype="text/csv",
         as_attachment=True,
         download_name="converted.csv"
