@@ -8,7 +8,6 @@
 <body>
     <h1>業務効率化ツール2 (フライト)</h1>
 
-    <!-- action を Blueprint の convert に向ける -->
     <form action="{{ url_for('work_optimize2.convert') }}" method="post">
         <div class="main-grid">
             <div class="left-half">
@@ -17,8 +16,8 @@
 
                 <label style="margin-top:1em; display:block;">路線</label>
                 <div class="route-horizontal" style="margin-bottom:1em;">
-                    <label><input type="radio" name="routes" value="往路"> 往路</label>
-                    <label><input type="radio" name="routes" value="復路"> 復路</label>
+                    <label><input type="radio" name="routes" value="往路" required> 往路</label>
+                    <label><input type="radio" name="routes" value="復路" required> 復路</label>
                 </div>
             </div>
 
@@ -49,9 +48,9 @@
 
                 <label>参加者合計人数</label>
                 <div class="radio-group-horizontal">
-                    <label><input type="radio" name="participants" value="1"> 一人</label>
-                    <label><input type="radio" name="participants" value="2"> 二人以上</label>
-                    <label><input type="radio" name="participants" value="全て"> 全て</label>
+                    <label><input type="radio" name="participants" value="1" required> 一人</label>
+                    <label><input type="radio" name="participants" value="2" required> 二人以上</label>
+                    <label><input type="radio" name="participants" value="全て" required> 全て</label>
                 </div>
             </div>
         </div>
@@ -75,14 +74,11 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- 大人 -->
                         <tr>
                             <td style="padding:2px 6px; border-right: 1.5px solid #e0e0e0;">大人</td>
-                            <!-- checkbox value を "1" にする -->
                             <td style="padding:2px 6px; border-right: 1.5px solid #e0e0e0;">
                                 <input type="checkbox" name="profit_adult_allweek" value="1">
                             </td>
-                            <!-- profit_adult[] を 7 個配置（順序: 日,月,火,水,木,金,土） -->
                             <td style="padding:2px 6px;"><input type="number" name="profit_adult[]" min="0" step="1" value="0" style="width:4em;"></td>
                             <td style="padding:2px 6px;"><input type="number" name="profit_adult[]" min="0" step="1" value="0" style="width:4em;"></td>
                             <td style="padding:2px 6px;"><input type="number" name="profit_adult[]" min="0" step="1" value="0" style="width:4em;"></td>
@@ -92,7 +88,6 @@
                             <td style="padding:2px 6px;"><input type="number" name="profit_adult[]" min="0" step="1" value="0" style="width:4em;"></td>
                         </tr>
 
-                        <!-- 子供 -->
                         <tr>
                             <td style="padding:2px 6px; border-right: 1.5px solid #e0e0e0;">子供</td>
                             <td style="padding:2px 6px; border-right: 1.5px solid #e0e0e0;">
@@ -107,7 +102,6 @@
                             <td style="padding:2px 6px;"><input type="number" name="profit_child[]" min="0" step="1" value="0" style="width:4em;"></td>
                         </tr>
 
-                        <!-- 幼児 -->
                         <tr>
                             <td style="padding:2px 6px; border-right: 1.5px solid #e0e0e0;">幼児</td>
                             <td style="padding:2px 6px; border-right: 1.5px solid #e0e0e0;">
