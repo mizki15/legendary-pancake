@@ -11,13 +11,13 @@
     <form action="{{ url_for('work_optimize2.convert') }}" method="post">
         <div class="main-grid">
             <div class="left-half">
-                <label>便番号</label>
-                <textarea class ="lefttext" name="flight_number" rows="18" required></textarea>
+                <label>便番号 (改行区切りで複数入力)</label>
+                <textarea class ="lefttext" name="flight_number" rows="18" required placeholder="例: NH123&#13;NH456"></textarea>
 
                 <label style="margin-top:1em; display:block;">路線</label>
-                <div class="route-horizontal" style="margin-bottom:1em;">
+                <div class="route-horizontal">
                     <label><input type="radio" name="routes" value="往路" required> 往路</label>
-                    <label><input type="radio" name="routes" value="復路" required> 復路</label>
+                    <label><input type="radio" name="routes" value="復路"> 復路</label>
                 </div>
             </div>
 
@@ -25,117 +25,58 @@
                 <div class="flight-period-box">
                     <label>販売期間</label>
                     <div class="flight-period-inline">
-                        <input type="text" name="sale_from" placeholder="YYYY/MM/DD または YYYYMMDD" required>
-                        <span style="margin:0 0.7em;">～</span>
-                        <input type="text" name="sale_to" placeholder="YYYY/MM/DD または YYYYMMDD" required>
+                        <input type="text" name="sale_from" placeholder="YYYY/MM/DD" required>
+                        <span>～</span>
+                        <input type="text" name="sale_to" placeholder="YYYY/MM/DD" required>
                     </div>
                 </div>
 
                 <div class="flight-period-box">
                     <label>搭乗期間</label>
                     <div class="flight-period-inline">
-                        <input type="text" name="flight_from" placeholder="YYYY/MM/DD または YYYYMMDD" required>
-                        <span style="margin:0 0.7em;">～</span>
-                        <input type="text" name="flight_to" placeholder="YYYY/MM/DD または YYYYMMDD" required>
+                        <input type="text" name="flight_from" placeholder="YYYY/MM/DD" required>
+                        <span>～</span>
+                        <input type="text" name="flight_to" placeholder="YYYY/MM/DD" required>
                     </div>
                 </div>
 
                 <label>発空港コード</label>
-                <input type="text" name="airport" placeholder="例: HND" required>
+                <input type="text" name="airport" placeholder="HND" required>
 
                 <label>日数</label>
-                <input class="day-input" min="1" type="number" name="day" required>
+                <input class="day-input" type="number" name="day" min="1" value="1" required>
 
                 <label>参加者合計人数</label>
                 <div class="radio-group-horizontal">
                     <label><input type="radio" name="participants" value="1" required> 一人</label>
-                    <label><input type="radio" name="participants" value="2" required> 二人以上</label>
-                    <label><input type="radio" name="participants" value="全て" required> 全て</label>
+                    <label><input type="radio" name="participants" value="2"> 二人以上</label>
+                    <label><input type="radio" name="participants" value="全て"> 全て</label>
                 </div>
             </div>
         </div>
 
         <div class="submit-container">
-            <div class="day-table-container" style="margin-bottom: 1em; margin-top: 0em;">
-                <label>利益率　　(全曜日☑の場合は日曜日の値を参照)</label>
-                <div style="display: flex; justify-content: center;">
-                <table class="day-table" style="margin-top: 0.5em; border-collapse: collapse; min-width: 0; text-align: center; font-size: 0.95em;">
-                    <thead>
-                        <tr>
-                            <th style="padding:2px 6px; border-right: 1.5px solid #e0e0e0; border-bottom: 1.5px solid #e0e0e0;">年齢層</th>
-                            <th style="padding:2px 6px; border-right: 1.5px solid #e0e0e0; border-bottom: 1.5px solid #e0e0e0;">全曜日適用</th>
-                            <th style="padding:2px 6px; border-bottom: 1.5px solid #e0e0e0;">日</th>
-                            <th style="padding:2px 6px; border-bottom: 1.5px solid #e0e0e0;">月</th>
-                            <th style="padding:2px 6px; border-bottom: 1.5px solid #e0e0e0;">火</th>
-                            <th style="padding:2px 6px; border-bottom: 1.5px solid #e0e0e0;">水</th>
-                            <th style="padding:2px 6px; border-bottom: 1.5px solid #e0e0e0;">木</th>
-                            <th style="padding:2px 6px; border-bottom: 1.5px solid #e0e0e0;">金</th>
-                            <th style="padding:2px 6px; border-bottom: 1.5px solid #e0e0e0;">土</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td style="padding:2px 6px; border-right: 1.5px solid #e0e0e0;">大人</td>
-                            <td style="padding:2px 6px; border-right: 1.5px solid #e0e0e0;">
-                                <input type="checkbox" name="profit_adult_allweek" value="1">
-                            </td>
-                            <td style="padding:2px 6px;"><input type="number" name="profit_adult[]" min="0" step="1" value="0" style="width:4em;"></td>
-                            <td style="padding:2px 6px;"><input type="number" name="profit_adult[]" min="0" step="1" value="0" style="width:4em;"></td>
-                            <td style="padding:2px 6px;"><input type="number" name="profit_adult[]" min="0" step="1" value="0" style="width:4em;"></td>
-                            <td style="padding:2px 6px;"><input type="number" name="profit_adult[]" min="0" step="1" value="0" style="width:4em;"></td>
-                            <td style="padding:2px 6px;"><input type="number" name="profit_adult[]" min="0" step="1" value="0" style="width:4em;"></td>
-                            <td style="padding:2px 6px;"><input type="number" name="profit_adult[]" min="0" step="1" value="0" style="width:4em;"></td>
-                            <td style="padding:2px 6px;"><input type="number" name="profit_adult[]" min="0" step="1" value="0" style="width:4em;"></td>
-                        </tr>
-
-                        <tr>
-                            <td style="padding:2px 6px; border-right: 1.5px solid #e0e0e0;">子供</td>
-                            <td style="padding:2px 6px; border-right: 1.5px solid #e0e0e0;">
-                                <input type="checkbox" name="profit_child_allweek" value="1">
-                            </td>
-                            <td style="padding:2px 6px;"><input type="number" name="profit_child[]" min="0" step="1" value="0" style="width:4em;"></td>
-                            <td style="padding:2px 6px;"><input type="number" name="profit_child[]" min="0" step="1" value="0" style="width:4em;"></td>
-                            <td style="padding:2px 6px;"><input type="number" name="profit_child[]" min="0" step="1" value="0" style="width:4em;"></td>
-                            <td style="padding:2px 6px;"><input type="number" name="profit_child[]" min="0" step="1" value="0" style="width:4em;"></td>
-                            <td style="padding:2px 6px;"><input type="number" name="profit_child[]" min="0" step="1" value="0" style="width:4em;"></td>
-                            <td style="padding:2px 6px;"><input type="number" name="profit_child[]" min="0" step="1" value="0" style="width:4em;"></td>
-                            <td style="padding:2px 6px;"><input type="number" name="profit_child[]" min="0" step="1" value="0" style="width:4em;"></td>
-                        </tr>
-
-                        <tr>
-                            <td style="padding:2px 6px; border-right: 1.5px solid #e0e0e0;">幼児</td>
-                            <td style="padding:2px 6px; border-right: 1.5px solid #e0e0e0;">
-                                <input type="checkbox" name="profit_infant_allweek" value="1">
-                            </td>
-                            <td style="padding:2px 6px;"><input type="number" name="profit_infant[]" min="0" step="1" value="0" style="width:4em;"></td>
-                            <td style="padding:2px 6px;"><input type="number" name="profit_infant[]" min="0" step="1" value="0" style="width:4em;"></td>
-                            <td style="padding:2px 6px;"><input type="number" name="profit_infant[]" min="0" step="1" value="0" style="width:4em;"></td>
-                            <td style="padding:2px 6px;"><input type="number" name="profit_infant[]" min="0" step="1" value="0" style="width:4em;"></td>
-                            <td style="padding:2px 6px;"><input type="number" name="profit_infant[]" min="0" step="1" value="0" style="width:4em;"></td>
-                            <td style="padding:2px 6px;"><input type="number" name="profit_infant[]" min="0" step="1" value="0" style="width:4em;"></td>
-                            <td style="padding:2px 6px;"><input type="number" name="profit_infant[]" min="0" step="1" value="0" style="width:4em;"></td>
-                        </tr>
-
-                    </tbody>
-                </table>
-                </div>
-            </div>
-
-            <button type="submit">CSVに変換</button>
+            <label>利益率設定 (全適用チェック時は日曜日の値を使用)</label>
+            <table class="day-table" style="width:100%; border-collapse: collapse; margin-top:10px;">
+                <thead>
+                    <tr style="background:#f2f2f2;">
+                        <th>年齢層</th><th>全適用</th><th>日</th><th>月</th><th>火</th><th>水</th><th>木</th><th>金</th><th>土</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for type_en, type_ja in [('adult','大人'), ('child','子供'), ('infant','幼児')] %}
+                    <tr>
+                        <td style="padding:5px;">{{ type_ja }}</td>
+                        <td><input type="checkbox" name="profit_{{ type_en }}_allweek" value="1"></td>
+                        {% for i in range(7) %}
+                        <td><input type="number" name="profit_{{ type_en }}[]" value="0" style="width:3.5em;"></td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button type="submit" style="margin-top:30px; padding: 10px 40px; font-weight: bold; cursor: pointer;">CSVに変換してダウンロード</button>
         </div>
     </form>
-
-<script>
-// 数値欄をクリックしたら全選択（従来の機能）
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('input[type="number"]')
-        .forEach(function(input) {
-            input.addEventListener('focus', function(e) {
-                e.target.select();
-            });
-        });
-});
-</script>
-
 </body>
 </html>
