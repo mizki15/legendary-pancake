@@ -17,16 +17,15 @@ def index():
 
 @work_optimize2_bp.route("/convert", methods=["POST"])
 def convert():
-    """
-    修正点:
-    - チェックボックスは個別 name (profit_adult_allweek 等)
-    - 数値入力はそれぞれ profit_adult[], profit_child[], profit_infant[]
-    - 各配列は7要素になるように不足分は "0" でパディング
-    - allweek チェックが入っていれば日曜日(インデックス0)の値を7日分に展開
-    """
-
     # ----- 基本情報 -----
-    flight_number = request.form.get("flight_number", "")
+    # テキストエリアからの入力を取得し、改行で分割してリスト化
+    flight_number_raw = request.form.get("flight_number", "")
+    flight_numbers = [line.strip() for line in flight_number_raw.splitlines() if line.strip()]
+
+    # 万が一、改行などで全て空になってしまった場合のフォールバック
+    if not flight_numbers:
+        flight_numbers = [""]
+
     route = request.form.get("routes", "")
     sale_from = request.form.get("sale_from", "")
     sale_to = request.form.get("sale_to", "")
@@ -85,7 +84,8 @@ def convert():
     now_str = datetime.now(JST).strftime("%Y/%m/%d %H:%M:%S")
 
     # CSV 出力（Shift_JIS でダウンロード）
-    output = io.StringIO()
+    # Excel等で開いた際の不要な空白行を防ぐため `newline=""` を指定
+    output = io.StringIO(newline="")
     writer = csv.writer(output, quoting=csv.QUOTE_ALL)
 
     # ヘッダ（必要なら）
@@ -95,25 +95,27 @@ def convert():
         "参加者","作成日時","曜日","大人利益率","子供利益率","幼児利益率"
     ])
 
-    for idx, youbi in enumerate(youbi_list):
-        writer.writerow([
-            flight_number,
-            route,
-            sale_from,
-            sale_to,
-            flight_from,
-            flight_to,
-            day,
-            airport,
-            participants_disp,
-            now_str,
-            youbi,
-            adult_profits[idx],
-            child_profits[idx],
-            infant_profits[idx],
-        ])
-    output.seek(0)
+    # 改行で分割した各便番号ごとに、7日分の行を作成
+    for f_num in flight_numbers:
+        for idx, youbi in enumerate(youbi_list):
+            writer.writerow([
+                f_num,
+                route,
+                sale_from,
+                sale_to,
+                flight_from,
+                flight_to,
+                day,
+                airport,
+                participants_disp,
+                now_str,
+                youbi,
+                adult_profits[idx],
+                child_profits[idx],
+                infant_profits[idx],
+            ])
 
+    # getvalue()にはseek()は影響しないため、そのままエンコード
     return send_file(
         io.BytesIO(output.getvalue().encode("shift_jis", errors="replace")),
         mimetype="text/csv",
