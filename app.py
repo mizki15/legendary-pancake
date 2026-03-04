@@ -22,14 +22,17 @@ def index_top():
 # Blueprint 登録
 # =========================
 app.register_blueprint(study_bp)
-app.register_blueprint(work_optimize1_bp)
-app.register_blueprint(work_optimize2_bp)
+
+app.register_blueprint(work_optimize1_bp, url_prefix="/opt1")
+app.register_blueprint(work_optimize2_bp, url_prefix="/opt2")
+
 app.register_blueprint(rocket_bp)
 app.register_blueprint(misc_bp)
 
 if __name__ == '__main__':
     # 開発環境ではdebug=True
     app.run(debug=True)
+
 
 
 
