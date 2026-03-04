@@ -75,13 +75,13 @@ def convert():
     # ===== CSV生成 =====
     output = io.StringIO()
     writer = csv.writer(output, quoting=csv.QUOTE_ALL)
-"""
+    """
     writer.writerow([
         "便番号","路線","販売期間(From)","販売期間(To)",
         "搭乗期間(From)","搭乗期間(To)","日数","発空港コード",
         "参加者","作成日時","曜日","大人利益率","子供利益率","幼児利益率"
     ])
-"""
+    """
     # 便番号が複数行の場合にも対応
     flight_numbers = [f.strip() for f in flight_number.splitlines() if f.strip()]
     if not flight_numbers:
