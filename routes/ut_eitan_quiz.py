@@ -5,7 +5,7 @@ import re
 ut_eitan_quiz_bp = Blueprint(
     'ut_eitan_quiz',
     __name__,
-    url_prefix="/quiz"
+    url_prefix="/ut_eitan_quiz"
 )
 
 words_list = [
@@ -53,7 +53,7 @@ def index():
     session["answer"] = correct_word
 
     return render_template(
-        "quiz.html",
+        "ut_eitan_quiz.html",
         words=choices,
         sentence=display_sentence,
         result=result
