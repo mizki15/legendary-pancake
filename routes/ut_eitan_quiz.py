@@ -2,8 +2,8 @@ from flask import Blueprint, render_template, request, session
 import random
 import re
 
-# Blueprint定義
-quiz_bp = Blueprint('quiz', __name__)
+# Blueprint定義（名前は一意に）
+ut_eitan_quiz_bp = Blueprint('ut_eitan_quiz', __name__, url_prefix="/quiz")
 
 # データ
 words_list = [
@@ -23,22 +23,20 @@ sentence_list = [
 ]
 
 # 問題表示
-@quiz_bp.route("/")
+@ut_eitan_quiz_bp.route("/")
 def index():
-    # 正解の文を先に決める
     sentence = random.choice(sentence_list)
     correct_word = sentence[2]
 
-    # 正解 + ダミー5個（←重要改善）
+    # 正解 + ダミー
     dummy_words = [w for w in words_list if w[1] != correct_word]
-    choices = random.sample(dummy_words, 5)
+    choices = random.sample(dummy_words, min(5, len(dummy_words)))
     choices.append((None, correct_word))
     random.shuffle(choices)
 
     # 空欄化
     display_sentence = re.sub(r"\[.*?\]", "_____", sentence[3])
 
-    # セッション保存
     session["answer"] = correct_word
 
     return render_template(
@@ -48,7 +46,7 @@ def index():
     )
 
 # 回答処理
-@quiz_bp.route("/answer", methods=["POST"])
+@ut_eitan_quiz_bp.route("/answer", methods=["POST"])
 def answer():
     user_input = request.form["answer"]
     correct = session.get("answer")
