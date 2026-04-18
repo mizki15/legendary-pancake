@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>英単語クイズ</title>
+</head>
+<body>
+
+<h2>単語リスト</h2>
+<ul>
+{% for w in words %}
+    <li>{{ w[1] }}</li>
+{% endfor %}
+</ul>
+
+<h2>問題</h2>
+<p>{{ sentence }}</p>
+
+<form method="post">
+    <input type="text" name="answer" required>
+    <button type="submit">回答</button>
+</form>
+
+{% if result %}
+    <h2>結果: {{ result }}</h2>
+
+    <!-- 次の問題ボタン -->
+    <form method="get">
+        <button type="submit">次の問題へ</button>
+    </form>
+{% endif %}
+
+</body>
+</html>
