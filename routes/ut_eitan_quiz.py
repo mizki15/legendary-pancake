@@ -1,6 +1,33 @@
 from flask import Blueprint, render_template, request, session
 import random
 import re
+import csv
+import os
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+def load_words():
+    path = os.path.join(BASE_DIR, "statics", "words.csv")
+    words = []
+    with open(path, newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            words.append((int(row["id"]), row["word"]))
+    return words
+
+def load_sentences():
+    path = os.path.join(BASE_DIR, "statics", "sentences.csv")
+    sentences = []
+    with open(path, newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            sentences.append((
+                int(row["id"]),
+                int(row["word_id"]),
+                row["conjugated"],
+                row["sentence"]
+            ))
+    return sentences
 
 ut_eitan_quiz_bp = Blueprint(
     'ut_eitan_quiz',
