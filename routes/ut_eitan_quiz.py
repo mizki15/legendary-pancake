@@ -13,7 +13,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # CSV読み込み
 # =========================
 def load_words():
-    path = os.path.join(BASE_DIR, "statics", "words.csv")
+    path = os.path.join(BASE_DIR, "static", "words.csv")
     words = []
     with open(path, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
@@ -23,7 +23,7 @@ def load_words():
 
 
 def load_sentences():
-    path = os.path.join(BASE_DIR, "statics", "sentences.csv")
+    path = os.path.join(BASE_DIR, "static", "sentences.csv")
     sentences = []
     with open(path, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
