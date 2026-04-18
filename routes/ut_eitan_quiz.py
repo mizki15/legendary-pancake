@@ -4,8 +4,14 @@ import re
 import csv
 import os
 
+# =========================
+# パス設定
+# =========================
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# =========================
+# CSV読み込み
+# =========================
 def load_words():
     path = os.path.join(BASE_DIR, "statics", "words.csv")
     words = []
@@ -14,6 +20,7 @@ def load_words():
         for row in reader:
             words.append((int(row["id"]), row["word"]))
     return words
+
 
 def load_sentences():
     path = os.path.join(BASE_DIR, "statics", "sentences.csv")
@@ -29,58 +36,76 @@ def load_sentences():
             ))
     return sentences
 
+
+# =========================
+# データを起動時に1回読み込み（重要）
+# =========================
+WORDS_LIST = load_words()
+SENTENCE_LIST = load_sentences()
+
+# =========================
+# Blueprint
+# =========================
 ut_eitan_quiz_bp = Blueprint(
     'ut_eitan_quiz',
     __name__,
     url_prefix="/ut_eitan_quiz"
 )
 
-words_list = [
-    (1, "go"),
-    (2, "eat"),
-    (3, "play"),
-    (4, "run"),
-    (5, "study"),
-    (6, "write"),
-    (7, "read"),
-]
-
-sentence_list = [
-    (1, 1, "went", "I [went] to school yesterday."),
-    (2, 2, "ate", "She [ate] an apple."),
-    (3, 3, "played", "They [played] soccer."),
-]
-
+# =========================
+# メイン処理
+# =========================
 @ut_eitan_quiz_bp.route("/", methods=["GET", "POST"])
 def index():
     result = None
-    correct = None
 
-    # POST → 回答判定
+    # ---------------------
+    # POST（回答処理）
+    # ---------------------
     if request.method == "POST":
-        user_input = request.form["answer"]
-        correct = session.get("answer")
+        user_input = request.form.get("answer", "")
+        correct_word = session.get("answer")
+        sentence = session.get("sentence")
 
-        if user_input.strip().lower() == correct.lower():
+        if not correct_word or not sentence:
+            # セッション切れ対策
+            return "セッションが切れました。ページを再読み込みしてください。"
+
+        if user_input.strip().lower() == correct_word.lower():
             result = "○"
         else:
-            result = f"✗ 正解: {correct}"
+            result = f"✗ 正解: {correct_word}"
 
-    # 新しい問題を生成（毎回）
-    sentence = random.choice(sentence_list)
-    correct_word = sentence[2]
+    # ---------------------
+    # GET（新しい問題生成）
+    # ---------------------
+    if request.method == "GET":
+        sentence = random.choice(SENTENCE_LIST)
+        correct_word = sentence[2]
 
-    dummy_words = [w for w in words_list if w[1] != correct_word]
+        session["sentence"] = sentence
+        session["answer"] = correct_word
+
+    # ---------------------
+    # 表示用データ取得
+    # ---------------------
+    sentence = session.get("sentence")
+    correct_word = session.get("answer")
+
+    if not sentence or not correct_word:
+        return "データ取得エラー"
+
+    # ダミー単語作成
+    dummy_words = [w for w in WORDS_LIST if w[1] != correct_word]
     choices = random.sample(dummy_words, min(5, len(dummy_words)))
     choices.append((None, correct_word))
     random.shuffle(choices)
 
+    # 空欄化
     display_sentence = re.sub(r"\[.*?\]", "_____", sentence[3])
 
-    session["answer"] = correct_word
-
     return render_template(
-        "ut_eitan_quiz.html",
+        "quiz.html",
         words=choices,
         sentence=display_sentence,
         result=result
