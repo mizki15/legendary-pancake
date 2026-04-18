@@ -2,10 +2,12 @@ from flask import Blueprint, render_template, request, session
 import random
 import re
 
-# Blueprint定義（名前は一意に）
-ut_eitan_quiz_bp = Blueprint('ut_eitan_quiz', __name__, url_prefix="/quiz")
+ut_eitan_quiz_bp = Blueprint(
+    'ut_eitan_quiz',
+    __name__,
+    url_prefix="/quiz"
+)
 
-# データ
 words_list = [
     (1, "go"),
     (2, "eat"),
@@ -22,38 +24,37 @@ sentence_list = [
     (3, 3, "played", "They [played] soccer."),
 ]
 
-# 問題表示
-@ut_eitan_quiz_bp.route("/")
+@ut_eitan_quiz_bp.route("/", methods=["GET", "POST"])
 def index():
+    result = None
+    correct = None
+
+    # POST → 回答判定
+    if request.method == "POST":
+        user_input = request.form["answer"]
+        correct = session.get("answer")
+
+        if user_input.strip().lower() == correct.lower():
+            result = "○"
+        else:
+            result = f"✗ 正解: {correct}"
+
+    # 新しい問題を生成（毎回）
     sentence = random.choice(sentence_list)
     correct_word = sentence[2]
 
-    # 正解 + ダミー
     dummy_words = [w for w in words_list if w[1] != correct_word]
     choices = random.sample(dummy_words, min(5, len(dummy_words)))
     choices.append((None, correct_word))
     random.shuffle(choices)
 
-    # 空欄化
     display_sentence = re.sub(r"\[.*?\]", "_____", sentence[3])
 
     session["answer"] = correct_word
 
     return render_template(
-        "index.html",
+        "quiz.html",
         words=choices,
-        sentence=display_sentence
+        sentence=display_sentence,
+        result=result
     )
-
-# 回答処理
-@ut_eitan_quiz_bp.route("/answer", methods=["POST"])
-def answer():
-    user_input = request.form["answer"]
-    correct = session.get("answer")
-
-    if user_input.strip().lower() == correct.lower():
-        result = "○"
-    else:
-        result = f"× (正解: {correct})"
-
-    return render_template("result.html", result=result)
