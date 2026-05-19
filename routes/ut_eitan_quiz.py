@@ -44,23 +44,42 @@ def load_data():
             
     return sentences, words
 
+# routes/ut_eitan_quiz.py の quiz_home 関数部分を以下のように修正・拡張します
+
 @ut_eitan_quiz_bp.route('/')
 def quiz_home():
     sentences, words = load_data()
     
-    # クイズとして出題可能な（ブラケット [...] が含まれる）文だけをフィルタリング
     pattern = re.compile(r'\[[a-zA-Z\s\']+\]')
     quiz_pool = []
     
+    # 1. 出題可能な問題をプール
     for s in sentences:
         if pattern.search(s['sentence']):
             quiz_pool.append(s)
             
     if not quiz_pool:
-        return "有効なクイズ問題が見つかりませんでした。sentences.json の形式を確認してください。"
+        return "有効なクイズ問題が見つかりませんでした。"
     
-    # ランダムに1問選択（またはセッションでインデックスを管理することも可能）
-    # 今回はシンプルにランダム、またはクエリパラメータで指定できるようにします
+    # 2. 【追加】サイドバー用の階層構造ツリーを作る
+    # 構造イメージ: { "1": { "1": [{"idx": 0, "q_num": "1"}, {"idx": 1, "q_num": "2"}], "2": [...] } }
+    sidebar_tree = {}
+    for idx, q in enumerate(quiz_pool):
+        ch = q['chapter']
+        num = q['number']
+        q_num = q['question_number']
+        
+        if ch not in sidebar_tree:
+            sidebar_tree[ch] = {}
+        if num not in sidebar_tree[ch]:
+            sidebar_tree[ch][num] = []
+            
+        sidebar_tree[ch][num].append({
+            'idx': idx,
+            'q_num': q_num
+        })
+
+    # 3. 現在の問題インデックスを取得
     q_idx = request.args.get('q', default=None, type=int)
     if q_idx is None or q_idx < 0 or q_idx >= len(quiz_pool):
         q_idx = random.randint(0, len(quiz_pool) - 1)
@@ -68,40 +87,31 @@ def quiz_home():
     question = quiz_pool[q_idx]
     original_sentence = question["sentence"]
     
-    # ターゲット（正解となる単語、カッコを除去したもの）を抽出
-    # 複数ある場合を考慮（例: ['accumulation', 'led']）
     raw_targets = pattern.findall(original_sentence)
     targets = [re.sub(r'[\[\]]', '', t) for t in raw_targets]
     
-    # カッコ部分を [     ] または番号付きの [ 1 ], [ 2 ] に置換
-    # フロントエンド側でインプットボックスに置き換えやすいように、特殊マークに変換します
     replaced_sentence = original_sentence
     for i, target in enumerate(raw_targets):
         replaced_sentence = replaced_sentence.replace(target, f"__INPUT_{i}__", 1)
         
-    # 画面上部に表示する「原形の英単語（ヒント候補）」の作成
-    # 1. 本問の正解に関連する原形単語（words.json から chapter, number で紐付け）
+    # ヒント単語の抽出
     hint_words = set()
     for w in words:
         if w['chapter'] == question['chapter'] and w['number'] == question['number']:
             hint_words.add(w['word'])
             
-    # 2. ダミーの選択肢もいくつか混ぜる（難易度調整用）
     all_words = [w['word'] for w in words]
     dummy_pool = [w for w in all_words if w not in hint_words]
-    
-    # ダミーから最大3つランダムに選択して追加
     random.shuffle(dummy_pool)
     for dw in dummy_pool[:3]:
         hint_words.add(dw)
         
     hint_list = list(hint_words)
-    random.shuffle(hint_list) # 選択肢をシャッフル
+    random.shuffle(hint_list)
     
-    # 正解データをセッションに一時保存（簡易的な検証用）
     session['current_targets'] = targets
-    session['current_question_idx'] = q_idx
     
+    # 4. sidebar_tree を追加してレンダリング
     return render_template(
         'ut_eitan_quiz/quiz.html',
         sentence_template=replaced_sentence,
@@ -111,7 +121,8 @@ def quiz_home():
         number=question['number'],
         question_number=question['question_number'],
         total_questions=len(quiz_pool),
-        current_idx=q_idx
+        current_idx=q_idx,
+        sidebar_tree=sidebar_tree  # ←追加
     )
 
 @ut_eitan_quiz_bp.route('/check', methods=['POST'])
