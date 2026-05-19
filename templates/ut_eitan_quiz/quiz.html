@@ -110,6 +110,15 @@
                                 次の問題へ <i class="fa-solid fa-arrow-right"></i>
                             </button>
                         </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-dashed border-slate-200 mt-4">
+                            <button type="button" onclick="loadRandomUnsolvedQuestion()" class="bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 font-semibold py-2.5 px-4 rounded-xl transition flex justify-center items-center gap-2 text-xs md:text-sm shadow-sm">
+                                <i class="fa-solid fa-shuffle text-amber-600"></i> 未クリアからランダムに出題
+                            </button>
+                            <button type="button" onclick="loadRandomQuestion()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 font-semibold py-2.5 px-4 rounded-xl transition flex justify-center items-center gap-2 text-xs md:text-sm shadow-sm">
+                                <i class="fa-solid fa-shuffle text-indigo-600"></i> 全問からランダムに出題
+                            </button>
+                        </div>
                     </form>
                 </div>
 
@@ -121,6 +130,10 @@
                     </div>
                 </div>
 
+            </div>
+
+            <div class="text-xs text-slate-400 pl-2">
+                全 {{ total_questions }} 問中 <span class="font-bold text-slate-600">{{ current_idx + 1 }}</span> 問目を表示中
             </div>
         </main>
 
@@ -255,7 +268,6 @@
             window.location.href = `/ut-eitan-quiz/`;
         }
 
-        // 追加：未クリア問題からランダム選出
         function loadRandomUnsolvedQuestion() {
             const progress = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
             const unsolvedIndices = [];
