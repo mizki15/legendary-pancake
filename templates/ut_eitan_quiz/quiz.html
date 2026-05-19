@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>東大英語クイズ - 進捗管理付き</title>
+    <title>UT Eitan Quiz - 進捗管理付き</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .word-badge { transition: all 0.2s ease; }
         .word-badge:hover { transform: translateY(-2px); }
-        /* サイドバー用のカスタムスクロールバー */
         .custom-scrollbar::-webkit-scrollbar { width: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -21,7 +20,7 @@
         <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
             <h1 class="text-xl font-bold flex items-center gap-2">
                 <i class="fa-solid fa-graduation-cap text-yellow-300"></i>
-                <span class="tracking-wide">東大英語クイズ<span class="text-xs font-normal bg-indigo-500 px-2 py-0.5 rounded ml-2">Pro</span></span>
+                <span class="tracking-wide">UT Eitan Quiz <span class="text-xs font-normal bg-indigo-500 px-2 py-0.5 rounded ml-2">Pro</span></span>
             </h1>
             <a href="/" class="text-xs bg-indigo-700 hover:bg-indigo-800 text-white font-semibold px-3 py-2 rounded-lg transition">
                 <i class="fa-solid fa-house"></i> トップへ
@@ -132,13 +131,11 @@
         const targetsCount = {{ targets_count }};
         const currentIdx = {{ current_idx }};
         const totalQuestions = {{ total_questions }};
-        
-        // ローカルストレージ用のキー名
         const STORAGE_KEY = 'ut_eitan_quiz_progress_2026';
 
         document.addEventListener('DOMContentLoaded', () => {
             renderSentenceAndInputs();
-            loadAndApplyProgress(); // サイドバーの正誤状態を復元
+            loadAndApplyProgress();
         });
 
         function renderSentenceAndInputs() {
@@ -162,13 +159,9 @@
             if(document.getElementById('answer-input-0')) document.getElementById('answer-input-0').focus();
         }
 
-        // --- 進捗管理のコアロジック ---
-        
-        // ローカルストレージから進捗データを読み込んでサイドバーに反映する
         function loadAndApplyProgress() {
             const progress = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
             
-            // 全てのサイドバーアイテムの状態を一括更新
             document.querySelectorAll('.sidebar-item').forEach(item => {
                 const idx = item.id.replace('sidebar-item-', '');
                 const badge = document.getElementById(`status-badge-${idx}`);
@@ -183,16 +176,13 @@
             });
         }
 
-        // 現在の問題の結果を保存する
         function saveProgress(status) {
             const progress = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-            
-            // すでに「正解」している場合は、上書きせず「正解」を維持する（お好みで変更可）
             if (progress[currentIdx] !== 'correct' || status === 'correct') {
                 progress[currentIdx] = status;
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
             }
-            loadAndApplyProgress(); // サイドバーの見た目を更新
+            loadAndApplyProgress();
         }
 
         function clearProgress() {
@@ -202,7 +192,6 @@
             }
         }
 
-        // 答え合わせ送信
         async function submitAnswer(event) {
             event.preventDefault();
             const answers = [];
@@ -218,7 +207,6 @@
                 });
                 const data = await response.json();
                 
-                // データの正誤をローカルストレージに保存
                 if (data.is_all_correct) {
                     saveProgress('correct');
                 } else {
@@ -261,6 +249,31 @@
             let nextIdx = currentIdx + 1;
             if (nextIdx >= totalQuestions) nextIdx = 0;
             window.location.href = `/ut-eitan-quiz/?q=${nextIdx}`;
+        }
+
+        function loadRandomQuestion() {
+            window.location.href = `/ut-eitan-quiz/`;
+        }
+
+        // 追加：未クリア問題からランダム選出
+        function loadRandomUnsolvedQuestion() {
+            const progress = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+            const unsolvedIndices = [];
+
+            for (let i = 0; i < totalQuestions; i++) {
+                if (progress[i] !== 'correct') {
+                    unsolvedIndices.push(i);
+                }
+            }
+
+            if (unsolvedIndices.length === 0) {
+                alert('素晴らしい！すべての問題をクリアしました！🎉\n全問題の中からランダムに出題します。');
+                loadRandomQuestion();
+                return;
+            }
+
+            const randomIndex = unsolvedIndices[Math.floor(Math.random() * unsolvedIndices.length)];
+            window.location.href = `/ut-eitan-quiz/?q=${randomIndex}`;
         }
     </script>
 </body>
