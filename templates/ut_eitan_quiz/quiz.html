@@ -12,25 +12,89 @@
         .custom-scrollbar::-webkit-scrollbar { width: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .drawer-open { transform: translateX(0); }
+        .drawer-closed { transform: translateX(-100%); }
     </style>
 </head>
 <body class="bg-slate-100 min-h-screen flex flex-col font-sans text-slate-800 antialiased">
 
-    <header class="bg-indigo-600 text-white shadow-md z-10">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-            <h1 class="text-xl font-bold flex items-center gap-2">
-                <i class="fa-solid fa-graduation-cap text-yellow-300"></i>
-                <span class="tracking-wide">UT Eitan Quiz <span class="text-xs font-normal bg-indigo-500 px-2 py-0.5 rounded ml-2">Pro</span></span>
-            </h1>
+    <header class="bg-indigo-600 text-white shadow-md z-30 relative">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center gap-3">
+            <div class="flex items-center gap-3">
+                <button id="mobile-menu-button" type="button"
+                        class="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-lg bg-indigo-700 hover:bg-indigo-800 transition"
+                        aria-label="進捗メニューを開く"
+                        aria-controls="mobile-progress-drawer"
+                        aria-expanded="false"
+                        onclick="toggleMobileMenu()">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <h1 class="text-xl font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-graduation-cap text-yellow-300"></i>
+                    <span class="tracking-wide">UT Eitan Quiz <span class="text-xs font-normal bg-indigo-500 px-2 py-0.5 rounded ml-2">Pro</span></span>
+                </h1>
+            </div>
             <a href="/" class="text-xs bg-indigo-700 hover:bg-indigo-800 text-white font-semibold px-3 py-2 rounded-lg transition">
                 <i class="fa-solid fa-house"></i> トップへ
             </a>
         </div>
     </header>
 
+    <!-- Mobile overlay -->
+    <div id="mobile-overlay" class="fixed inset-0 bg-black/40 z-40 hidden md:hidden" onclick="closeMobileMenu()"></div>
+
+    <!-- Mobile drawer -->
+    <aside id="mobile-progress-drawer"
+           class="fixed top-0 left-0 h-full w-[85vw] max-w-sm bg-white shadow-2xl z-50 md:hidden transform transition-transform duration-300 drawer-closed">
+        <div class="h-full flex flex-col">
+            <div class="p-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+                <h2 class="font-bold text-sm text-slate-700 flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-indigo-500"></i>問題ナビゲーション
+                </h2>
+                <button type="button" onclick="closeMobileMenu()" class="text-slate-500 hover:text-slate-700 text-lg" aria-label="閉じる">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                <button onclick="clearProgress()" class="text-xs text-rose-500 hover:underline font-medium">
+                    進捗リセット
+                </button>
+            </div>
+
+            <div class="flex-grow overflow-y-auto p-3 space-y-4 custom-scrollbar text-sm">
+                {% for ch, sections in sidebar_tree.items() %}
+                <div class="border border-slate-100 rounded-xl p-2 bg-slate-50/50">
+                    <div class="font-bold text-indigo-900 px-2 py-1 flex items-center gap-1 bg-indigo-50 rounded-lg text-xs mb-2">
+                        <i class="fa-solid fa-book"></i> Chapter {{ ch }}
+                    </div>
+
+                    {% for sec, questions in sections.items() %}
+                    <div class="ml-2 mb-2 last:mb-0">
+                        <div class="text-xs font-semibold text-slate-500 mb-1 pl-1">Section {{ sec }}</div>
+                        <div class="grid grid-cols-1 gap-1">
+                            {% for q in questions %}
+                            <a href="/ut-eitan-quiz/?q={{ q.idx }}"
+                               id="mobile-sidebar-item-{{ q.idx }}"
+                               class="sidebar-item flex items-center justify-between px-3 py-2 rounded-lg font-mono text-xs transition {% if q.idx == current_idx %}bg-indigo-600 text-white font-bold shadow-sm{% else %}bg-white hover:bg-slate-100 text-slate-700 border border-slate-200/60{% endif %}">
+                                <span>問題 {{ q.q_num }}</span>
+                                <span id="mobile-status-badge-{{ q.idx }}" class="text-[10px] font-sans px-1.5 py-0.5 rounded font-bold bg-slate-100 text-slate-400">
+                                    未挑戦
+                                </span>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </aside>
+
     <div class="flex flex-col md:flex-row flex-grow max-w-7xl w-full mx-auto">
         
-        <aside class="w-full md:w-80 bg-white border-r border-slate-200 flex flex-col md:h-[calc(100vh-61px)] sticky top-[61px]">
+        <aside class="hidden md:flex w-full md:w-80 bg-white border-r border-slate-200 flex-col md:h-[calc(100vh-61px)] sticky top-[61px]">
             <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
                 <h2 class="font-bold text-sm text-slate-700 flex items-center gap-2">
                     <i class="fa-solid fa-list-check text-indigo-500"></i>問題ナビゲーション
@@ -92,7 +156,7 @@
                         <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">問題英文 (Chapter {{ chapter }} - Sec {{ number }} - 問{{ question_number }})</h3>
                     </div>
                     <div class="bg-slate-900 text-slate-100 p-6 rounded-2xl font-mono text-base md:text-lg leading-relaxed shadow-inner" id="sentence-container">
-                        </div>
+                    </div>
                 </div>
 
                 <hr class="border-slate-200 my-6">
@@ -100,7 +164,7 @@
                 <div>
                     <form id="quiz-form" onsubmit="submitAnswer(event)" class="space-y-4">
                         <div id="inputs-container" class="space-y-3">
-                            </div>
+                        </div>
 
                         <div class="flex flex-col sm:flex-row gap-3 pt-4">
                             <button type="submit" class="flex-grow bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3.5 px-6 rounded-xl shadow-lg transition flex justify-center items-center gap-2">
@@ -169,16 +233,18 @@
             }
             sentenceContainer.innerHTML = htmlSentence;
             inputsContainer.innerHTML = inputsHtml;
-            if(document.getElementById('answer-input-0')) document.getElementById('answer-input-0').focus();
+            if (document.getElementById('answer-input-0')) document.getElementById('answer-input-0').focus();
         }
 
         function loadAndApplyProgress() {
             const progress = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-            
+
             document.querySelectorAll('.sidebar-item').forEach(item => {
-                const idx = item.id.replace('sidebar-item-', '');
-                const badge = document.getElementById(`status-badge-${idx}`);
-                
+                const idx = item.id.replace('sidebar-item-', '').replace('mobile-sidebar-item-', '');
+                const badge = document.getElementById(`status-badge-${idx}`) || document.getElementById(`mobile-status-badge-${idx}`);
+
+                if (!badge) return;
+
                 if (progress[idx] === 'correct') {
                     badge.textContent = '解けた';
                     badge.className = "text-[10px] font-sans px-1.5 py-0.5 rounded font-bold bg-emerald-100 text-emerald-700";
@@ -199,7 +265,7 @@
         }
 
         function clearProgress() {
-            if(confirm('これまでの正誤記録をすべてリセットしますか？')) {
+            if (confirm('これまでの正誤記録をすべてリセットしますか？')) {
                 localStorage.removeItem(STORAGE_KEY);
                 location.reload();
             }
@@ -219,13 +285,13 @@
                     body: JSON.stringify({ answers: answers })
                 });
                 const data = await response.json();
-                
+
                 if (data.is_all_correct) {
                     saveProgress('correct');
                 } else {
                     saveProgress('incorrect');
                 }
-                
+
                 displayResult(data);
             } catch (error) {
                 alert('エラーが発生しました。');
@@ -250,7 +316,7 @@
                 titleBox.textContent = '不正解が含まれています';
                 let html = '<ul class="list-disc pl-4 space-y-1 font-mono text-xs mt-2">';
                 data.results.forEach((r, i) => {
-                    html += `<li>空欄 [${i+1}]: ${r.is_correct ? '✅ OK' : `❌ 正解は <b>${r.correct_answer}</b>`}</li>`;
+                    html += `<li>空欄 [${i + 1}]: ${r.is_correct ? '✅ OK' : `❌ 正解は <b>${r.correct_answer}</b>`}</li>`;
                 });
                 html += '</ul>';
                 descBox.innerHTML = html;
@@ -287,6 +353,43 @@
             const randomIndex = unsolvedIndices[Math.floor(Math.random() * unsolvedIndices.length)];
             window.location.href = `/ut-eitan-quiz/?q=${randomIndex}`;
         }
+
+        function openMobileMenu() {
+            const drawer = document.getElementById('mobile-progress-drawer');
+            const overlay = document.getElementById('mobile-overlay');
+            const button = document.getElementById('mobile-menu-button');
+            drawer.classList.remove('drawer-closed');
+            drawer.classList.add('drawer-open');
+            overlay.classList.remove('hidden');
+            button?.setAttribute('aria-expanded', 'true');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMobileMenu() {
+            const drawer = document.getElementById('mobile-progress-drawer');
+            const overlay = document.getElementById('mobile-overlay');
+            const button = document.getElementById('mobile-menu-button');
+            drawer.classList.remove('drawer-open');
+            drawer.classList.add('drawer-closed');
+            overlay.classList.add('hidden');
+            button?.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
+        }
+
+        function toggleMobileMenu() {
+            const drawer = document.getElementById('mobile-progress-drawer');
+            if (drawer.classList.contains('drawer-closed')) {
+                openMobileMenu();
+            } else {
+                closeMobileMenu();
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768) {
+                closeMobileMenu();
+            }
+        });
     </script>
 </body>
 </html>
