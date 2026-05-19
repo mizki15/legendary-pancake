@@ -3,272 +3,264 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UT Eitan Quiz - 英単語穴埋めクイズ</title>
+    <title>UT Eitan Quiz - 進捗管理付き</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* 単語バッジがホバー時にふわっと浮き上がるアニメーション */
-        .word-badge {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .word-badge:hover {
-            transform: translateY(-2px);
-        }
+        .word-badge { transition: all 0.2s ease; }
+        .word-badge:hover { transform: translateY(-2px); }
+        /* サイドバー用のカスタムスクロールバー */
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen flex flex-col font-sans text-slate-800 antialiased">
+<body class="bg-slate-100 min-h-screen flex flex-col font-sans text-slate-800 antialiased">
 
-    <header class="bg-indigo-600 text-white shadow-md">
-        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+    <header class="bg-indigo-600 text-white shadow-md z-10">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
             <h1 class="text-xl font-bold flex items-center gap-2">
                 <i class="fa-solid fa-graduation-cap text-yellow-300"></i>
-                <span class="tracking-wide">UT Eitan Quiz</span>
+                <span class="tracking-wide">UT Eitan Quiz <span class="text-xs font-normal bg-indigo-500 px-2 py-0.5 rounded ml-2">Pro</span></span>
             </h1>
-            <a href="/" class="text-xs bg-indigo-700 hover:bg-indigo-800 text-white font-semibold px-3 py-2 rounded-lg transition duration-200 flex items-center gap-1.5">
-                <i class="fa-solid fa-house"></i> トップに戻る
+            <a href="/" class="text-xs bg-indigo-700 hover:bg-indigo-800 text-white font-semibold px-3 py-2 rounded-lg transition">
+                <i class="fa-solid fa-house"></i> トップへ
             </a>
         </div>
     </header>
 
-    <main class="flex-grow max-w-4xl w-full mx-auto px-4 py-8">
+    <div class="flex flex-col md:flex-row flex-grow max-w-7xl w-full mx-auto">
         
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8 mb-6">
-            
-            <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
-                <div class="flex items-center gap-2">
-                    <span class="bg-indigo-50 text-indigo-700 font-bold px-3 py-1 rounded-lg text-xs tracking-wider border border-indigo-100">
-                        Chapter {{ chapter }}
-                    </span>
-                    <span class="bg-emerald-50 text-emerald-700 font-bold px-3 py-1 rounded-lg text-xs tracking-wider border border-emerald-100">
-                        Section {{ number }}
-                    </span>
-                </div>
-                <span class="text-sm font-semibold text-slate-400">
-                    問題番号: {{ question_number }}
-                </span>
+        <aside class="w-full md:w-80 bg-white border-r border-slate-200 flex flex-col md:h-[calc(100vh-61px)] sticky top-[61px]">
+            <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                <h2 class="font-bold text-sm text-slate-700 flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-indigo-500"></i>問題ナビゲーション
+                </h2>
+                <button onclick="clearProgress()" class="text-xs text-rose-500 hover:underline font-medium">
+                    進捗リセット
+                </button>
             </div>
-
-            <div class="mb-8">
-                <div class="flex items-center gap-2 mb-3">
-                    <i class="fa-solid fa-lightbulb text-amber-500 text-sm"></i>
-                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">活用前の単語（ヒント候補）</h3>
-                </div>
-                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-wrap gap-2.5">
-                    {% for hint in hints %}
-                    <span class="word-badge bg-white border border-slate-300 text-slate-700 px-4 py-2 rounded-xl font-mono font-semibold shadow-sm text-sm hover:border-indigo-500 hover:text-indigo-600 cursor-default select-none">
-                        {{ hint }}
-                    </span>
+            
+            <div class="flex-grow overflow-y-auto p-3 space-y-4 custom-scrollbar text-sm">
+                {% for ch, sections in sidebar_tree.items() %}
+                <div class="border border-slate-100 rounded-xl p-2 bg-slate-50/50">
+                    <div class="font-bold text-indigo-900 px-2 py-1 flex items-center gap-1 bg-indigo-50 rounded-lg text-xs mb-2">
+                        <i class="fa-solid fa-book"></i> Chapter {{ ch }}
+                    </div>
+                    
+                    {% for sec, questions in sections.items() %}
+                    <div class="ml-2 mb-2 last:mb-0">
+                        <div class="text-xs font-semibold text-slate-500 mb-1 pl-1">Section {{ sec }}</div>
+                        <div class="grid grid-cols-1 gap-1">
+                            {% for q in questions %}
+                            <a href="/ut-eitan-quiz/?q={{ q.idx }}" 
+                               id="sidebar-item-{{ q.idx }}"
+                               class="sidebar-item flex items-center justify-between px-3 py-2 rounded-lg font-mono text-xs transition {% if q.idx == current_idx %}bg-indigo-600 text-white font-bold shadow-sm{% else %}bg-white hover:bg-slate-100 text-slate-700 border border-slate-200/60{% endif %}">
+                                <span>問題 {{ q.q_num }}</span>
+                                <span id="status-badge-{{ q.idx }}" class="text-[10px] font-sans px-1.5 py-0.5 rounded font-bold bg-slate-100 text-slate-400">
+                                    未挑戦
+                                </span>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
                     {% endfor %}
                 </div>
+                {% endfor %}
             </div>
+        </aside>
 
-            <div class="mb-8">
-                <div class="flex items-center gap-2 mb-3">
-                    <i class="fa-solid fa-quote-left text-indigo-500 text-sm"></i>
-                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">問題英文</h3>
-                </div>
-                <div class="bg-slate-900 text-slate-100 p-6 rounded-2xl font-mono text-base md:text-lg leading-relaxed shadow-inner" id="sentence-container">
+        <main class="flex-grow p-4 md:p-8 overflow-y-auto">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 md:p-8 mb-6">
+                
+                <div class="mb-8">
+                    <div class="flex items-center gap-2 mb-3">
+                        <i class="fa-solid fa-lightbulb text-amber-500 text-sm"></i>
+                        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">活用前の単語（ヒント候補）</h3>
                     </div>
-            </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-wrap gap-2.5">
+                        {% for hint in hints %}
+                        <span class="word-badge bg-white border border-slate-300 text-slate-700 px-4 py-2 rounded-xl font-mono font-semibold shadow-sm text-sm cursor-default select-none">
+                            {{ hint }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
 
-            <hr class="border-slate-150 my-6">
-
-            <div>
-                <form id="quiz-form" onsubmit="submitAnswer(event)" class="space-y-4">
-                    <div id="inputs-container" class="space-y-3">
+                <div class="mb-8">
+                    <div class="flex items-center gap-2 mb-3">
+                        <i class="fa-solid fa-quote-left text-indigo-500 text-sm"></i>
+                        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">問題英文 (Chapter {{ chapter }} - Sec {{ number }} - 問{{ question_number }})</h3>
+                    </div>
+                    <div class="bg-slate-900 text-slate-100 p-6 rounded-2xl font-mono text-base md:text-lg leading-relaxed shadow-inner" id="sentence-container">
                         </div>
-
-                    <div class="flex flex-col sm:flex-row gap-3 pt-4">
-                        <button type="submit" id="submit-btn" class="flex-grow bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3.5 px-6 rounded-xl shadow-lg shadow-indigo-100 hover:shadow-indigo-200 transition duration-200 flex justify-center items-center gap-2 text-sm md:text-base">
-                            <i class="fa-solid fa-circle-check"></i> 答え合わせをする
-                        </button>
-                        <button type="button" onclick="loadNextQuestion()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3.5 px-6 rounded-xl transition duration-200 flex justify-center items-center gap-2 text-sm md:text-base">
-                            次の問題に進む <i class="fa-solid fa-arrow-right"></i>
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <div id="result-alert" class="mt-6 p-5 rounded-xl border-2 hidden flex items-start gap-4">
-                <div class="text-3xl mt-0.5" id="result-icon"></div>
-                <div class="flex-grow">
-                    <h4 class="font-bold text-base md:text-lg" id="result-title"></h4>
-                    <div class="text-sm mt-2 leading-relaxed" id="result-desc"></div>
                 </div>
+
+                <hr class="border-slate-200 my-6">
+
+                <div>
+                    <form id="quiz-form" onsubmit="submitAnswer(event)" class="space-y-4">
+                        <div id="inputs-container" class="space-y-3">
+                            </div>
+
+                        <div class="flex flex-col sm:flex-row gap-3 pt-4">
+                            <button type="submit" class="flex-grow bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3.5 px-6 rounded-xl shadow-lg transition flex justify-center items-center gap-2">
+                                <i class="fa-solid fa-circle-check"></i> 答え合わせをする
+                            </button>
+                            <button type="button" onclick="loadNextQuestion()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3.5 px-6 rounded-xl transition flex justify-center items-center gap-2">
+                                次の問題へ <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="result-alert" class="mt-6 p-5 rounded-xl border-2 hidden flex items-start gap-4">
+                    <div class="text-3xl mt-0.5" id="result-icon"></div>
+                    <div class="flex-grow">
+                        <h4 class="font-bold text-base md:text-lg" id="result-title"></h4>
+                        <div class="text-sm mt-2" id="result-desc"></div>
+                    </div>
+                </div>
+
             </div>
+        </main>
 
-        </div>
-
-        <div class="flex flex-col sm:flex-row justify-between items-center gap-3 text-sm text-slate-500 px-2">
-            <div>
-                全 {{ total_questions }} 問中 <span class="font-bold text-slate-800">{{ current_idx + 1 }}</span> 問目
-            </div>
-            <button onclick="loadRandomQuestion()" class="text-indigo-600 hover:text-indigo-700 font-semibold flex items-center gap-1.5 transition">
-                <i class="fa-solid fa-shuffle"></i> ランダムに出題する
-            </button>
-        </div>
-
-    </main>
-
-    <footer class="bg-slate-100 border-t border-slate-200 py-6 text-center text-xs text-slate-400">
-        <p>&copy; 2026 UT Eitan Quiz App. Powered by Flask & Tailwind CSS</p>
-    </footer>
+    </div>
 
     <script>
-        // Flaskから安全にデータを引き継ぎ
         const sentenceTemplate = {{ sentence_template|tojson }};
         const targetsCount = {{ targets_count }};
         const currentIdx = {{ current_idx }};
         const totalQuestions = {{ total_questions }};
+        
+        // ローカルストレージ用のキー名
+        const STORAGE_KEY = 'ut_eitan_quiz_progress_2026';
 
-        // 読み込み完了時に実行
         document.addEventListener('DOMContentLoaded', () => {
             renderSentenceAndInputs();
+            loadAndApplyProgress(); // サイドバーの正誤状態を復元
         });
 
-        // 英文内の特殊文字列を入力用バッジに変え、解答フォームを生成する
         function renderSentenceAndInputs() {
             const sentenceContainer = document.getElementById('sentence-container');
             const inputsContainer = document.getElementById('inputs-container');
-            
             let htmlSentence = sentenceTemplate;
             let inputsHtml = '';
 
             for (let i = 0; i < targetsCount; i++) {
-                // 英文内の "__INPUT_0__" などを視覚的な空欄インジケータに置き換え
-                const placeholderHtml = `<span class="inline-block bg-indigo-500/20 text-indigo-300 border-b-2 border-indigo-400 px-2.5 py-0.5 rounded mx-1 font-bold text-sm">空欄 [${i + 1}]</span>`;
+                const placeholderHtml = `<span class="inline-block bg-indigo-500/20 text-indigo-300 border-b-2 border-indigo-400 px-2 rounded mx-1 font-bold text-sm">空欄 [${i + 1}]</span>`;
                 htmlSentence = htmlSentence.replace(`__INPUT_${i}__`, placeholderHtml);
 
-                // 下部に表示するインプット要素の組み立て
                 inputsHtml += `
-                    <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
-                        <label for="answer-input-${i}" class="flex-shrink-0 bg-indigo-100 text-indigo-800 font-bold w-7 h-7 rounded-full flex items-center justify-center text-xs">
-                            ${i + 1}
-                        </label>
-                        <input type="text" id="answer-input-${i}" 
-                               class="answer-field flex-grow bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition font-mono font-medium text-slate-800"
-                               placeholder="空欄 [${i + 1}] の解答を入力してください" 
-                               autocomplete="off"
-                               onkeydown="handleKeyNavigation(event, ${i})">
-                    </div>
-                `;
+                    <div class="flex items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                        <label class="bg-indigo-100 text-indigo-800 font-bold w-7 h-7 rounded-full flex items-center justify-center text-xs">${i + 1}</label>
+                        <input type="text" id="answer-input-${i}" class="flex-grow bg-white border border-slate-200 rounded-lg px-3 py-2 outline-none font-mono focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="解答を入力" autocomplete="off">
+                    </div>`;
             }
-
             sentenceContainer.innerHTML = htmlSentence;
             inputsContainer.innerHTML = inputsHtml;
-
-            // 最初の解答欄にフォーカスを当てる
-            const firstInput = document.getElementById('answer-input-0');
-            if (firstInput) firstInput.focus();
+            if(document.getElementById('answer-input-0')) document.getElementById('answer-input-0').focus();
         }
 
-        // 複数穴がある場合、Enterキーでスムーズに次の入力欄へ移るためのナビゲーション
-        function handleKeyNavigation(event, currentIndex) {
-            if (event.key === 'Enter') {
-                if (currentIndex < targetsCount - 1) {
-                    event.preventDefault(); // フォーム送信を防ぐ
-                    const nextInput = document.getElementById(`answer-input-${currentIndex + 1}`);
-                    if (nextInput) nextInput.focus();
+        // --- 進捗管理のコアロジック ---
+        
+        // ローカルストレージから進捗データを読み込んでサイドバーに反映する
+        function loadAndApplyProgress() {
+            const progress = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+            
+            // 全てのサイドバーアイテムの状態を一括更新
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                const idx = item.id.replace('sidebar-item-', '');
+                const badge = document.getElementById(`status-badge-${idx}`);
+                
+                if (progress[idx] === 'correct') {
+                    badge.textContent = '解けた';
+                    badge.className = "text-[10px] font-sans px-1.5 py-0.5 rounded font-bold bg-emerald-100 text-emerald-700";
+                } else if (progress[idx] === 'incorrect') {
+                    badge.textContent = '不正解';
+                    badge.className = "text-[10px] font-sans px-1.5 py-0.5 rounded font-bold bg-rose-100 text-rose-700";
                 }
+            });
+        }
+
+        // 現在の問題の結果を保存する
+        function saveProgress(status) {
+            const progress = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+            
+            // すでに「正解」している場合は、上書きせず「正解」を維持する（お好みで変更可）
+            if (progress[currentIdx] !== 'correct' || status === 'correct') {
+                progress[currentIdx] = status;
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+            }
+            loadAndApplyProgress(); // サイドバーの見た目を更新
+        }
+
+        function clearProgress() {
+            if(confirm('これまでの正誤記録をすべてリセットしますか？')) {
+                localStorage.removeItem(STORAGE_KEY);
+                location.reload();
             }
         }
 
-        // 答え合わせ（非同期通信）
+        // 答え合わせ送信
         async function submitAnswer(event) {
             event.preventDefault();
-
             const answers = [];
             for (let i = 0; i < targetsCount; i++) {
-                const val = document.getElementById(`answer-input-${i}`).value;
-                answers.push(val);
+                answers.push(document.getElementById(`answer-input-${i}`).value);
             }
 
             try {
                 const response = await fetch('/ut-eitan-quiz/check', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ answers: answers })
                 });
-
-                if (!response.ok) throw new Error('判定処理でサーバーエラーが発生しました。');
-
                 const data = await response.json();
+                
+                // データの正誤をローカルストレージに保存
+                if (data.is_all_correct) {
+                    saveProgress('correct');
+                } else {
+                    saveProgress('incorrect');
+                }
+                
                 displayResult(data);
-
             } catch (error) {
-                console.error(error);
-                alert('通信に失敗しました。ファイルパスやサーバーの状態を確認してください。');
+                alert('エラーが発生しました。');
             }
         }
 
-        // 判定結果の描画
         function displayResult(data) {
             const alertBox = document.getElementById('result-alert');
             const iconBox = document.getElementById('result-icon');
             const titleBox = document.getElementById('result-title');
             const descBox = document.getElementById('result-desc');
-
             alertBox.className = "mt-6 p-5 rounded-xl border-2 hidden flex items-start gap-4";
 
             if (data.is_all_correct) {
-                // 全問正解時のUI
                 alertBox.classList.add('bg-emerald-50', 'border-emerald-300', 'text-emerald-900');
                 iconBox.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-500"></i>';
-                titleBox.textContent = 'Excellent! すべて正解です！';
-                descBox.innerHTML = '完璧です！すべての空欄に正しい単語が入力されました。';
-                
-                for (let i = 0; i < targetsCount; i++) {
-                    document.getElementById(`answer-input-${i}`).className = "answer-field flex-grow bg-emerald-50 border border-emerald-300 rounded-lg px-3.5 py-2.5 outline-none font-mono font-medium text-emerald-800";
-                }
+                titleBox.textContent = '正解です！';
+                descBox.innerHTML = '進捗ナビゲーションに記録されました。';
             } else {
-                // 不正解が含まれる場合のUI
                 alertBox.classList.add('bg-rose-50', 'border-rose-300', 'text-rose-900');
                 iconBox.innerHTML = '<i class="fa-solid fa-circle-xmark text-rose-500"></i>';
-                titleBox.textContent = '不正解が含まれています。確認しましょう：';
-                
-                let detailsHtml = '<div class="space-y-2 mt-2">';
-                data.results.forEach((res, idx) => {
-                    const input = document.getElementById(`answer-input-${idx}`);
-                    if (res.is_correct) {
-                        input.className = "answer-field flex-grow bg-emerald-50 border border-emerald-300 rounded-lg px-3.5 py-2.5 outline-none font-mono font-medium text-emerald-800";
-                        detailsHtml += `
-                            <div class="flex items-center gap-2 font-mono">
-                                <span class="text-emerald-600 font-bold">✓ 空欄 [${idx + 1}]:</span>
-                                <span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold">${res.correct_answer}</span>
-                            </div>
-                        `;
-                    } else {
-                        input.className = "answer-field flex-grow bg-rose-50 border border-rose-300 rounded-lg px-3.5 py-2.5 outline-none font-mono font-medium text-rose-800";
-                        detailsHtml += `
-                            <div class="flex flex-wrap items-center gap-2 font-mono">
-                                <span class="text-rose-600 font-bold">✗ 空欄 [${idx + 1}]:</span>
-                                <span>正解は:</span>
-                                <span class="bg-indigo-100 text-indigo-950 px-2 py-0.5 rounded font-bold">${res.correct_answer}</span>
-                                <span class="text-slate-400 text-xs">(入力: <span class="line-through">${res.user_answer || "未入力"}</span>)</span>
-                            </div>
-                        `;
-                    }
+                titleBox.textContent = '不正解が含まれています';
+                let html = '<ul class="list-disc pl-4 space-y-1 font-mono text-xs mt-2">';
+                data.results.forEach((r, i) => {
+                    html += `<li>空欄 [${i+1}]: ${r.is_correct ? '✅ OK' : `❌ 正解は <b>${r.correct_answer}</b>`}</li>`;
                 });
-                detailsHtml += '</div>';
-                descBox.innerHTML = detailsHtml;
+                html += '</ul>';
+                descBox.innerHTML = html;
             }
-
             alertBox.classList.remove('hidden');
-            alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
-        // 次の問題に進む
         function loadNextQuestion() {
             let nextIdx = currentIdx + 1;
-            if (nextIdx >= totalQuestions) nextIdx = 0; // 最後まで行ったら最初に戻る
+            if (nextIdx >= totalQuestions) nextIdx = 0;
             window.location.href = `/ut-eitan-quiz/?q=${nextIdx}`;
-        }
-
-        // ランダム出題
-        function loadRandomQuestion() {
-            window.location.href = `/ut-eitan-quiz/`;
         }
     </script>
 </body>
