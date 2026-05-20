@@ -9,7 +9,7 @@
         "chapter": "1",
         "number": "1",
         "question_number": "2",
-        "sentence": "An [accumulation] of small misfortunes eventually [led] to the government's collapse."
+        "sentence": "An [accumulation] of small misfortunes eventually led to the government's collapse."
     },
     {
         "chapter": "1",
@@ -65,6 +65,264 @@
         "number": "5",
         "question_number": "2",
         "sentence": "The politician complained that he had been quoted out of [context]."
+    },
+    {
+        "chapter": "2",
+        "number": "1",
+        "question_number": "1",
+        "sentence": "Some philosophers have [claimed] that all knowledge is relative and that there is no [absolute] truth."
+    },
+    {
+        "chapter": "2",
+        "number": "1",
+        "question_number": "2",
+        "sentence": "There is [absolutely] no doubt that DNA is the medium by which genetic information is passed between generations."
+    },
+    {
+        "chapter": "2",
+        "number": "2",
+        "question_number": "1",
+        "sentence": "The amount of energy consumed during exercise can be [analyzed] using special measuring equipment."
+    },
+    {
+        "chapter": "2",
+        "number": "2",
+        "question_number": "2",
+        "sentence": "An [analysis] of the text’s vocabulary showed that it had [probably] been written by Shakespeare."
+    },
+    {
+        "chapter": "2",
+        "number": "3",
+        "question_number": "1",
+        "sentence": "Diabetes is [categorized] as type 1 or type 2 based on whether a patient does not produce enough insulin or is resistant to insulin."
+    },
+    {
+        "chapter": "2",
+        "number": "3",
+        "question_number": "2",
+        "sentence": "The [categorization] of societies as civilized or uncivilized is [controversial] because the definition of civilization is unclear."
+    },
+    {
+        "chapter": "2",
+        "number": "4",
+        "question_number": "1",
+        "sentence": "The patient’s [condition] worsened when she developed a high fever."
+    },
+    {
+        "chapter": "2",
+        "number": "4",
+        "question_number": "2",
+        "sentence": "Myocardial infarction is a sudden heart [condition] often accompanied by chest pain, weakness, and sweating."
+    },
+    {
+        "chapter": "2",
+        "number": "5",
+        "question_number": "1",
+        "sentence": "Private companies have become more [conscious] of the importance of diversifying their workforce."
+    },
+    {
+        "chapter": "2",
+        "number": "5",
+        "question_number": "2",
+        "sentence": "Computers [process] information with no [consciousness] of its meaning."
+    },
+    {
+        "chapter": "2",
+        "number": "6",
+        "question_number": "1",
+        "sentence": "One [effective] technique for remembering telephone numbers is to think of the numbers as words."
+    },
+    {
+        "chapter": "2",
+        "number": "6",
+        "question_number": "2",
+        "sentence": "The [effectiveness] of the death penalty in preventing crime has not been demonstrated statistically."
+    },
+    {
+        "chapter": "2",
+        "number": "7",
+        "question_number": "1",
+        "sentence": "The most [efficient] way to find a book in the library is to look it up first in the online catalog."
+    },
+    {
+        "chapter": "2",
+        "number": "7",
+        "question_number": "2",
+        "sentence": "Worker [efficiency] is easier to [analyze] in factories than in offices."
+    },
+    {
+        "chapter": "2",
+        "number": "8",
+        "question_number": "1",
+        "sentence": "Psychologists disagree about whether a person’s personality is [innate] or is formed during early childhood."
+    },
+    {
+        "chapter": "2",
+        "number": "8",
+        "question_number": "2",
+        "sentence": "Some birds seem to know their migration routes [innately]."
+    },
+    {
+        "chapter": "2",
+        "number": "9",
+        "question_number": "1",
+        "sentence": "Historical research [involves] studying, describing, and explaining what happened in the past."
+    },
+    {
+        "chapter": "2",
+        "number": "9",
+        "question_number": "2",
+        "sentence": "Many molecular and cellular [processes] are [involved] in hormone secretion."
+    },
+    {
+        "chapter": "2",
+        "number": "9",
+        "question_number": "3",
+        "sentence": "Many readers have found Wuthering Heights to be an [involving] novel that is difficult to stop reading."
+    },
+    {
+        "chapter": "2",
+        "number": "10",
+        "question_number": "1",
+        "sentence": "Regular exercise is [essential] for [maintaining] good health."
+    },
+    {
+        "chapter": "2",
+        "number": "10",
+        "question_number": "2",
+        "sentence": "The government’s environmental [policy] emphasizes the [maintenance] of forests in hilly areas."
+    },
+    {
+        "chapter": "2",
+        "number": "11",
+        "question_number": "1",
+        "sentence": "The new drug [appears] to be [effective], but the [mechanism] by which it works is still unknown."
+    },
+    {
+        "chapter": "2",
+        "number": "11",
+        "question_number": "2",
+        "sentence": "Translation software [analyzes] text [mechanically] without [considering] the context or meaning."
+    },
+    {
+        "chapter": "2",
+        "number": "12",
+        "question_number": "1",
+        "sentence": "An [original] solution to a problem is not [necessarily] the best solution; sometimes conventional methods are better."
+    },
+    {
+        "chapter": "2",
+        "number": "12",
+        "question_number": "2",
+        "sentence": "For the London gentleman of the eighteenth century, a wig was simply a [necessity]."
+    },
+    {
+        "chapter": "2",
+        "number": "12",
+        "question_number": "3",
+        "sentence": "The experiment cannot be started until all of the [necessary] equipment and [materials] are ready."
+    },
+    {
+        "chapter": "2",
+        "number": "13",
+        "question_number": "1",
+        "sentence": "Many subatomic particles are very difficult to [observe] because they have extremely short lifespans."
+    },
+    {
+        "chapter": "2",
+        "number": "13",
+        "question_number": "2",
+        "sentence": "Close [Observation] of humans walking reveals the important role played by the ankle in maintaining balance."
+    },
+    {
+        "chapter": "2",
+        "number": "14",
+        "question_number": "1",
+        "sentence": "The increase in obesity is a worldwide [phenomenon] that has not yet been [adequately] explained."
+    },
+    {
+        "chapter": "2",
+        "number": "14",
+        "question_number": "2",
+        "sentence": "Recent brain [research] offers a new framework for understanding [phenomena] such as [consciousness], emotions, and mental illness."
+    },
+    {
+        "chapter": "2",
+        "number": "15",
+        "question_number": "1",
+        "sentence": "The website allows users to set their own personal [preferences] for font size, background color, and page layout."
+    },
+    {
+        "chapter": "2",
+        "number": "15",
+        "question_number": "2",
+        "sentence": "Even a small amount of daily exercise is [preferable] to none at all."
+    },
+    {
+        "chapter": "2",
+        "number": "16",
+        "question_number": "1",
+        "sentence": "The [significance] of the initial find was not clear until after further excavations were made."
+    },
+    {
+        "chapter": "2",
+        "number": "16",
+        "question_number": "2",
+        "sentence": "The first landing on the moon [signified] a unique advance in human history."
+    },
+    {
+        "chapter": "2",
+        "number": "17",
+        "question_number": "1",
+        "sentence": "The journalist refused to reveal the [source] of her information."
+    },
+    {
+        "chapter": "2",
+        "number": "17",
+        "question_number": "2",
+        "sentence": "India’s growing population is [creating] an urgent need for new water [sources]."
+    },
+    {
+        "chapter": "2",
+        "number": "18",
+        "question_number": "1",
+        "sentence": "Marie and Pierre Curie discovered the elements polonium and radium in a dark [substance] called pitchblende."
+    },
+    {
+        "chapter": "2",
+        "number": "18",
+        "question_number": "2",
+        "sentence": "It’s an interesting [hypothesis], but I am afraid the evidence for it is not very [substantial]."
+    },
+    {
+        "chapter": "2",
+        "number": "19",
+        "question_number": "1",
+        "sentence": "The [technical] term for the knee cap is “patella.”"
+    },
+    {
+        "chapter": "2",
+        "number": "19",
+        "question_number": "2",
+        "sentence": "Pluto became [technically] no longer a planet in 2006."
+    },
+    {
+        "chapter": "2",
+        "number": "20",
+        "question_number": "1",
+        "sentence": "The [ultimate] solution to urban traffic jams would be to ban cars from cities and rely only on trains, subways, and buses."
+    },
+    {
+        "chapter": "2",
+        "number": "20",
+        "question_number": "2",
+        "sentence": "Experts disagree over whether the [ultimate] reason for suicide bombings is cultural, psychological, or religious."
+    },
+    {
+        "chapter": "2",
+        "number": "20",
+        "question_number": "3",
+        "sentence": "The hostage-takers issued an [ultimatum]: If their demands were not met, they would start killing their hostages."
     },
     {
         "chapter": "3",
@@ -293,5 +551,516 @@
         "number": "20",
         "question_number": "2",
         "sentence": "I’m afraid I have a meeting at two, so—[unfortunately]—I won’t be able to attend the presentation."
+    },
+    {
+        "chapter": "4",
+        "number": "1",
+        "question_number": "1",
+        "sentence": "Stravinsky’s Rite of Spring, though very [controversial] when it was first performed, is now accepted as a [breakthrough] in modern music."
+    },
+    {
+        "chapter": "4",
+        "number": "1",
+        "question_number": "2",
+        "sentence": "Crick and Watson’s [breakthrough] discovery of the structure of DNA led to many revolutionary advances in the life sciences."
+    },
+    {
+        "chapter": "4",
+        "number": "2",
+        "question_number": "1",
+        "sentence": "The virus acquired the [capability] to infect not only birds but humans as well."
+    },
+    {
+        "chapter": "4",
+        "number": "2",
+        "question_number": "2",
+        "sentence": "Few economists thought that the government was [capable] of stopping inflation."
+    },
+    {
+        "chapter": "4",
+        "number": "3",
+        "question_number": "1",
+        "sentence": "Archaeologists from three countries [collaborated] in the excavation of the tomb."
+    },
+    {
+        "chapter": "4",
+        "number": "3",
+        "question_number": "2",
+        "sentence": "Textual evidence suggests that Shakespeare’s Henry VIII was written [collaboratively] with John Fletcher."
+    },
+    {
+        "chapter": "4",
+        "number": "4",
+        "question_number": "1",
+        "sentence": "A [comparison] of the strata revealed that the rocks in the lower stratum were nearly a billion years older than the rocks in the higher one."
+    },
+    {
+        "chapter": "4",
+        "number": "4",
+        "question_number": "2",
+        "sentence": "Political ideology has sometimes been [compared] to religious faith in terms of the intensity with which people hold on to their beliefs."
+    },
+    {
+        "chapter": "4",
+        "number": "5",
+        "question_number": "1",
+        "sentence": "Her archival [research] has yielded [conclusive] proof as to the [identity] of the assassins of Sakamoto Ryoma."
+    },
+    {
+        "chapter": "4",
+        "number": "5",
+        "question_number": "2",
+        "sentence": "Tests by an independent laboratory [demonstrated] [conclusively] that the toy could cause serious injuries to children."
+    },
+    {
+        "chapter": "4",
+        "number": "6",
+        "question_number": "1",
+        "sentence": "Despite centuries of effort by mathematicians, the [conjecture] that there are no odd perfect numbers is still unproved."
+    },
+    {
+        "chapter": "4",
+        "number": "6",
+        "question_number": "2",
+        "sentence": "The evidence for European settlement of North America before Columbus is largely [conjectural]."
+    },
+    {
+        "chapter": "4",
+        "number": "7",
+        "question_number": "1",
+        "sentence": "The [theory] of plate tectonics was [developed] during the 1960s."
+    },
+    {
+        "chapter": "4",
+        "number": "7",
+        "question_number": "2",
+        "sentence": "The [development] of stronger, more versatile plastics has revolutionized the design and manufacture of consumer products."
+    },
+    {
+        "chapter": "4",
+        "number": "8",
+        "question_number": "1",
+        "sentence": "The [physical] [dimensions] of the doorway made it impossible to bring the piano into the room."
+    },
+    {
+        "chapter": "4",
+        "number": "8",
+        "question_number": "2",
+        "sentence": "The novel’s characters are [two-dimensional], lacking the depth and [uniqueness] we find in great fiction."
+    },
+    {
+        "chapter": "4",
+        "number": "8",
+        "question_number": "3",
+        "sentence": "The study [considered] only the monetary cost of the [proposed] airport; other [dimensions], such as its social impact, were ignored."
+    },
+    {
+        "chapter": "4",
+        "number": "9",
+        "question_number": "1",
+        "sentence": "After the dinosaur bones had been pieced together, they were [exhibited] in a museum."
+    },
+    {
+        "chapter": "4",
+        "number": "9",
+        "question_number": "2",
+        "sentence": "One of the [exhibits] presented in the trial was a rope that had allegedly been used as the murder weapon."
+    },
+    {
+        "chapter": "4",
+        "number": "10",
+        "question_number": "1",
+        "sentence": "Characterizations of ethnic groups might be true in [general] while not applying to every [particular] [individual]."
+    },
+    {
+        "chapter": "4",
+        "number": "10",
+        "question_number": "2",
+        "sentence": "Many scientists in the nineteenth century were [generalists], but scientific [research] today usually requires a high degree of specialization."
+    },
+    {
+        "chapter": "4",
+        "number": "11",
+        "question_number": "1",
+        "sentence": "Game [theory] offers [insights] into the [dynamics] of business transactions."
+    },
+    {
+        "chapter": "4",
+        "number": "11",
+        "question_number": "2",
+        "sentence": "Her [insightful] [remark] about the structure of the molecule [enabled] the team to synthesize it."
+    },
+    {
+        "chapter": "4",
+        "number": "12",
+        "question_number": "1",
+        "sentence": "The dam [proposal] encountered [intense] opposition from local residents."
+    },
+    {
+        "chapter": "4",
+        "number": "12",
+        "question_number": "2",
+        "sentence": "In optics, brightness is defined as the perceived [intensity] of light."
+    },
+    {
+        "chapter": "4",
+        "number": "13",
+        "question_number": "1",
+        "sentence": "The [margins] of the book were filled with the author’s handwritten notes and corrections."
+    },
+    {
+        "chapter": "4",
+        "number": "13",
+        "question_number": "2",
+        "sentence": "Under the colonial regime, the indigenous peoples were [marginalized] and played little [role] in society or the economy."
+    },
+    {
+        "chapter": "4",
+        "number": "13",
+        "question_number": "3",
+        "sentence": "Their contribution was [marginally] useful but hardly [essential]."
+    },
+    {
+        "chapter": "4",
+        "number": "14",
+        "question_number": "1",
+        "sentence": "The [probability] of an asteroid colliding with the Earth is small but not [negligible]."
+    },
+    {
+        "chapter": "4",
+        "number": "14",
+        "question_number": "2",
+        "sentence": "The Pre-Raphaelites romanticized a medieval era that, in all [probability], never existed."
+    },
+    {
+        "chapter": "4",
+        "number": "15",
+        "question_number": "1",
+        "sentence": "In the Greek myth, Narcissus becomes fascinated by his own [reflection] in a pool."
+    },
+    {
+        "chapter": "4",
+        "number": "15",
+        "question_number": "2",
+        "sentence": "The increase in funding for nursing education [reflects] concern about an impending shortage of trained nurses."
+    },
+    {
+        "chapter": "4",
+        "number": "15",
+        "question_number": "3",
+        "sentence": "Newton used his year away from Cambridge to [reflect on] the various problems he had been studying and, as a result, to make several important [breakthroughs]."
+    },
+    {
+        "chapter": "4",
+        "number": "16",
+        "question_number": "1",
+        "sentence": "Only after years of painstaking [research] was the human genome decoded completely."
+    },
+    {
+        "chapter": "4",
+        "number": "16",
+        "question_number": "2",
+        "sentence": "Various [researchers] have been trying to determine the [theoretical] limit for the speed of quantum computers."
+    },
+    {
+        "chapter": "4",
+        "number": "17",
+        "question_number": "1",
+        "sentence": "Survivors’ reports led us to [surmise] that the tsunami had [probably] been about two meters high."
+    },
+    {
+        "chapter": "4",
+        "number": "17",
+        "question_number": "2",
+        "sentence": "His [surmise] about the [origin] of AIDS turned out to be incorrect."
+    },
+    {
+        "chapter": "4",
+        "number": "18",
+        "question_number": "1",
+        "sentence": "The road to the tomb is lined with [symmetrical] rows of trees."
+    },
+    {
+        "chapter": "4",
+        "number": "18",
+        "question_number": "2",
+        "sentence": "European music of the pre-Romantic period is characterized by a [fundamental] [symmetry]."
+    },
+    {
+        "chapter": "4",
+        "number": "19",
+        "question_number": "1",
+        "sentence": "The [traits] shared by that family included ambition, seriousness of purpose, and an inability to accept criticism."
+    },
+    {
+        "chapter": "4",
+        "number": "19",
+        "question_number": "2",
+        "sentence": "The gray fox possesses a [unique] [trait] that distinguishes it from other members of the dog family: It is anatomically adapted for climbing."
+    },
+    {
+        "chapter": "4",
+        "number": "20",
+        "question_number": "1",
+        "sentence": "Einstein’s goal of a [unified] field [theory] — one that would explain both electromagnetism and the [general] [theory] of relativity — has yet to be achieved."
+    },
+    {
+        "chapter": "4",
+        "number": "20",
+        "question_number": "2",
+        "sentence": "Perhaps nothing marked the end of the Cold War as clearly as the 1990 [reunification] of Germany."
+    },
+    {
+        "chapter": "5",
+        "number": "1",
+        "question_number": "1",
+        "sentence": "The guard insisted that he had no [authority] to open the gate if we could not show proper identification."
+    },
+    {
+        "chapter": "5",
+        "number": "1",
+        "question_number": "2",
+        "sentence": "Although she has not studied the subject formally, she is an acknowledged [authority] on Chinese ceramics."
+    },
+    {
+        "chapter": "5",
+        "number": "2",
+        "question_number": "1",
+        "sentence": "In such unfavorable [circumstances], an accident was bound to happen."
+    },
+    {
+        "chapter": "5",
+        "number": "2",
+        "question_number": "2",
+        "sentence": "Dicken's family [circumstances] were of crucial importance for his development as a novelist."
+    },
+    {
+        "chapter": "5",
+        "number": "3",
+        "question_number": "1",
+        "sentence": "The International Monetary Fund had failed to [consider] the long-term implications of its lending policies for developing countries."
+    },
+    {
+        "chapter": "5",
+        "number": "3",
+        "question_number": "2",
+        "sentence": "Deeper [consideration] of the evidence suggests that Homo floresiensis was a genuinely distinct species."
+    },
+    {
+        "chapter": "5",
+        "number": "4",
+        "question_number": "1",
+        "sentence": "The invention of the telescope was [crucial] step in the evolution of our modern worldview."
+    },
+    {
+        "chapter": "5",
+        "number": "4",
+        "question_number": "2",
+        "sentence": "The [crux] of the global warming problem is whether alternative sources of energy can be developed quickly enough."
+    },
+    {
+        "chapter": "5",
+        "number": "5",
+        "question_number": "1",
+        "sentence": "There is no [debate] among mainstream biologists about the reality of evolution."
+    },
+    {
+        "chapter": "5",
+        "number": "5",
+        "question_number": "2",
+        "sentence": "It remains [debatable] whether it was Leonardo or one of his apprentices who actually painted the picture."
+    },
+    {
+        "chapter": "5",
+        "number": "6",
+        "question_number": "1",
+        "sentence": "She chose Switzerland for her holiday quite [deliberately], thinking that her next novel might be set there."
+    },
+    {
+        "chapter": "5",
+        "number": "6",
+        "question_number": "2",
+        "sentence": "After much [deliberation], the committee decided to award the prize to an African botanist who had discovered a new species of orchid."
+    },
+    {
+        "chapter": "5",
+        "number": "7",
+        "question_number": "1",
+        "sentence": "The new element's scientific [designation] was decided in 1879."
+    },
+    {
+        "chapter": "5",
+        "number": "7",
+        "question_number": "2",
+        "sentence": "The Shirakami Mountains were [designated] a World Heritage Site in 1993."
+    },
+    {
+        "chapter": "5",
+        "number": "8",
+        "question_number": "1",
+        "sentence": "The company was [established] soon after the war."
+    },
+    {
+        "chapter": "5",
+        "number": "8",
+        "question_number": "2",
+        "sentence": "Archaeologists have [established] that the Mayans had a very sophisticated calendar."
+    },
+    {
+        "chapter": "5",
+        "number": "9",
+        "question_number": "1",
+        "sentence": "Without a clear [hypothetical] case: Suppose demand for electricity had risen that afternoon instead of falling. What would have happened then?"
+    },
+    {
+        "chapter": "5",
+        "number": "10",
+        "question_number": "1",
+        "sentence": "The new edition [incorporates] all recent advances in scholarship."
+    },
+    {
+        "chapter": "5",
+        "number": "10",
+        "question_number": "2",
+        "sentence": "By [incorporating], investors can reduce their personal liability."
+    },
+    {
+        "chapter": "5",
+        "number": "11",
+        "question_number": "1",
+        "sentence": "The process of natural selection seems to lead inevitably to organisms which are more and more complex."
+    },
+    {
+        "chapter": "5",
+        "number": "11",
+        "question_number": "2",
+        "sentence": "I suppose it was [inevitable] that Thompson and Simmons would disagree about politics, since they disagree about everything else."
+    },
+    {
+        "chapter": "5",
+        "number": "12",
+        "question_number": "1",
+        "sentence": "In view of the high correlation which we have established, the possibility of significant error is [negligible]."
+    },
+    {
+        "chapter": "5",
+        "number": "12",
+        "question_number": "2",
+        "sentence": "The invasion plan unfortunately [neglected] to consider the onset of winter."
+    },
+    {
+        "chapter": "5",
+        "number": "12",
+        "question_number": "3",
+        "sentence": "The doctor's failure to ask about allergies was a clear case of professional [negligence]."
+    },
+    {
+        "chapter": "5",
+        "number": "13",
+        "question_number": "1",
+        "sentence": "In judging the beauty of a painting, it is hardly possible to be fully [objective]."
+    },
+    {
+        "chapter": "5",
+        "number": "13",
+        "question_number": "2",
+        "sentence": "Many people began to doubt the [objectivity] of scientists who denied the dangers of tobacco."
+    },
+    {
+        "chapter": "5",
+        "number": "13",
+        "question_number": "3",
+        "sentence": "Napoleon's [objective] during this part of the campaign was to capture the strategic city of Acre."
+    },
+    {
+        "chapter": "5",
+        "number": "14",
+        "question_number": "1",
+        "sentence": "An early death prevented her great [potential] from being fully realized."
+    },
+    {
+        "chapter": "5",
+        "number": "14",
+        "question_number": "2",
+        "sentence": "Their research is [potentially] revolutionary in its implications."
+    },
+    {
+        "chapter": "5",
+        "number": "15",
+        "question_number": "1",
+        "sentence": "In the 1860s, Mendeleyev [proposed] a radically new classification of the elements."
+    },
+    {
+        "chapter": "5",
+        "number": "15",
+        "question_number": "2",
+        "sentence": "In this crisis, Athens suggested an alliance, but Sparta rejected the [proposal]."
+    },
+    {
+        "chapter": "5",
+        "number": "16",
+        "question_number": "1",
+        "sentence": "Joyce's Ulysses [radically] transformed the possibilities of English prose."
+    },
+    {
+        "chapter": "5",
+        "number": "16",
+        "question_number": "2",
+        "sentence": "In his youth, he belonged to a [radical] communist group, but he later became very right wing."
+    },
+    {
+        "chapter": "5",
+        "number": "17",
+        "question_number": "1",
+        "sentence": "The bank considered our restructuring plan very [realistic] and decided to lend us the necessary funds."
+    },
+    {
+        "chapter": "5",
+        "number": "17",
+        "question_number": "2",
+        "sentence": "We cannot expect to see any dependable [objective] data — [realistically] speaking — for another six months."
+    },
+    {
+        "chapter": "5",
+        "number": "18",
+        "question_number": "1",
+        "sentence": "We believe that the results of this study are unreliable because the [sample] is too small."
+    },
+    {
+        "chapter": "5",
+        "number": "18",
+        "question_number": "2",
+        "sentence": "The first step in their investigation was to [sample] the river water at different points along its course."
+    },
+    {
+        "chapter": "5",
+        "number": "18",
+        "question_number": "3",
+        "sentence": "We hope to send a [sample] chapter to the publisher next week."
+    },
+    {
+        "chapter": "5",
+        "number": "19",
+        "question_number": "1",
+        "sentence": "Even today, we have no generally agreed [theory] of space-time."
+    },
+    {
+        "chapter": "5",
+        "number": "19",
+        "question_number": "2",
+        "sentence": "Critics of Schoenberg often dismiss his music as overly [theoretical]."
+    },
+    {
+        "chapter": "5",
+        "number": "20",
+        "question_number": "1",
+        "sentence": "Machiavelli assumed that selfishness is more or less [universal]."
+    },
+    {
+        "chapter": "5",
+        "number": "20",
+        "question_number": "2",
+        "sentence": "In his early days, Gamal Nasser was [universally] loved and respected by his countrymen."
     }
 ]
+
