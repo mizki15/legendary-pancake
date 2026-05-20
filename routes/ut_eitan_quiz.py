@@ -95,19 +95,54 @@ def quiz_home():
         replaced_sentence = replaced_sentence.replace(target, f"__INPUT_{i}__", 1)
         
     # ヒント単語の抽出
-    hint_words = set()
+    # === 【修正】ヒント単語の抽出ロジック（常にぴったり10語） ===
+    
+    # 1. 現在の問題と同じChapter/Numberに属する単語（正解の原形候補）をすべて抽出
+    correct_hints = set()
     for w in words:
         if w['chapter'] == question['chapter'] and w['number'] == question['number']:
-            hint_words.add(w['word'])
+            correct_hints.add(w['word'])
             
-    all_words = [w['word'] for w in words]
-    dummy_pool = [w for w in all_words if w not in hint_words]
+    # 2. ダミー単語のプール（正解セクションに含まれない他のすべての単語）を作成
+    all_words = list(set(w['word'] for w in words))
+    dummy_pool = [w for w in all_words if w not in correct_hints]
     random.shuffle(dummy_pool)
-    for dw in dummy_pool[:3]:
-        hint_words.add(dw)
+    
+    # 3. 常に10語ぴったりになるように調整
+    hint_set = set(correct_hints)
+    
+    if len(hint_set) > 10:
+        # 【ケースA】同じセクションの単語だけで10語を超えている場合
+        # 今回の空欄（targets）に使われている単語と関連性が高いものを優先して10語に絞り込む
+        target_lowers = [t.lower() for t in targets]
+        priority_hints = []
+        other_hints = []
         
-    hint_list = list(hint_words)
+        for h in hint_set:
+            h_lower = h.lower()
+            # 簡易的な前方一致・部分一致で、空欄の答え（活用形）の原形っぽいものを優先
+            if any(h_lower in t or t in h_lower for t in target_lowers):
+                priority_hints.append(h)
+            else:
+                other_hints.append(h)
+        
+        # 優先度の高い順に並べ替えて先頭から10語を取得
+        final_hints = priority_hints + other_hints
+        hint_list = final_hints[:10]
+        
+    else:
+        # 【ケースB】10語に満たない場合（通常はこちら）
+        # ぴったり10語になるまで、シャッフルしたダミープールから単語を補充
+        for dw in dummy_pool:
+            if len(hint_set) >= 10:
+                break
+            hint_set.add(dw)
+        hint_list = list(hint_set)
+        
+    # 4. 最後に順番をランダムにシャッフル（正解がどこにあるか分からなくするため）
     random.shuffle(hint_list)
+    
+    # === 修正ここまで ===
     
     session['current_targets'] = targets
     
