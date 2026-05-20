@@ -28,5 +28,270 @@
         "number": "3",
         "question_number": "1",
         "sentence": "The moon hoax theory [claims] that people have never traveled to the moon."
+    },
+    {
+        "chapter": "1",
+        "number": "3",
+        "question_number": "2",
+        "sentence": "If no one claims the prize, it will be added to next week's total."
+    },
+    {
+        "chapter": "1",
+        "number": "3",
+        "question_number": "3",
+        "sentence": "The victim submitted a [claim] to the insurance company but did not receive the money."
+    },
+    {
+        "chapter": "1",
+        "number": "4",
+        "question_number": "1",
+        "sentence": "There was a [considerable] delay before the results could be finally verified."
+
+    },
+    {
+        "chapter": "1",
+        "number": "4",
+        "question_number": "2",
+        "sentence": "The committee feels that it has given your proposal all due [consideration]."
+    },
+    {
+        "chapter": "1",
+        "number": "5",
+        "question_number": "1",
+        "sentence": "The outbreak of World War I can only be understood if we see it in its wider European [context]."
+    },
+    {
+        "chapter": "1",
+        "number": "5",
+        "question_number": "2",
+        "sentence": "The politician complained that he had been quoted out of [context]."
+    },
+    {
+        "chapter": "3",
+        "number": "1",
+        "question_number": "1",
+        "sentence": "History reveals that important new ideas often begin life in bitter [controversy]."
+    },
+    {
+        "chapter": "3",
+        "number": "1",
+        "question_number": "2",
+        "sentence": "These surprising [claims] will remain [controversial] until the results of the experiment can be reproduced."
+    },
+    {
+        "chapter": "3",
+        "number": "2",
+        "question_number": "1",
+        "sentence": "This [research] [appears] to show that higher primates are [capable] of using symbols in a truly [creative] way."
+    },
+    {
+        "chapter": "3",
+        "number": "2",
+        "question_number": "2",
+        "sentence": "These factors combined to [create] a situation in which war was not merely likely but [inevitable]."
+    },
+    {
+        "chapter": "3",
+        "number": "3",
+        "question_number": "1",
+        "sentence": "It was [necessary], because of the contaminated water, to [dismantle] the whole apparatus and begin the experiment again from scratch."
+    },
+    {
+        "chapter": "3",
+        "number": "3",
+        "question_number": "2",
+        "sentence": "His goal in politics was to [dismantle] the post-war consensus which—he believed—was a threat to the nation’s greatness."
+    },
+    {
+        "chapter": "3",
+        "number": "4",
+        "question_number": "1",
+        "sentence": "The sudden improvement in the weather [enabled] us to make very rapid progress towards the summit."
+    },
+    {
+        "chapter": "3",
+        "number": "4",
+        "question_number": "2",
+        "sentence": "Overseas [development] aid can, in the right [circumstances], be not only [enabling] but truly liberating to the recipients."
+    },
+    {
+        "chapter": "3",
+        "number": "5",
+        "question_number": "1",
+        "sentence": "We will not be [entitled] to draw that [conclusion] until more evidence is found."
+    },
+    {
+        "chapter": "3",
+        "number": "5",
+        "question_number": "2",
+        "sentence": "Her new position [entitles] her to a company car."
+    },
+    {
+        "chapter": "3",
+        "number": "6",
+        "question_number": "1",
+        "sentence": "The [fundamental] reason for global warming is human consumption of fossil fuels."
+    },
+    {
+        "chapter": "3",
+        "number": "6",
+        "question_number": "2",
+        "sentence": "According to Keynesian economists, inflation [fundamentally] occurs because there is too much money chasing too few goods."
+    },
+    {
+        "chapter": "3",
+        "number": "7",
+        "question_number": "1",
+        "sentence": "Language is the most important part of our human [heritage]."
+    },
+    {
+        "chapter": "3",
+        "number": "7",
+        "question_number": "2",
+        "sentence": "In many cultures, the oldest child [inherits] all of his or her parents' property."
+    },
+    {
+        "chapter": "3",
+        "number": "8",
+        "question_number": "1",
+        "sentence": "Police have not yet [established] the [identity] of the thief."
+    },
+    {
+        "chapter": "3",
+        "number": "8",
+        "question_number": "2",
+        "sentence": "No group can have a secure [sense] of [identity] without a proper understanding of its own history."
+    },
+    {
+        "chapter": "3",
+        "number": "9",
+        "question_number": "1",
+        "sentence": "In music, the one [indispensable] element is rhythm."
+    },
+    {
+        "chapter": "3",
+        "number": "9",
+        "question_number": "2",
+        "sentence": "Water is [indispensable] to life."
+    },
+    {
+        "chapter": "3",
+        "number": "10",
+        "question_number": "1",
+        "sentence": "The wildness of nature was important to all the Romantic poets, but it was a special [inspiration] to Wordsworth."
+    },
+    {
+        "chapter": "3",
+        "number": "10",
+        "question_number": "2",
+        "sentence": "Thank you for your very [original]—I might even say [inspired]—suggestion."
+    },
+    {
+        "chapter": "3",
+        "number": "12",
+        "question_number": "1",
+        "sentence": "The company [claimed] that they were under no moral or legal [obligation] to release that information."
+    },
+    {
+        "chapter": "3",
+        "number": "13",
+        "question_number": "1",
+        "sentence": "Few people are lucky enough to turn a hobby into an [occupation]."
+    },
+    {
+        "chapter": "3",
+        "number": "13",
+        "question_number": "2",
+        "sentence": "Israel's [occupation] of territories captured in the 1967 war remains [controversial] to this day."
+    },
+    {
+        "chapter": "3",
+        "number": "14",
+        "question_number": "1",
+        "sentence": "Field [research] in Nepal is [particularly] difficult at the moment because of the troubled political situation."
+    },
+    {
+        "chapter": "3",
+        "number": "14",
+        "question_number": "2",
+        "sentence": "It was Voltaire in [particular] who embodied the Enlightenment ideals of reason and toleration."
+    },
+    {
+        "chapter": "3",
+        "number": "15",
+        "question_number": "1",
+        "sentence": "Jung provided a completely new [perspective] for the study of psychological phenomena."
+    },
+    {
+        "chapter": "3",
+        "number": "15",
+        "question_number": "2",
+        "sentence": "From any scientific [perspective], the evidence for telepathy is too thin to encourage further [research]."
+    },
+    {
+        "chapter": "3",
+        "number": "16",
+        "question_number": "1",
+        "sentence": "Babies of a very young age have a remarkable ability to [recognize] faces."
+    },
+    {
+        "chapter": "3",
+        "number": "16",
+        "question_number": "2",
+        "sentence": "All civilized nations now [recognize] the importance of human rights."
+    },
+    {
+        "chapter": "3",
+        "number": "16",
+        "question_number": "3",
+        "sentence": "Gerty Cori was awarded the Nobel prize in [recognition] of her [research] on the metabolization of glucose."
+    },
+    {
+        "chapter": "3",
+        "number": "17",
+        "question_number": "1",
+        "sentence": "Accuracy improved dramatically as their methods became more [sophisticated]."
+    },
+    {
+        "chapter": "3",
+        "number": "17",
+        "question_number": "2",
+        "sentence": "Simplicity is an advantage for [theories], at least in their early life—too much [sophistication] can be a barrier to understanding."
+    },
+    {
+        "chapter": "3",
+        "number": "18",
+        "question_number": "1",
+        "sentence": "The doctor told us that the patient’s [condition] was [stable]."
+    },
+    {
+        "chapter": "3",
+        "number": "18",
+        "question_number": "2",
+        "sentence": "This car’s low center of gravity improves its [stability] on winding roads."
+    },
+    {
+        "chapter": "3",
+        "number": "19",
+        "question_number": "1",
+        "sentence": "The history of mathematics is full of new [developments], but Cantor’s set [theory] [transcends] them all."
+    },
+    {
+        "chapter": "3",
+        "number": "19",
+        "question_number": "2",
+        "sentence": "Followers of the guru believe that by meditating on a special word they can achieve a state of [transcendental] peace."
+    },
+    {
+        "chapter": "3",
+        "number": "20",
+        "question_number": "1",
+        "sentence": "[Unfortunately], there was too much cloud and we were unable to [observe] the lunar eclipse."
+    },
+    {
+        "chapter": "3",
+        "number": "20",
+        "question_number": "2",
+        "sentence": "I’m afraid I have a meeting at two, so—[unfortunately]—I won’t be able to attend the presentation."
     }
 ]
