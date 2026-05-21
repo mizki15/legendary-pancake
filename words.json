@@ -2,78 +2,84 @@
     {
         "chapter": "1",
         "number": "1",
-        "word": "accumulate"
+        "word": ["accumulate"]
     },
     {
         "chapter": "1",
         "number": "2",
-        "word": "civilization"
+        "word": ["civilization"]
     },
     {
         "chapter": "1",
         "number": "3",
-        "word": "claim"
+        "word": ["claim"]
     },
     {
         "chapter": "1",
         "number": "4",
-        "word": "considerable"
+        "word": ["considerable"]
     },
     {
         "chapter": "1",
         "number": "5",
-        "word": "context"
+        "word": ["context"]
     },
     {
         "chapter": "1",
         "number": "6",
-        "word": "framework"
+        "word": ["framework"]
     },
     {
         "chapter": "1",
         "number": "7",
-        "word": "individual"
+        "word": ["individual"]
     },
     {
         "chapter": "1",
         "number": "8",
-        "word": "investment"
+        "word": ["investment"]
     },
     {
         "chapter": "1",
         "number": "9",
-        "word": "literally"
+        "word": ["literally"]
     },
     {
         "chapter": "1",
         "number": "10",
-        "word": "metaphorically"
+        "word": ["metaphorically"]
     },
     {
         "chapter": "1",
         "number": "11",
-        "word": "original"
+        "word": ["original"]
     },
     {
         "chapter": "1",
         "number": "12",
-        "word": "potential"
+        "word": ["potential"]
     },
     {
         "chapter": "1",
         "number": "13",
-        "word": "revolution"
+        "word": ["revolution"]
     },
     {
         "chapter": "1",
         "number": "14",
-        "word": "significant"
+        "word": ["significant"]
     },
     {
         "chapter": "1",
         "number": "15",
-        "word": "theory"
+        "word": ["theory"]
+    },
+    {
+        "chapter": "2",
+        "number": "1",
+        "word": ["absolute"]
     }
+
 ]
 
 
