@@ -1,111 +1,57 @@
-import os
 import json
-import re
 import random
-from flask import Blueprint, render_template, request, jsonify, session
+from flask import Blueprint, render_template, request, jsonify
 
-ut_eitan_quiz_bp = Blueprint(
-    'ut_eitan_quiz',
-    __name__,
-    url_prefix='/ut-eitan-quiz',
-    template_folder='../templates'
-)
+# Blueprintの定義（環境に合わせて名前などは調整してください）
+ut_eitan_quiz_bp = Blueprint('ut_eitan_quiz', __name__)
 
-# JSONデータの読み込み関数
 def load_data():
-    # 実行環境のパスに合わせて調整できるようにする
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    
-    sentences_path = os.path.join(base_dir, 'sentences.json')
-    words_path = os.path.join(base_dir, 'words.json')
-    
-    # 万が一ファイルがない場合のフォールバック（デモデータ）
-    if not os.path.exists(sentences_path):
-        sentences = [
-            {"chapter": "1", "number": "1", "question_number": "1", "sentence": "The researchers [accumulated] hundreds of photographs of irregular plant growth caused by chemical fertilizers."},
-            {"chapter": "1", "number": "1", "question_number": "2", "sentence": "An [accumulation] of small misfortunes eventually [led] to the government's collapse."},
-            {"chapter": "1", "number": "2", "question_number": "1", "sentence": "Colonialists often see themselves as bringing [civilization] to less fortunate peoples."},
-            {"chapter": "1", "number": "2", "question_number": "2", "sentence": "The society which produced the pyramids certainly deserves to be called a [civilization]."},
-            {"chapter": "1", "number": "3", "question_number": "1", "sentence": "The moon hoax theory claims that people have never traveled to the moon."}
-        ]
-    else:
-        with open(sentences_path, 'r', encoding='utf-8') as f:
-            sentences = json.load(f)
-            
-    if not os.path.exists(words_path):
-        words = [
-            {"chapter": "1", "number": "1", "word": "accumulate"},
-            {"chapter": "1", "number": "2", "word": "civilization"},
-            {"chapter": "1", "number": "3", "word": "claim"}
-        ]
-    else:
-        with open(words_path, 'r', encoding='utf-8') as f:
-            words = json.load(f)
-            
-    return sentences, words
+    """データをロードする関数（パスは環境に合わせて変更してください）"""
+    with open('data/questions.json', 'r', encoding='utf-8') as f:
+        questions = json.load(f)
+    with open('data/words.json', 'r', encoding='utf-8') as f:
+        words = json.load(f)
+    return questions, words
 
-# routes/ut_eitan_quiz.py の quiz_home 関数部分を以下のように修正・拡張します
 
-@ut_eitan_quiz_bp.route('/')
+@ut_eitan_quiz_bp.route('/ut-eitan-quiz/')
 def quiz_home():
-    sentences, words = load_data()
+    questions, words = load_data()
     
-    pattern = re.compile(r'\[[a-zA-Z\s\']+\]')
-    quiz_pool = []
-    
-    # 1. 出題可能な問題をプール
-    for s in sentences:
-        if pattern.search(s['sentence']):
-            quiz_pool.append(s)
-            
-    if not quiz_pool:
-        return "有効なクイズ問題が見つかりませんでした。"
-    
-    # 2. 【追加】サイドバー用の階層構造ツリーを作る
-    # 構造イメージ: { "1": { "1": [{"idx": 0, "q_num": "1"}, {"idx": 1, "q_num": "2"}], "2": [...] } }
-    sidebar_tree = {}
-    for idx, q in enumerate(quiz_pool):
-        ch = q['chapter']
-        num = q['number']
-        q_num = q['question_number']
+    # クエリパラメータから現在の問題インデックスを取得
+    q_idx_str = request.args.get('q', '0')
+    try:
+        current_idx = int(q_idx_str)
+    except ValueError:
+        current_idx = 0
         
-        if ch not in sidebar_tree:
-            sidebar_tree[ch] = {}
-        if num not in sidebar_tree[ch]:
-            sidebar_tree[ch][num] = []
-            
-        sidebar_tree[ch][num].append({
-            'idx': idx,
-            'q_num': q_num
-        })
+    if current_idx < 0 or current_idx >= len(questions):
+        current_idx = 0
 
-    # 3. 現在の問題インデックスを取得
-    q_idx = request.args.get('q', default=None, type=int)
-    if q_idx is None or q_idx < 0 or q_idx >= len(quiz_pool):
-        q_idx = random.randint(0, len(quiz_pool) - 1)
-        
-    question = quiz_pool[q_idx]
-    original_sentence = question["sentence"]
+    question = questions[current_idx]
     
-    raw_targets = pattern.findall(original_sentence)
-    targets = [re.sub(r'[\[\]]', '', t) for t in raw_targets]
+    # 問題データから変数を取り出し（※お使いのJsonのキー名に合わせてください）
+    sentence_template = question['sentence_template']
+    targets = question['targets']  # 空欄に入る実際の答え（活用形など）のリスト
+    targets_count = len(targets)
     
-    replaced_sentence = original_sentence
-    for i, target in enumerate(raw_targets):
-        replaced_sentence = replaced_sentence.replace(target, f"__INPUT_{i}__", 1)
-        
-    # ヒント単語の抽出
-    # === 【修正】ヒント単語の抽出ロジック（常にぴったり10語） ===
+    # ========================================================
+    # 【アプローチ2対応】ヒント単語の抽出ロジック（常にぴったり10語）
+    # ========================================================
     
     # 1. 現在の問題と同じChapter/Numberに属する単語（正解の原形候補）をすべて抽出
     correct_hints = set()
     for w in words:
-        if w['chapter'] == question['chapter'] and w['number'] == question['number']:
-            correct_hints.add(w['word'])
+        if str(w['chapter']) == str(question['chapter']) and str(w['number']) == str(question['number']):
+            # アプローチ2: w['words'] はリストなので update() でセットに一括追加
+            correct_hints.update(w['words'])
             
-    # 2. ダミー単語のプール（正解セクションに含まれない他のすべての単語）を作成
-    all_words = list(set(w['word'] for w in words))
-    dummy_pool = [w for w in all_words if w not in correct_hints]
+    # 2. ダミー単語のプールを作成（すべての単語から正解セクションのヒントを除外）
+    all_words = set()
+    for w in words:
+        all_words.update(w['words'])  # すべての単語をセットに集める
+        
+    dummy_pool = [dw for dw in all_words if dw not in correct_hints]
     random.shuffle(dummy_pool)
     
     # 3. 常に10語ぴったりになるように調整
@@ -113,20 +59,18 @@ def quiz_home():
     
     if len(hint_set) > 10:
         # 【ケースA】同じセクションの単語だけで10語を超えている場合
-        # 今回の空欄（targets）に使われている単語と関連性が高いものを優先して10語に絞り込む
+        # 空欄の答え（活用形）の文字列と部分一致するものを優先して10語に絞り込む
         target_lowers = [t.lower() for t in targets]
         priority_hints = []
         other_hints = []
         
         for h in hint_set:
             h_lower = h.lower()
-            # 簡易的な前方一致・部分一致で、空欄の答え（活用形）の原形っぽいものを優先
             if any(h_lower in t or t in h_lower for t in target_lowers):
                 priority_hints.append(h)
             else:
                 other_hints.append(h)
         
-        # 優先度の高い順に並べ替えて先頭から10語を取得
         final_hints = priority_hints + other_hints
         hint_list = final_hints[:10]
         
@@ -139,57 +83,34 @@ def quiz_home():
             hint_set.add(dw)
         hint_list = list(hint_set)
         
-    # 4. 最後に順番をランダムにシャッフル（正解がどこにあるか分からなくするため）
+    # 4. 最後に順番をランダムにシャッフル（正解の位置をバラバラにする）
     random.shuffle(hint_list)
     
-    # === 修正ここまで ===
-    
-    session['current_targets'] = targets
-    
-    # 4. sidebar_tree を追加してレンダリング
+    # ========================================================
+
+    # サイドバー用のツリー構造を作るロジック（既存のものを維持）
+    sidebar_tree = {}
+    for idx, q in enumerate(questions):
+        ch = q['chapter']
+        sec = q['number']
+        if ch not in sidebar_tree:
+            sidebar_tree[ch] = {}
+        if sec not in sidebar_tree[ch]:
+            sidebar_tree[ch][sec] = []
+        sidebar_tree[ch][sec].append({
+            'idx': idx,
+            'q_num': q.get('question_number', idx + 1)
+        })
+
     return render_template(
         'ut_eitan_quiz/quiz.html',
-        sentence_template=replaced_sentence,
-        hints=hint_list,
-        targets_count=len(targets),
+        sentence_template=sentence_template,
+        targets_count=targets_count,
+        current_idx=current_idx,
+        total_questions=len(questions),
         chapter=question['chapter'],
         number=question['number'],
-        question_number=question['question_number'],
-        total_questions=len(quiz_pool),
-        current_idx=q_idx,
-        sidebar_tree=sidebar_tree  # ←追加
+        question_number=question.get('question_number', current_idx + 1),
+        hints=hint_list,  # 画面に渡す10語のヒント
+        sidebar_tree=sidebar_tree
     )
-
-@ut_eitan_quiz_bp.route('/check', methods=['POST'])
-def check_answer():
-    """解答を判定するAPI endpoint"""
-    data = request.get_json() or {}
-    user_answers = data.get('answers', [])
-    correct_answers = session.get('current_targets', [])
-    
-    if not correct_answers:
-        return jsonify({'error': 'セッションがタイムアウトしたか、問題データが存在しません。'}), 400
-        
-    results = []
-    is_all_correct = True
-    
-    for i, correct in enumerate(correct_answers):
-        # ユーザーの解答（空欄対応）
-        user_ans = user_answers[i].strip() if i < len(user_answers) else ""
-        
-        # 大文字小文字を区別せずに比較
-        is_correct = user_ans.lower() == correct.lower()
-        if not is_correct:
-            is_all_correct = False
-            
-        results.append({
-            'index': i,
-            'user_answer': user_ans,
-            'correct_answer': correct,
-            'is_correct': is_correct
-        })
-        
-    return jsonify({
-        'is_all_correct': is_all_correct,
-        'results': results
-    })
