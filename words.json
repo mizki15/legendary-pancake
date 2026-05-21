@@ -1,84 +1,967 @@
 [
-    {
-        "chapter": "1",
-        "number": "1",
-        "words": ["accumulate"]
-    },
-    {
-        "chapter": "1",
-        "number": "2",
-        "words": ["civilization"]
-    },
-    {
-        "chapter": "1",
-        "number": "3",
-        "words": ["claim"]
-    },
-    {
-        "chapter": "1",
-        "number": "4",
-        "words": ["considerable"]
-    },
-    {
-        "chapter": "1",
-        "number": "5",
-        "words": ["context"]
-    },
-    {
-        "chapter": "1",
-        "number": "6",
-        "words": ["framework"]
-    },
-    {
-        "chapter": "1",
-        "number": "7",
-        "words": ["individual"]
-    },
-    {
-        "chapter": "1",
-        "number": "8",
-        "words": ["investment"]
-    },
-    {
-        "chapter": "1",
-        "number": "9",
-        "words": ["literally"]
-    },
-    {
-        "chapter": "1",
-        "number": "10",
-        "words": ["metaphorically"]
-    },
-    {
-        "chapter": "1",
-        "number": "11",
-        "words": ["original"]
-    },
-    {
-        "chapter": "1",
-        "number": "12",
-        "words": ["potential"]
-    },
-    {
-        "chapter": "1",
-        "number": "13",
-        "words": ["revolution"]
-    },
-    {
-        "chapter": "1",
-        "number": "14",
-        "words": ["significant"]
-    },
-    {
-        "chapter": "1",
-        "number": "15",
-        "words": ["theory"]
-    },
-    {
-        "chapter": "2",
-        "number": "1",
-        "words": ["absolute"]
-    }
+  {
+    "chapter": "1",
+    "number": "1",
+    "words": [
+      "accumulate",
+      "research"
+    ]
+  },
+  {
+    "chapter": "1",
+    "number": "2",
+    "words": [
+      "civilization"
+    ]
+  },
+  {
+    "chapter": "1",
+    "number": "3",
+    "words": [
+      "claim",
+      "theoretical"
+    ]
+  },
+  {
+    "chapter": "1",
+    "number": "4",
+    "words": [
+      "considerable",
+      "propose"
+    ]
+  },
+  {
+    "chapter": "1",
+    "number": "5",
+    "words": [
+      "context"
+    ]
+  },
+  {
+    "chapter": "1",
+    "number": "6",
+    "words": [
+      "framework",
+      "individual"
+    ]
+  },
+  {
+    "chapter": "1",
+    "number": "7",
+    "words": [
+      "individual",
+      "essential"
+    ]
+  },
+  {
+    "chapter": "1",
+    "number": "8",
+    "words": [
+      "investment",
+      "involve",
+      "condition"
+    ]
+  },
+  {
+    "chapter": "1",
+    "number": "9",
+    "words": [
+      "literally",
+      "sense",
+      "analyze",
+      "role",
+      "metaphorically"
+    ]
+  },
+  {
+    "chapter": "1",
+    "number": "10",
+    "words": [
+      "metaphorically"
+    ]
+  },
+  {
+    "chapter": "1",
+    "number": "11",
+    "words": [
+      "original",
+      "theoretical"
+    ]
+  },
+  {
+    "chapter": "1",
+    "number": "12",
+    "words": [
+      "policy",
+      "develop",
+      "effective"
+    ]
+  },
+  {
+    "chapter": "1",
+    "number": "13",
+    "words": [
+      "process",
+      "material"
+    ]
+  },
+  {
+    "chapter": "1",
+    "number": "14",
+    "words": [
+      "resources",
+      "necessary"
+    ]
+  },
+  {
+    "chapter": "1",
+    "number": "15",
+    "words": [
+      "role"
+    ]
+  },
+  {
+    "chapter": "1",
+    "number": "16",
+    "words": [
+      "specific"
+    ]
+  },
+  {
+    "chapter": "1",
+    "number": "17",
+    "words": [
+      "strategy"
+    ]
+  },
+  {
+    "chapter": "1",
+    "number": "18",
+    "words": [
+      "text",
+      "unfortunately",
+      "source"
+    ]
+  },
+  {
+    "chapter": "1",
+    "number": "19",
+    "words": [
+      "tradition"
+    ]
+  },
+  {
+    "chapter": "1",
+    "number": "20",
+    "words": [
+      "unique",
+      "specific",
+      "material"
+    ]
+  },
+  {
+    "chapter": "2",
+    "number": "1",
+    "words": [
+      "absolute",
+      "claim"
+    ]
+  },
+  {
+    "chapter": "2",
+    "number": "2",
+    "words": [
+      "analyze",
+      "probability"
+    ]
+  },
+  {
+    "chapter": "2",
+    "number": "3",
+    "words": [
+      "categorize",
+      "controversy"
+    ]
+  },
+  {
+    "chapter": "2",
+    "number": "4",
+    "words": [
+      "condition"
+    ]
+  },
+  {
+    "chapter": "2",
+    "number": "5",
+    "words": [
+      "conscious",
+      "process"
+    ]
+  },
+  {
+    "chapter": "2",
+    "number": "6",
+    "words": [
+      "effective"
+    ]
+  },
+  {
+    "chapter": "2",
+    "number": "7",
+    "words": [
+      "efficient",
+      "analyze"
+    ]
+  },
+  {
+    "chapter": "2",
+    "number": "8",
+    "words": [
+      "innate"
+    ]
+  },
+  {
+    "chapter": "2",
+    "number": "9",
+    "words": [
+      "involve",
+      "process"
+    ]
+  },
+  {
+    "chapter": "2",
+    "number": "10",
+    "words": [
+      "maintain",
+      "essential",
+      "policy"
+    ]
+  },
+  {
+    "chapter": "2",
+    "number": "11",
+    "words": [
+      "mechanism",
+      "apparent",
+      "effective",
+      "analyze",
+      "considerable"
+    ]
+  },
+  {
+    "chapter": "2",
+    "number": "12",
+    "words": [
+      "necessary",
+      "original",
+      "material"
+    ]
+  },
+  {
+    "chapter": "2",
+    "number": "13",
+    "words": [
+      "observe"
+    ]
+  },
+  {
+    "chapter": "2",
+    "number": "14",
+    "words": [
+      "phenomenon",
+      "adequate",
+      "research",
+      "conscious"
+    ]
+  },
+  {
+    "chapter": "2",
+    "number": "15",
+    "words": [
+      "preference"
+    ]
+  },
+  {
+    "chapter": "2",
+    "number": "16",
+    "words": [
+      "significance"
+    ]
+  },
+  {
+    "chapter": "2",
+    "number": "17",
+    "words": [
+      "source",
+      "create"
+    ]
+  },
+  {
+    "chapter": "2",
+    "number": "18",
+    "words": [
+      "substance",
+      "hypothesis"
+    ]
+  },
+  {
+    "chapter": "2",
+    "number": "19",
+    "words": [
+      "technical"
+    ]
+  },
+  {
+    "chapter": "2",
+    "number": "20",
+    "words": [
+      "ultimate"
+    ]
+  },
+  {
+    "chapter": "3",
+    "number": "1",
+    "words": [
+      "controversy",
+      "claim"
+    ]
+  },
+  {
+    "chapter": "3",
+    "number": "2",
+    "words": [
+      "create",
+      "research",
+      "apparent",
+      "capability",
+      "inevitably"
+    ]
+  },
+  {
+    "chapter": "3",
+    "number": "3",
+    "words": [
+      "dismantle",
+      "necessary"
+    ]
+  },
+  {
+    "chapter": "3",
+    "number": "4",
+    "words": [
+      "enable",
+      "develop",
+      "circumstances"
+    ]
+  },
+  {
+    "chapter": "3",
+    "number": "5",
+    "words": [
+      "entitled",
+      "conclusive"
+    ]
+  },
+  {
+    "chapter": "3",
+    "number": "6",
+    "words": [
+      "fundamental"
+    ]
+  },
+  {
+    "chapter": "3",
+    "number": "7",
+    "words": [
+      "heritage"
+    ]
+  },
+  {
+    "chapter": "3",
+    "number": "8",
+    "words": [
+      "identity",
+      "establish",
+      "sense"
+    ]
+  },
+  {
+    "chapter": "3",
+    "number": "9",
+    "words": [
+      "indispensable"
+    ]
+  },
+  {
+    "chapter": "3",
+    "number": "10",
+    "words": [
+      "inspire",
+      "original"
+    ]
+  },
+  {
+    "chapter": "3",
+    "number": "11",
+    "words": [
+      "material",
+      "observe",
+      "controversy"
+    ]
+  },
+  {
+    "chapter": "3",
+    "number": "12",
+    "words": [
+      "obligation",
+      "claim"
+    ]
+  },
+  {
+    "chapter": "3",
+    "number": "13",
+    "words": [
+      "occupation",
+      "controversy"
+    ]
+  },
+  {
+    "chapter": "3",
+    "number": "14",
+    "words": [
+      "particularly",
+      "research"
+    ]
+  },
+  {
+    "chapter": "3",
+    "number": "15",
+    "words": [
+      "perspective",
+      "research"
+    ]
+  },
+  {
+    "chapter": "3",
+    "number": "16",
+    "words": [
+      "recognize",
+      "research"
+    ]
+  },
+  {
+    "chapter": "3",
+    "number": "17",
+    "words": [
+      "sophisticated",
+      "theoretical"
+    ]
+  },
+  {
+    "chapter": "3",
+    "number": "18",
+    "words": [
+      "stable",
+      "condition"
+    ]
+  },
+  {
+    "chapter": "3",
+    "number": "19",
+    "words": [
+      "transcend",
+      "develop",
+      "theoretical"
+    ]
+  },
+  {
+    "chapter": "3",
+    "number": "20",
+    "words": [
+      "unfortunately",
+      "observe"
+    ]
+  },
+  {
+    "chapter": "4",
+    "number": "1",
+    "words": [
+      "breakthrough",
+      "controversy"
+    ]
+  },
+  {
+    "chapter": "4",
+    "number": "2",
+    "words": [
+      "capability"
+    ]
+  },
+  {
+    "chapter": "4",
+    "number": "3",
+    "words": [
+      "collaborate"
+    ]
+  },
+  {
+    "chapter": "4",
+    "number": "4",
+    "words": [
+      "comparison"
+    ]
+  },
+  {
+    "chapter": "4",
+    "number": "5",
+    "words": [
+      "conclusive",
+      "research",
+      "identity",
+      "demonstrate"
+    ]
+  },
+  {
+    "chapter": "4",
+    "number": "6",
+    "words": [
+      "conjecture"
+    ]
+  },
+  {
+    "chapter": "4",
+    "number": "7",
+    "words": [
+      "develop",
+      "theoretical"
+    ]
+  },
+  {
+    "chapter": "4",
+    "number": "8",
+    "words": [
+      "dimension",
+      "physical",
+      "unique",
+      "considerable",
+      "propose"
+    ]
+  },
+  {
+    "chapter": "4",
+    "number": "9",
+    "words": [
+      "exhibit"
+    ]
+  },
+  {
+    "chapter": "4",
+    "number": "10",
+    "words": [
+      "general",
+      "particularly",
+      "individual",
+      "research"
+    ]
+  },
+  {
+    "chapter": "4",
+    "number": 11,
+    "words": [
+      "insight",
+      "theoretical",
+      "dynamics",
+      "remark",
+      "enable"
+    ]
+  },
+  {
+    "chapter": "4",
+    "number": "12",
+    "words": [
+      "intense",
+      "propose"
+    ]
+  },
+  {
+    "chapter": "4",
+    "number": "13",
+    "words": [
+      "margin",
+      "role",
+      "essential"
+    ]
+  },
+  {
+    "chapter": "4",
+    "number": "14",
+    "words": [
+      "probability",
+      "negligible"
+    ]
+  },
+  {
+    "chapter": "4",
+    "number": "15",
+    "words": [
+      "reflect",
+      "breakthrough"
+    ]
+  },
+  {
+    "chapter": "4",
+    "number": "16",
+    "words": [
+      "research",
+      "theoretical"
+    ]
+  },
+  {
+    "chapter": "4",
+    "number": "17",
+    "words": [
+      "surmise",
+      "probability",
+      "original"
+    ]
+  },
+  {
+    "chapter": "4",
+    "number": 18,
+    "words": [
+      "symmetrical",
+      "fundamental"
+    ]
+  },
+  {
+    "chapter": "4",
+    "number": 19,
+    "words": [
+      "trait",
+      "unique"
+    ]
+  },
+  {
+    "chapter": "4",
+    "number": 20,
+    "words": [
+      "unify",
+      "theoretical",
+      "general"
+    ]
+  },
+  {
+    "chapter": "5",
+    "number": "1",
+    "words": [
+      "authority",
+      "identity",
+      "subjective"
+    ]
+  },
+  {
+    "chapter": "5",
+    "number": "2",
+    "words": [
+      "circumstances",
+      "crucial"
+    ]
+  },
+  {
+    "chapter": "5",
+    "number": "3",
+    "words": [
+      "consider",
+      "considerable",
+      "implication",
+      "policy",
+      "develop"
+    ]
+  },
+  {
+    "chapter": "5",
+    "number": "4",
+    "words": [
+      "crucial",
+      "source",
+      "develop"
+    ]
+  },
+  {
+    "chapter": "5",
+    "number": "5",
+    "words": [
+      "debate",
+      "realistic"
+    ]
+  },
+  {
+    "chapter": "5",
+    "number": "6",
+    "words": [
+      "deliberately"
+    ]
+  },
+  {
+    "chapter": "5",
+    "number": 7,
+    "words": [
+      "designated",
+      "heritage"
+    ]
+  },
+  {
+    "chapter": "5",
+    "number": 8,
+    "words": [
+      "establish",
+      "sophisticated"
+    ]
+  },
+  {
+    "chapter": "5",
+    "number": 9,
+    "words": [
+      "hypothesis",
+      "research"
+    ]
+  },
+  {
+    "chapter": "5",
+    "number": 10,
+    "words": [
+      "incorporate",
+      "investment"
+    ]
+  },
+  {
+    "chapter": "5",
+    "number": 11,
+    "words": [
+      "inevitably",
+      "process"
+    ]
+  },
+  {
+    "chapter": "5",
+    "number": 12,
+    "words": [
+      "negligible",
+      "significance",
+      "unfortunately",
+      "considerable"
+    ]
+  },
+  {
+    "chapter": "5",
+    "number": 13,
+    "words": [
+      "objective",
+      "strategy"
+    ]
+  },
+  {
+    "chapter": "5",
+    "number": 14,
+    "words": [
+      "potential"
+    ]
+  },
+  {
+    "chapter": 5,
+    "number": 15,
+    "words": [
+      "propose",
+      "radically"
+    ]
+  },
+  {
+    "chapter": "5",
+    "number": 16,
+    "words": [
+      "radically"
+    ]
+  },
+  {
+    "chapter": "5",
+    "number": 17,
+    "words": [
+      "realistic",
+      "considerable",
+      "necessary",
+      "objective"
+    ]
+  },
+  {
+    "chapter": "5",
+    "number": 18,
+    "words": [
+      "sample"
+    ]
+  },
+  {
+    "chapter": "5",
+    "number": 19,
+    "words": [
+      "theoretical",
+      "general"
+    ]
+  },
+  {
+    "chapter": "5",
+    "number": 20,
+    "words": [
+      "universal"
+    ]
+  },
+  {
+    "chapter": "6",
+    "number": "1",
+    "words": [
+      "account"
+    ]
+  },
+  {
+    "chapter": "6",
+    "number": "2",
+    "words": [
+      "adequate"
+    ]
+  },
+  {
+    "chapter": "6",
+    "number": "3",
+    "words": [
+      "ambiguous"
+    ]
+  },
+  {
+    "chapter": "6",
+    "number": "4",
+    "words": [
+      "apparent"
+    ]
+  },
+  {
+    "chapter": "6",
+    "number": "5",
+    "words": [
+      "consequence",
+      "significance",
+      "sample"
+    ]
+  },
+  {
+    "chapter": "6",
+    "number": "6",
+    "words": [
+      "consistent",
+      "theoretical"
+    ]
+  },
+  {
+    "chapter": "6",
+    "number": "7",
+    "words": [
+      "demonstrate"
+    ]
+  },
+  {
+    "chapter": "6",
+    "number": 8,
+    "words": [
+      "description"
+    ]
+  },
+  {
+    "chapter": "6",
+    "number": 9,
+    "words": [
+      "dynamics",
+      "inspire"
+    ]
+  },
+  {
+    "chapter": "6",
+    "number": 10,
+    "words": [
+      "essential",
+      "technical",
+      "role"
+    ]
+  },
+  {
+    "chapter": "6",
+    "number": 11,
+    "words": [
+      "implication"
+    ]
+  },
+  {
+    "chapter": 6,
+    "number": 12,
+    "words": [
+      "interpret"
+    ]
+  },
+  {
+    "chapter": "6",
+    "number": 13,
+    "words": [
+      "physical",
+      "intense",
+      "dimension"
+    ]
+  },
+  {
+    "chapter": "6",
+    "number": 14,
+    "words": [
+      "remark"
+    ]
+  },
+  {
+    "chapter": "6",
+    "number": 15,
+    "words": [
+      "revise"
+    ]
+  },
+  {
+    "chapter": "6",
+    "number": 16,
+    "words": [
+      "sense"
+    ]
+  },
+  {
+    "chapter": "6",
+    "number": 17,
+    "words": [
+      "severe"
+    ]
+  },
+  {
+    "chapter": "6",
+    "number": 18,
+    "words": [
+      "subjective"
+    ]
+  },
+  {
+    "chapter": "6",
+    "number": 19,
+    "words": [
+      "substitute",
+      "create",
+      "process"
+    ]
+  },
+  {
+    "chapter": "6",
+    "number": 20,
+    "words": [
+      "witness"
+    ]
+  }
 ]
-
-
