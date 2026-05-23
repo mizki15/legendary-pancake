@@ -790,7 +790,7 @@
         "chapter": "4",
         "number": "4",
         "question_number": "2",
-        "sentence": "Political ideology has sometimes been [compared] to religious faith in terms of the intensity with which people hold on to their beliefs."
+        "sentence": "Political ideology has sometimes been [compared] to religious faith in terms of the [intensity] with which people hold on to their beliefs."
     },
     {
         "chapter": "4",
@@ -1138,7 +1138,7 @@
         "chapter": "5",
         "number": "12",
         "question_number": "1",
-        "sentence": "In view of the high correlation which we have established, the possibility of [significant] error is [negligible]."
+        "sentence": "In view of the high correlation which we have [established], the possibility of [significant] error is [negligible]."
     },
     {
         "chapter": "5",
