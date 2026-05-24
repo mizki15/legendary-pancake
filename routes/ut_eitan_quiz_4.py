@@ -7,7 +7,7 @@ from flask import Blueprint, render_template, request, jsonify, session
 ut_eitan_quiz_bp_4 = Blueprint(
     'ut_eitan_quiz_4',
     __name__,
-    url_prefix='/ut-eitan-quiz-2',
+    url_prefix='/ut-eitan-quiz-4',
     template_folder='../templates'
 )
 
