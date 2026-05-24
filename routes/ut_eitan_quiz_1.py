@@ -151,7 +151,7 @@ def quiz_home():
     
     # 4. sidebar_tree を追加してレンダリング
     return render_template(
-        'ut_eitan_quiz/quiz.html',
+        'ut_eitan_quiz/quiz_1.html',
         sentence_template=replaced_sentence,
         hints=hint_list,
         targets_count=len(targets),
@@ -163,7 +163,7 @@ def quiz_home():
         sidebar_tree=sidebar_tree
     )
 
-@ut_eitan_quiz_bp.route('/check', methods=['POST'])
+@ut_eitan_quiz_bp_1.route('/check', methods=['POST'])
 def check_answer():
     """解答を判定するAPI endpoint"""
     data = request.get_json() or {}
