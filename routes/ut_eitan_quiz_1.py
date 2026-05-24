@@ -151,7 +151,7 @@ def quiz_home():
     
     # 4. sidebar_tree を追加してレンダリング
     return render_template(
-        'ut_eitan_quiz/quiz_1.html',
+        'ut_eitan_quiz_1/quiz.html',
         sentence_template=replaced_sentence,
         hints=hint_list,
         targets_count=len(targets),
