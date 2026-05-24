@@ -69,7 +69,7 @@
                         <div class="text-xs font-semibold text-slate-500 mb-1 pl-1">Section {{ sec }}</div>
                         <div class="grid grid-cols-1 gap-1">
                             {% for q in questions %}
-                            <a href="/ut-eitan-quiz-1/?q={{ q.idx }}" 
+                            <a href="/ut-eitan-quiz-6/?q={{ q.idx }}" 
                                id="sidebar-item-{{ q.idx }}"
                                class="sidebar-item flex items-center justify-between px-3 py-2 rounded-lg font-mono text-xs transition {% if q.idx == current_idx %}bg-indigo-600 text-white font-bold shadow-sm{% else %}bg-white hover:bg-slate-100 text-slate-700 border border-slate-200/60{% endif %}">
                                 <span>問題 {{ q.q_num }}</span>
@@ -248,7 +248,7 @@
             }
 
             try {
-                const response = await fetch('/ut-eitan-quiz-1/check', {
+                const response = await fetch('/ut-eitan-quiz-6/check', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ answers: answers })
@@ -296,11 +296,11 @@
         function loadNextQuestion() {
             let nextIdx = currentIdx + 1;
             if (nextIdx >= totalQuestions) nextIdx = 0;
-            window.location.href = `/ut-eitan-quiz-1/?q=${nextIdx}`;
+            window.location.href = `/ut-eitan-quiz-6/?q=${nextIdx}`;
         }
 
         function loadRandomQuestion() {
-            window.location.href = `/ut-eitan-quiz-1/`;
+            window.location.href = `/ut-eitan-quiz-6/`;
         }
 
         function loadRandomUnsolvedQuestion() {
@@ -320,7 +320,7 @@
             }
 
             const randomIndex = unsolvedIndices[Math.floor(Math.random() * unsolvedIndices.length)];
-            window.location.href = `/ut-eitan-quiz-1/?q=${randomIndex}`;
+            window.location.href = `/ut-eitan-quiz-6/?q=${randomIndex}`;
         }
     </script>
 </body>
