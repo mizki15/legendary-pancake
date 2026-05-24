@@ -9,6 +9,11 @@ from routes.rocket import rocket_bp
 from routes.misc import misc_bp
 from routes.ut_eitan_quiz import ut_eitan_quiz_bp
 from routes.ut_eitan_quiz_1 import ut_eitan_quiz_bp_1
+from routes.ut_eitan_quiz_2 import ut_eitan_quiz_bp_2
+from routes.ut_eitan_quiz_3 import ut_eitan_quiz_bp_3
+from routes.ut_eitan_quiz_4 import ut_eitan_quiz_bp_4
+from routes.ut_eitan_quiz_5 import ut_eitan_quiz_bp_5
+from routes.ut_eitan_quiz_6 import ut_eitan_quiz_bp_6
 
 # .env読み込み
 load_dotenv()
