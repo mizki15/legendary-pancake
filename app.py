@@ -34,6 +34,12 @@ app.register_blueprint(rocket_bp)
 app.register_blueprint(misc_bp)
 
 app.register_blueprint(ut_eitan_quiz_bp)
+app.register_blueprint(ut_eitan_quiz_bp_1)
+app.register_blueprint(ut_eitan_quiz_bp_2)
+app.register_blueprint(ut_eitan_quiz_bp_3)
+app.register_blueprint(ut_eitan_quiz_bp_4)
+app.register_blueprint(ut_eitan_quiz_bp_5)
+app.register_blueprint(ut_eitan_quiz_bp_6)
 
 if __name__ == '__main__':
     # 開発環境ではdebug=True
