@@ -838,7 +838,7 @@
         "chapter": "4",
         "number": "8",
         "question_number": "2",
-        "sentence": "The novel’s characters are [two-dimensional], lacking the depth and [uniqueness] we find in great fiction."
+        "sentence": "The novel’s characters are two-[dimensional], lacking the depth and [uniqueness] we find in great fiction."
     },
     {
         "chapter": "4",
@@ -1420,7 +1420,7 @@
         "chapter": "6",
         "number": "13",
         "question_number": "2",
-        "sentence": "The greatest challenge for a novelist is to capture the [intense] [physicality] of the world in the [two-dimensional] black and white of print."
+        "sentence": "The greatest challenge for a novelist is to capture the [intense] [physicality] of the world in the two-[dimensional] black and white of print."
     },
     {
         "chapter": "6",
