@@ -8,6 +8,7 @@ from routes.work_optimize2 import work_optimize2_bp
 from routes.rocket import rocket_bp
 from routes.misc import misc_bp
 from routes.ut_eitan_quiz import ut_eitan_quiz_bp
+from routes.ut_eitan_quiz_1 import ut_eitan_quiz_bp_1
 
 # .env読み込み
 load_dotenv()
