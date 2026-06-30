@@ -47,7 +47,11 @@ def get_data_from_api(facility_num, facility_name):
     }
 
     try:
-        response = requests.get(url, params=params)
+        response = requests.get(url, params=params, timeout=10)
+
+        print(response.status_code)
+        print(response.url)
+        print(response.text)
         response.raise_for_status()
         data = response.json()
 
