@@ -32,18 +32,20 @@ def convert_date_to_slash_format(date_str):
 def get_data_from_api(facility_num, facility_name):
     time.sleep(0.1)
     app_id = os.getenv("RAKUTEN_APP_ID")
+    access_key = os.getenv("RAKUTEN_ACCESS_KEY")
     affiliate_id = os.getenv("RAKUTEN_AFFILIATE_ID")
 
     if not app_id or not affiliate_id:
         return {"error": "APIキーが設定されていません (.env を確認してください)"}
 
-    url = "https://app.rakuten.co.jp/services/api/Travel/SimpleHotelSearch/20170426"
+    url = "https://openapi.rakuten.co.jp/engine/api/Travel/SimpleHotelSearch/20170426"
     params = {
         "format": "json",
         "responseType": "large",
         "hotelNo": facility_num,
         "applicationId": app_id,
-        "affiliateId": affiliate_id
+        "accessKey": access_key,
+        "affiliateId": affiliate_id,
     }
 
     try:
