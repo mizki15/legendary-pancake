@@ -37,7 +37,7 @@ def get_data_from_api(facility_num, facility_name):
     if not app_id or not affiliate_id:
         return {"error": "APIキーが設定されていません (.env を確認してください)"}
 
-    url = "https://app.rakuten.co.jp/services/api/Travel/SimpleHotelSearch/20170426"
+    url = "https://openapi.rakuten.co.jp/services/api/Travel/SimpleHotelSearch/20170426"
     params = {
         "format": "json",
         "responseType": "large",
