@@ -48,8 +48,13 @@ def get_data_from_api(facility_num, facility_name):
         "affiliateId": affiliate_id,
     }
 
+    headers = {
+        "Referer": "https://legendary-pancake-eus9.onrender.com/",
+        "Origin": "https://legendary-pancake-eus9.onrender.com"
+    }
+
     try:
-        response = requests.get(url, params=params, timeout=10)
+        response = requests.get(url, params=params, headers=headers, timeout=10)
 
         print(response.status_code)
         print(response.url)
