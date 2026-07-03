@@ -18,6 +18,7 @@ load_dotenv()
 # 定数とロジック（既存コード維持）
 # =========================
 youbi_list = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
+hotel_cache = {}
 JST = zoneinfo.ZoneInfo("Asia/Tokyo")
 
 def convert_date_to_slash_format(date_str):
@@ -30,7 +31,10 @@ def convert_date_to_slash_format(date_str):
         return None
 
 def get_data_from_api(facility_num, facility_name):
-    time.sleep(0.1)
+    # キャッシュにあればAPIを呼ばない
+    if facility_num in hotel_cache:
+        return hotel_cache[facility_num]
+    time.sleep(1.1)
     app_id = os.getenv("RAKUTEN_APP_ID")
     access_key = os.getenv("RAKUTEN_ACCESS_KEY")
     affiliate_id = os.getenv("RAKUTEN_AFFILIATE_ID")
@@ -68,12 +72,16 @@ def get_data_from_api(facility_num, facility_name):
         small_class_code = hotel[2]["hotelDetailInfo"]["smallClassCode"]
 
         if facility_name.strip() == hotel_name.strip():
-            return {
+            result = {
                 "施設番号": facility_num,
                 "施設名": hotel_name,
                 "都道府県コード": middle_class_code,
                 "市区町村コード": small_class_code,
             }
+            
+            hotel_cache[facility_num] = result
+            
+            return result
         else:
             return {"error": f"施設名が一致しません: {facility_num} ({facility_name} ≠ {hotel_name})"}
     except Exception as e:
