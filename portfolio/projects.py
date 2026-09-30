@@ -89,13 +89,13 @@ PROJECTS = [
         "cards": [{"endpoint": "ut_eitan_quiz.quiz_home", "title": "英単語クイズ", "description": "", "image": ""}],
     },
     {
-        "id": "HowtoImproveCrawl",
-        "visible": True,  # False ならトップページから隠す
+        "id": "howtoimprovecrawl",
+        "visible": True,
         "cards": [{
             "endpoint": "howtoimprovecrawl.howtoimprovecrawl",
-            "title": "天気アプリ",
-            "description": "天気を表示",
-            "image": "画像の URL",
+            "title": "既存シートを高速版に切り替える",
+            "description": "写真付き手順書",
+            "image": "",
         }],
     },
 ]
