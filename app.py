@@ -12,6 +12,7 @@ from apps.txtstore.routes import txtstore_bp
 from apps.keiba.routes import keiba_bp
 from apps.mainkurafuto.routes import mainkurafuto_bp
 from apps.pingpong.routes import pingpong_bp
+from apps.HowtoImproveCrawl.routes import howtoimprovecrawl_bp
 from apps.ut_eitan_quiz.ut_eitan_quiz import ut_eitan_quiz_bp
 from apps.ut_eitan_quiz.ut_eitan_quiz_1 import ut_eitan_quiz_bp_1
 from apps.ut_eitan_quiz.ut_eitan_quiz_2 import ut_eitan_quiz_bp_2
@@ -34,6 +35,7 @@ app.register_blueprint(txtstore_bp)
 app.register_blueprint(keiba_bp)
 app.register_blueprint(mainkurafuto_bp)
 app.register_blueprint(pingpong_bp)
+app.register_blueprint(howtoimprovecrawl_bp)
 app.register_blueprint(ut_eitan_quiz_bp)
 app.register_blueprint(ut_eitan_quiz_bp_1)
 app.register_blueprint(ut_eitan_quiz_bp_2)

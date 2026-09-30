@@ -17,7 +17,7 @@ class SiteTests(unittest.TestCase):
             "/", "/study", "/opt1/work_optimize1", "/opt2/work_optimize2",
             "/rocket", "/rocket_orbit", "/rocket_mobile",
             "/rocket_mobile_orbit", "/txtstore", "/keiba",
-            "/mainkurafuto", "/pingpong",
+            "/mainkurafuto", "/pingpong", "/howtoimprovecrawl",
             *[f"/ut-eitan-quiz{suffix}/" for suffix in ("", "-1", "-2", "-3", "-4", "-5", "-6")],
         ]
         for path in paths:
@@ -51,6 +51,14 @@ class SiteTests(unittest.TestCase):
             self.assertEqual(self.client.get("/rocket_mobile_orbit").status_code, 200)
         finally:
             project["visible"] = old_value
+
+    def test_howtoimprovecrawl_card_opens_guide(self):
+        home = self.client.get("/")
+        self.assertEqual(home.status_code, 200)
+        self.assertIn('href="/howtoimprovecrawl"', home.get_data(as_text=True))
+        guide = self.client.get("/howtoimprovecrawl")
+        self.assertEqual(guide.status_code, 200)
+        self.assertIn("既存シートを高速版に切り替える".encode(), guide.data)
 
     def test_local_data_and_csv_conversion(self):
         self.assertGreater(len(fetch_words()), 0)
