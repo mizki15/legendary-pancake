@@ -21,6 +21,10 @@ function supabaseResponseError_(response) {
   // Only fixed, known error codes may appear in logs. Never log upstream
   // messages, details, hints, request headers or response bodies.
   const hints = {
+    PGRST000: 'Data APIからDBへ接続できません。SupabaseのAPIログとDBの稼働状態を確認してください。',
+    PGRST001: 'Data API内部のDB接続エラーです。SupabaseのAPIログを確認してください。',
+    PGRST002: 'Data APIのスキーマキャッシュを構築できません。Data APIのExposed schemasとAPIログを確認してください。',
+    PGRST003: 'Data APIのDB接続待ちがタイムアウトしました。接続数とAPIログを確認してください。',
     PGRST205: 'schema.sqlを対象プロジェクトで実行し、public.mk_ideasを作成してください。',
     '42P01': 'schema.sqlを対象プロジェクトで実行し、public.mk_ideasを作成してください。',
     '42501': 'サーバー用キーとschema.sqlのservice_role権限を確認してください。',
@@ -38,7 +42,7 @@ function supabaseResponseError_(response) {
     403: 'サーバー用キーとテーブル権限、Data APIの設定を確認してください。',
     404: 'Project URL、Data APIの有効化、public.mk_ideasの作成を確認してください。',
     429: '利用制限の可能性があります。少し待って再実行してください。',
-    503: 'プロジェクトの休止・起動中・一時的な障害を確認してください。'
+    503: 'Data APIや中継先が利用できません。Healthyの場合もAPIログ・Data API設定・公式Project URLを確認してください。'
   };
   return new Error('unavailable: Supabase HTTP ' + status + (code ? ' / ' + code : '')
     + '。' + (hints[code] || byStatus[status] || 'Supabaseのプロジェクト設定と稼働状態を確認してください。'));
