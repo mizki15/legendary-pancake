@@ -47,6 +47,13 @@ Project URLはConnectやData APIの設定画面で確認できる `https://<proj
 | PGRST205 / 42P01 | 対象プロジェクトでschema.sqlを実行し、public.mk_ideasを作成済みか |
 | HTTP 404 | Project URLが正しいか。Data APIが有効か。テーブルがあるか |
 | HTTP 429 / 503 | 利用制限、休止や起動中の状態になっていないか |
+| PGRST000 / PGRST001 | Data APIからDBへの接続障害。APIログとDBの状態を確認 |
+| PGRST002 | Data APIのスキーマキャッシュ障害。Exposed schemasに存在しないスキーマがないか確認 |
+| PGRST003 | Data API内部の接続待ちタイムアウト。接続数とAPIログを確認 |
+
+HealthyでもData APIの障害は別に起こりえます。SQL Editorで `select to_regclass('public.mk_ideas');` を実行できれば、DBとテーブルは応答しています。503が続く場合は接続確認に出るPGRSTコード、またはSupabaseのLogsのAPI/PostgRESTエラーを確認します。コードが出ない場合はDB障害と断定せず、Data API設定とダッシュボードに表示される公式Project URLも確認してください。キーやログ全文は共有しないでください。
+
+参照: [Supabase公式のPostgRESTエラーコード](https://supabase.com/docs/guides/api/rest/postgrest-error-codes)、[PGRST002の確認事項](https://supabase.com/kb/troubleshooting/postgrest-error-pgrst002-could-not-query-the-database-for-the-schema-cache-c396e9)。
 
 接続エラーのHTTP番号と既知のエラーコードだけを表示し、キーや応答本文はログへ出しません。問い合わせ時はこのエラー行だけを共有してください。サーバー用キーを取り直した場合は、Apps ScriptとRenderに設定する値も揃えます。
 
