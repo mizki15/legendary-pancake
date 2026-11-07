@@ -1,6 +1,6 @@
 # legendary-pancake
 
-Flask 製のポートフォリオサイトです。Render の起動コマンドは `gunicorn app:app` です。
+Flask 製のポートフォリオサイトです。Render の起動コマンドは `gunicorn app:app --threads 4 --timeout 90` です。Google Apps Script を待つ間も別のリクエストを処理できるようにしています。
 
 ## 構成
 
@@ -26,3 +26,5 @@ python3 -m venv .venv
 トップページは `http://127.0.0.1:8000/` です。動作確認は `.venv/bin/python -m unittest discover -s tests` で実行できます。楽天 API を使う業務効率化ツールには `RAKUTEN_APP_ID`、`RAKUTEN_ACCESS_KEY`、`RAKUTEN_AFFILIATE_ID` が必要です。学習とテキスト保存の外部 API への通信も別途必要です。
 
 新しいアプリの追加方法は [新しいアプリを作るとき.md](新しいアプリを作るとき.md) を参照してください。
+
+`/mizkiandkaren/` の2人用手帳は、[設定手順](apps/mizkiandkaren/README.md)に従い、保存用の別GoogleアカウントとRenderの環境変数を設定して利用します。

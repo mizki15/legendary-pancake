@@ -1,0 +1,41 @@
+{% extends "mizkiandkaren/base.html" %}
+{% block title %}Date ideas | Mizki & Karen{% endblock %}
+{% block scripts %}<script type="module" src="{{ url_for('mizkiandkaren.static', filename='journal.js') }}"></script>{% endblock %}
+{% block content %}
+<section class="page-heading"><div><h1>Date ideas</h1><p>ふたりの「今度行こう」を、ここに。</p></div></section>
+<form id="quick-add" class="quick-add"><div class="quick-label"><label for="quick-title">新しいデート案</label><button id="open-editor" type="button" class="text-button">{{ icon('edit') }}詳しく追加</button></div><div class="quick-row"><input id="quick-title" name="title" placeholder="海の見えるカフェで、のんびりする" maxlength="120" required autocomplete="off" aria-describedby="quick-error"><button class="button primary" type="submit">{{ icon('plus') }}追加する</button></div><p id="quick-error" class="form-error" aria-live="polite"></p></form>
+<div class="ideas-toolbar"><nav id="view-nav" class="view-nav" aria-label="デート案の表示"><a href="?view=ideas" data-view="ideas">行きたい <span data-count="ideas">0</span></a><a href="?view=archive" data-view="archive">思い出 <span data-count="archive">0</span></a><a href="?view=trash" data-view="trash">{{ icon('trash') }}ゴミ箱 <span data-count="trash">0</span></a></nav></div>
+<form id="filters" class="filter-area" role="search" aria-label="デート案を絞り込む">
+  <div class="search-row"><label class="search-field"><span class="visually-hidden">キーワード検索</span>{{ icon('search') }}<input type="search" name="q" placeholder="キーワードで探す" maxlength="120" autocomplete="off"></label><button type="button" id="favorite-filter" class="button quiet" aria-pressed="false">{{ icon('heart') }}お気に入り</button><button type="button" id="toggle-filters" class="button quiet" aria-expanded="false" aria-controls="extra-filters">{{ icon('filter') }}絞り込み<span id="filter-count"></span></button></div>
+  <div id="extra-filters" class="extra-filters" hidden>
+    <label class="field">場所<input name="place" placeholder="鎌倉、近所、京都…" maxlength="100"></label>
+    <div class="field"><span>予算（円／人）</span><div class="budget-range"><input type="number" name="min" min="0" max="100000000" step="1" inputmode="numeric" placeholder="下限" aria-label="予算の下限"><span>〜</span><input type="number" name="max" min="0" max="100000000" step="1" inputmode="numeric" placeholder="上限" aria-label="予算の上限"></div></div>
+    <fieldset class="season-field"><legend>季節（複数選択可）</legend><div class="season-options">{% for value, label in [('spring','春'),('summer','夏'),('autumn','秋'),('winter','冬')] %}<label><input type="checkbox" name="season" value="{{ value }}"><span>{{ label }}</span></label>{% endfor %}</div></fieldset>
+    <button type="button" id="clear-filters" class="text-button">条件をクリア</button>
+  </div>
+</form>
+<div class="results-line"><p id="result-count" class="muted" role="status">読み込んでいます…</p><div class="results-actions"><button id="random-button" class="button quiet">{{ icon('shuffle') }}ひとつ選ぶ</button><button id="refresh" class="text-button">最新に更新</button></div></div>
+<p id="trash-note" class="trash-note" hidden>削除した案は30日間ここに残ります。その後、写真と一緒に完全に削除されます。</p>
+<div id="load-error" class="error-panel" role="alert" hidden><p></p><button id="retry" class="button quiet">もう一度読み込む</button></div>
+<div id="idea-list" class="idea-grid" aria-busy="true"><div class="loading-paper" aria-hidden="true"></div><div class="loading-paper" aria-hidden="true"></div><div class="loading-paper" aria-hidden="true"></div></div>
+<div id="empty-state" class="empty-state" hidden><h2 id="empty-title">Our next little adventure</h2><p id="empty-copy">最初の「行ってみたい」を書いてみよう。</p><button id="empty-action" class="button quiet">{{ icon('plus') }}デート案を追加する</button></div>
+{% endblock %}
+{% block overlays %}
+<dialog id="editor" aria-labelledby="editor-heading" class="editor-dialog"><form id="idea-form" class="editor-form">
+  <div class="dialog-heading"><div><h2 id="editor-heading">A new idea</h2><p class="muted" id="editor-caption">タイトルだけでも、気軽に。</p></div><button class="icon-button" type="button" data-close aria-label="閉じる">{{ icon('close') }}</button></div>
+  <label class="field"><span>タイトル <span class="required-label">必須</span></span><input name="title" required maxlength="120" aria-describedby="editor-error"></label>
+  <label class="field">メモ<textarea name="note" rows="3" maxlength="3000" placeholder="何をしたい？ 気になったことも、ひとこと。"></textarea></label>
+  <div class="form-columns"><label class="field">場所<input name="place" maxlength="300" placeholder="お店や施設の名前、住所など"><span class="field-help">保存すると Google マップで開けます。</span></label><label class="field">予算（円／人）<input name="budget" type="number" min="0" max="100000000" step="1" inputmode="numeric" placeholder="未定なら空欄"></label></div>
+  <label class="field">参考URL<input name="reference_url" type="url" maxlength="2000" placeholder="https://" inputmode="url"></label>
+  <fieldset class="season-field"><legend>季節 <span class="muted">複数選択可</span></legend><div class="season-options">{% for value, label in [('spring','春'),('summer','夏'),('autumn','秋'),('winter','冬')] %}<label><input type="checkbox" name="season" value="{{ value }}"><span>{{ label }}</span></label>{% endfor %}<button type="button" class="text-button" id="all-seasons">いつでも</button></div><p class="field-help">すべて選ぶと「いつでも」と表示します。</p></fieldset>
+  <div class="photo-field"><label class="field"><span>デート案の写真 <span class="muted">1枚まで</span></span><input name="idea_photo" type="file" accept="image/jpeg,image/png,image/webp"></label><div class="photo-preview" id="idea-photo-preview" hidden><label class="check-label"><input type="checkbox" name="remove_idea_photo">この写真を削除する</label></div><p class="field-help">JPEG・PNG・WebP、12MBまで。軽く圧縮して保存します。</p></div>
+  <label class="check-label"><input type="checkbox" name="favorite">お気に入りにする</label>
+  <section id="memory-fields" class="memory-fields" hidden><h3>Our memory</h3><label class="field">実施日<input type="date" name="completed_on"></label><label class="field">感想<textarea name="memory" rows="3" maxlength="3000" placeholder="楽しかったこと、また行きたいところ。"></textarea></label><div class="photo-field"><label class="field"><span>思い出の写真 <span class="muted">1枚まで</span></span><input name="memory_photo" type="file" accept="image/jpeg,image/png,image/webp"></label><div id="memory-photo-preview" class="photo-preview" hidden><label class="check-label"><input type="checkbox" name="remove_memory_photo">この写真を削除する</label></div><p class="field-help">JPEG・PNG・WebP、12MBまで。軽く圧縮して保存します。</p></div></section>
+  <p id="editor-error" class="form-error" role="alert"></p><p id="editor-conflict" class="conflict-note" hidden>入力内容はこの画面に残っています。閉じて最新の案を開き直し、変更を確認してください。</p>
+  <div class="dialog-actions"><button class="button quiet" type="button" data-close>キャンセル</button><button class="button primary" type="submit" id="save-idea">保存する</button></div>
+</form></dialog>
+<dialog id="random-dialog" class="random-dialog" aria-labelledby="random-heading"><div class="dialog-heading"><h2 id="random-heading">How about this?</h2><button class="icon-button" type="button" data-close aria-label="閉じる">{{ icon('close') }}</button></div><div id="random-result"></div><div class="dialog-actions"><button id="reroll" class="button quiet">{{ icon('shuffle') }}もう一度選ぶ</button><button id="random-open" class="button primary">この案を見る</button></div></dialog>
+<dialog id="confirm-dialog" class="confirm-dialog" aria-labelledby="confirm-heading"><h2 id="confirm-heading">変更を保存しますか？</h2><p>閉じると、まだ保存していない入力は失われます。</p><div class="dialog-actions"><button id="keep-editing" class="button primary">編集を続ける</button><button id="discard-edit" class="button quiet">保存せず閉じる</button></div></dialog>
+<div id="notification" class="notification" role="status" hidden><span></span><button id="undo" class="text-button" hidden>元に戻す</button><button id="dismiss-notification" class="icon-button" aria-label="通知を閉じる">{{ icon('close') }}</button></div>
+<div id="celebration" class="celebration" aria-hidden="true" hidden><span>Another lovely memory.</span><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><use href="#i-heart"></use></svg></div>
+{% endblock %}
