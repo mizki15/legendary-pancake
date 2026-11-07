@@ -8,7 +8,7 @@
     {% if configured %}
     <form method="post" class="stack" action="{{ url_for('mizkiandkaren.login') }}">
       <input type="hidden" name="login_token" value="{{ login_token }}"><input type="hidden" name="next" value="{{ next_path }}">
-      <label class="field">ふたりの合言葉<input type="password" name="passphrase" autocomplete="current-password" required maxlength="512" autofocus aria-describedby="login-error" {% if error %}aria-invalid="true"{% endif %}></label>
+      <label class="field">ふたりの合言葉<input type="text" name="passphrase" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" required maxlength="512" autofocus aria-describedby="login-error" {% if error %}aria-invalid="true"{% endif %}></label>
       <label class="check-label"><input type="checkbox" name="remember">この端末で30日間ログインを保つ</label>
       <p id="login-error" class="form-error" role="alert">{{ error }}</p>
       <button type="submit" class="button primary">{{ icon('book') }}手帳を開く</button>
