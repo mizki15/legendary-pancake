@@ -4,9 +4,10 @@ The existing scrapbook design was updated to the user's countryside palette and 
 
 ## Current design
 
-- Cream surfaces, muted blush and blue, and deep plum controls; a thin double frame around the anniversary.
+- Parchment cream surfaces, muted blush and deep plum controls; a thin double frame around the anniversary. Memories uses the exact requested `#b3a288` base with darker text and focus rings.
 - The M＆K wordmark uses the exact four paths of the supplied SVG's lower-left walking cat. The white background and the other cats are excluded.
-- A generated, transparent botanical bouquet decorates the background. The original generation remains outside the repository; the web asset is a 209,674-byte WebP.
+- A generated transparent bouquet sits upright at bottom-left, a sleeping cat at bottom-right, and a strawberry shortcake at the anniversary's top-right. The original generations remain outside the repository; the WebP assets are 209,674, 96,460 and 33,078 bytes respectively.
+- A small, static, seamless SVG texture adds parchment fibres and grain to the page, paper panels, idea cards and dialogs. It introduces no animation or external requests. The requested texture and illustrations override the skill's default preference against decorative imagery.
 - The anniversary shows its label at upper-left, days/hours/minutes/seconds in one centered row, and the configured start date at lower-right. It updates every second and suspends its timer while the page is hidden. The actual start date remains a private configuration value.
 - Requested intro copy and the footer are removed; the section headings are Anniversary, Memories and Pages.
 - Each photo preview has a keyboard-accessible X button. Saved photos can be restored before submission; a newly selected file can also be cleared. The server API contract is unchanged.
@@ -19,7 +20,7 @@ The existing scrapbook design was updated to the user's countryside palette and 
 - Chromium: the existing add/edit/filter/random/archive/trash/restore/conflict/offline workflow passed. Additional checks covered the exact requested copy removal and cat asset, every-second ticks, the anniversary's midnight, three-digit day counts in a single row at 320, 375, 768, 1280 and 1920px, photo X/undo, saved photo removal and cancellation of a newly selected file.
 - Chromium also confirmed that a warmed browser image cache returns 401 after logout.
 - Hallmark static/render checks ran for Home, Date ideas and login, with 0 Floor FAIL, 0 open REFLEX and 0 WARN. The existing waiver permits long user-entered date titles in two lines. Existing Finish answers cover prose-only selectors and consistent app-control corners.
-- A fresh-context finish reviewer returned `ship` with no concrete defects in the desktop, phone and photo-removal captures. A separate login check found and fixed a decorative container extending beyond the phone viewport; recapture passed.
+- The preceding palette/photo-control version received a fresh-context finish review of `ship`. The later parchment and corner-art adjustment was checked directly in desktop and phone captures, with the render checks repeated for Home, Date ideas and login; all returned zero unresolved findings. Browser assertions cover the upright bouquet, the three requested corners, exact Memories base colour, noninteractive artwork and single-row countdown from 320 to 1920px. All journal artwork requests succeeded.
 
 ## Cache behavior
 

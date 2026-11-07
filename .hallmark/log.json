@@ -1,6 +1,23 @@
 [
   {
     "date": "2026-11-07",
+    "mode": "follow-up",
+    "scope": "app",
+    "theme": "Existing scrapbook system with parchment and taupe Memories",
+    "imagery": "upright bouquet bottom-left, sleeping cat bottom-right, shortcake top-right of anniversary",
+    "prompt": "Place the upright bouquet at bottom-left, a sleeping cat line drawing at bottom-right and shortcake at the anniversary top-right; use #b3a288 for Memories and parchment texture throughout.",
+    "verification": {
+      "python_tests": 17,
+      "apps_script_tests": 5,
+      "floor_failures": 0,
+      "open_reflex": 0,
+      "warnings": 0,
+      "review": "direct desktop and phone capture inspection; prior finish review applies to preceding version",
+      "browser": "corner placement, upright bouquet, exact Memories base colour, parchment, noninteractive art and 320–1920px countdown"
+    }
+  },
+  {
+    "date": "2026-11-07",
     "mode": "redesign",
     "depth": "restyle",
     "scope": "app",

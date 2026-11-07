@@ -1,8 +1,8 @@
 :root {
   color-scheme: light;
-  --color-paper: #fff0db;
+  --color-paper: #f3e7d0;
   --color-paper-2: #f2d2bf;
-  --color-paper-3: #fff9ed;
+  --color-paper-3: #fcf4e4;
   --color-ink: #494256;
   --color-ink-2: #5b5069;
   --color-muted: #6c5b72;
@@ -20,7 +20,9 @@
   --color-tape: #e9b9ad;
   --color-shadow: #d8c1bd;
   --color-backdrop: #3b304a66;
-  --color-memory-paper: #e6eff1;
+  --color-memory-paper: #b3a288;
+  --color-memory-ink: #332b3a;
+  --color-memory-muted: #3b2d3b;
   --color-petal-paper: #f4e2e3;
   --color-transparent: transparent;
   --font-display: Georgia, 'Times New Roman', 'Noto Serif', serif;

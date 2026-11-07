@@ -255,3 +255,42 @@ body[data-page='login']::before, body[data-page='login']::after { display: none;
 .countdown, #anniversary-number, .countdown-part > span { font-variant-numeric: tabular-nums; }
 @media (max-width: 60rem) { .home-memories[data-count] { grid-template-columns: minmax(0,1fr); } }
 @media (max-width: 40rem) { .login-art { right: 0; } }
+
+/* Stationary parchment fibres and grain, with the illustrations kept in their own corners. */
+body, .anniversary-sheet, .memory-space, .idea-card, .login-sheet, dialog {
+  background-image: url('./images/parchment.svg');
+  background-size: 256px 256px;
+  background-repeat: repeat;
+}
+body::before {
+  inset: auto auto 0 0;
+  width: min(27vw, 350px);
+  height: min(62vh, 520px);
+  background: url('./images/bouquet.webp') left bottom / contain no-repeat;
+  transform: none;
+  opacity: .44;
+}
+body::after {
+  inset: auto 0 0 auto;
+  width: min(26vw, 320px);
+  height: min(32vh, 260px);
+  background: url('./images/sleeping-cat.webp') right bottom / contain no-repeat;
+  transform: none;
+  opacity: .62;
+}
+.anniversary-sheet::after {
+  inset: var(--space-sm) var(--space-lg) auto auto;
+  width: 180px;
+  height: 180px;
+  background: url('./images/shortcake.webp') right top / contain no-repeat;
+  transform: none;
+  opacity: .72;
+}
+.memory-space { --color-ink: var(--color-memory-ink); --color-muted: var(--color-memory-muted); color: var(--color-ink); }
+body[data-page='login']::before, body[data-page='login']::after { display: block; }
+@media (max-width: 40rem) {
+  body::before { inset: auto auto 0 0; width: 43vw; height: 290px; opacity: .3; }
+  body::after { inset: auto 0 0 auto; width: 41vw; height: 170px; opacity: .48; }
+  .anniversary-sheet::after { inset: var(--space-xs) var(--space-sm) auto auto; width: 100px; height: 100px; opacity: .6; }
+}
+.memory-space { --color-focus: var(--color-memory-ink); }
