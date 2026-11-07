@@ -67,32 +67,38 @@ function metadata(idea) {
   if (idea.seasons.length) meta.append(node('span', '', seasonLabel(idea.seasons)));
   return meta;
 }
-function countdown() {
-  const anchor = $('.anniversary-sheet').dataset.anniversary;
-  if (!anchor) return;
-  const start = new Date(anchor);
-  if (!Number.isFinite(start.getTime())) return;
+function startCountdown() {
+  const sheet = $('.anniversary-sheet');
+  const start = new Date(sheet.dataset.anniversary);
+  if (!sheet.dataset.anniversary || !Number.isFinite(start.getTime())) return;
   const jst = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
   const parts = jst.formatToParts(start);
   const get = name => Number(parts.find(p => p.type === name).value);
   const startYear = get('year'), month = get('month'), day = get('day'), hour = get('hour'), minute = get('minute');
-  const now = Date.now();
-  let year = Number(new Intl.DateTimeFormat('en', { timeZone: 'Asia/Tokyo', year: 'numeric' }).format(new Date(now)));
-  const inYear = value => Date.UTC(value, month - 1, day, hour - 9, minute);
-  let target = inYear(year);
-  if (now >= target + DAY) { year++; target = inYear(year); }
-  const remaining = Math.max(0, target - now);
-  const days = Math.floor(remaining / DAY);
-  const hours = Math.floor(remaining % DAY / 3600000);
-  const minutes = Math.floor(remaining % 3600000 / 60000);
-  $('#countdown-days').textContent = money.format(days);
-  $('#countdown-clock').textContent = remaining ? `${hours}時間 ${minutes}分` : 'おめでとう。これからも、ふたりで。';
-  $('#anniversary-name').textContent = remaining ? `${year - startYear}周年記念日まで` : `今日は${year - startYear}周年記念日`;
-  $('#anniversary-date').textContent = `${year}.${String(month).padStart(2, '0')}.${String(day).padStart(2, '0')} ${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}（日本時間）`;
+  const yearFormat = new Intl.DateTimeFormat('en', { timeZone: 'Asia/Tokyo', year: 'numeric' });
+  const inYear = year => Date.UTC(year, month - 1, day, hour - 9, minute);
+  function tick() {
+    const now = Date.now();
+    let year = Number(yearFormat.format(new Date(now)));
+    let target = inYear(year);
+    if (now >= target + DAY) { year++; target = inYear(year); }
+    const remaining = Math.max(0, target - now);
+    const values = { days: Math.floor(remaining / DAY), hours: Math.floor(remaining % DAY / 3600000), minutes: Math.floor(remaining % 3600000 / 60000), seconds: Math.floor(remaining % 60000 / 1000) };
+    for (const [unit, value] of Object.entries(values)) $(`#countdown-${unit}`).textContent = String(value).padStart(2, '0');
+    $('#anniversary-number').textContent = String(year - startYear);
+    $('#anniversary-label').textContent = remaining ? '周年記念日まで' : '周年記念日';
+    $('#anniversary-status').hidden = remaining > 0;
+    $('#anniversary-status').textContent = '今日はふたりの記念日。';
+    $('.countdown').setAttribute('aria-label', `${year}年${month}月${day}日の記念日まで、${values.days}日${values.hours}時間${values.minutes}分${values.seconds}秒`);
+  }
+  let timer;
+  function resume() { clearInterval(timer); tick(); if (!document.hidden) timer = setInterval(tick, 1000); }
+  document.addEventListener('visibilitychange', resume);
+  resume();
 }
 
 async function home() {
-  countdown(); setInterval(countdown, 30000);
+  startCountdown();
   const container = $('#home-memories');
   const load = async () => {
     container.setAttribute('aria-busy', 'true');
@@ -103,6 +109,7 @@ async function home() {
       const { ideas } = await api();
       const memories = ideas.filter(idea => !idea.deleted_at && idea.completed_on).sort((a, b) => b.completed_on.localeCompare(a.completed_on)).slice(0, 3);
       container.replaceChildren();
+      container.dataset.count = String(memories.length);
       if (!memories.length) {
         const empty = node('div', 'memory-empty');
         empty.append(node('p', '', 'デートを達成したら、ここにふたりの思い出が並びます。'), link('最初の「行きたい」を書く', `${root}date_idea`, 'text-link'));
@@ -125,7 +132,7 @@ async function home() {
 }
 function ideasApp() {
   const form = $('#idea-form'), filters = $('#filters'), editor = $('#editor');
-  const state = { ideas: [], loaded: false, loading: false, stale: false, view: 'ideas', editing: null, mode: 'edit', dirty: false, random: null, lastLoaded: 0, undo: null, notificationTimer: null, previewUrls: {} };
+  const state = { ideas: [], loaded: false, loading: false, stale: false, view: 'ideas', editing: null, mode: 'edit', dirty: false, random: null, lastLoaded: 0, undo: null, notificationTimer: null, previewUrls: {}, removedPhotos: new Set() };
   const url = new URL(location.href);
   const validViews = ['ideas', 'archive', 'trash'];
   state.view = validViews.includes(url.searchParams.get('view')) ? url.searchParams.get('view') : 'ideas';
@@ -276,7 +283,9 @@ function ideasApp() {
   function resetPreviews() {
     for (const value of Object.values(state.previewUrls)) URL.revokeObjectURL(value);
     state.previewUrls = {};
-    for (const kind of ['idea', 'memory']) { const preview = $(`#${kind}-photo-preview`); preview.hidden = true; preview.classList.remove('is-removed'); $('img', preview)?.remove(); }
+    state.removedPhotos.clear();
+    for (const feedback of $$('[data-photo-feedback]')) feedback.hidden = true;
+    for (const kind of ['idea', 'memory']) { const preview = $(`#${kind}-photo-preview`); preview.hidden = true; $('img', preview)?.remove(); }
   }
   function previewImage(kind, url) {
     const preview = $(`#${kind}-photo-preview`);
@@ -320,20 +329,28 @@ function ideasApp() {
   window.addEventListener('beforeunload', event => { if (state.dirty) { event.preventDefault(); event.returnValue = ''; } });
   for (const kind of ['idea', 'memory']) {
     const input = form.elements[`${kind}_photo`];
-    form.elements[`remove_${kind}_photo`].addEventListener('change', event => {
-      const preview = $(`#${kind}-photo-preview`);
-      preview.classList.toggle('is-removed', event.target.checked);
-      if (event.target.checked) { input.value = ''; input.setCustomValidity(''); }
-      else if (state.editing?.[`${kind}_photo_url`]) previewImage(kind, state.editing[`${kind}_photo_url`]);
-      else preview.hidden = true;
+    $(`[data-remove-photo="${kind}"]`).addEventListener('click', () => {
+      input.value = ''; input.setCustomValidity('');
+      state.removedPhotos.add(kind); state.dirty = true;
+      if (state.previewUrls[kind]) { URL.revokeObjectURL(state.previewUrls[kind]); delete state.previewUrls[kind]; }
+      const preview = $(`#${kind}-photo-preview`); preview.hidden = true; $('img', preview)?.remove();
+      const feedback = $(`[data-photo-feedback="${kind}"]`);
+      feedback.hidden = !state.editing?.[`${kind}_photo_url`];
+      (feedback.hidden ? input : $('button', feedback)).focus();
+    });
+    $(`[data-restore-photo="${kind}"]`).addEventListener('click', () => {
+      state.removedPhotos.delete(kind); state.dirty = true;
+      $(`[data-photo-feedback="${kind}"]`).hidden = true;
+      if (state.editing?.[`${kind}_photo_url`]) previewImage(kind, state.editing[`${kind}_photo_url`]);
+      $(`[data-remove-photo="${kind}"]`).focus();
     });
     input.addEventListener('change', () => {
       input.setCustomValidity('');
       const file = input.files[0], preview = $(`#${kind}-photo-preview`);
       if (state.previewUrls[kind]) { URL.revokeObjectURL(state.previewUrls[kind]); delete state.previewUrls[kind]; }
       if (file?.size > 12000000) { input.setCustomValidity('写真は12MB以内で選んでください。'); input.reportValidity(); return; }
-      if (file) { const value = URL.createObjectURL(file); state.previewUrls[kind] = value; preview.classList.remove('is-removed'); previewImage(kind, value); form.elements[`remove_${kind}_photo`].checked = false; }
-      else if (state.editing?.[`${kind}_photo_url`]) { previewImage(kind, state.editing[`${kind}_photo_url`]); }
+      if (file) { const value = URL.createObjectURL(file); state.previewUrls[kind] = value; previewImage(kind, value); state.removedPhotos.delete(kind); $(`[data-photo-feedback="${kind}"]`).hidden = true; }
+      else if (!state.removedPhotos.has(kind) && state.editing?.[`${kind}_photo_url`]) { previewImage(kind, state.editing[`${kind}_photo_url`]); }
       else preview.hidden = true;
     });
   }
@@ -349,7 +366,7 @@ function ideasApp() {
       completed_on: completed ? form.elements.completed_on.value : null, memory: form.elements.memory.value,
     };
     data.version = state.editing?.version ?? 0;
-    data.remove_photos = ['idea', 'memory'].filter(kind => form.elements[`remove_${kind}_photo`].checked && (state.mode !== 'complete' || kind === 'memory'));
+    data.remove_photos = ['idea', 'memory'].filter(kind => state.removedPhotos.has(kind) && (state.mode !== 'complete' || kind === 'memory'));
     const body = new FormData(); body.set('data', JSON.stringify(data));
     for (const kind of ['idea', 'memory']) { const file = form.elements[`${kind}_photo`].files[0]; if (file && !data.remove_photos.includes(kind) && (state.mode !== 'complete' || kind === 'memory')) body.append(`${kind}_photo`, file); }
     try {

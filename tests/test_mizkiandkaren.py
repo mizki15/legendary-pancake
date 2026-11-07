@@ -158,12 +158,66 @@ class JournalTests(unittest.TestCase):
         app.config['MIZKI_KAREN_ANNIVERSARY_START'] = value
         public = self.client.get('/mizkiandkaren/login')
         self.assertNotIn(value, public.text)
-        self.assertNotIn('2020.02.03', public.text)
+        self.assertNotIn('2020/02/03', public.text)
         self.login()
         private = self.client.get('/mizkiandkaren/')
         self.assertIn('data-anniversary="' + value + '"', private.text)
-        self.assertIn('2020.02.03', private.text)
+        self.assertIn('2020/02/03', private.text)
         self.assertIn('no-store', private.headers['Cache-Control'])
+
+    def test_photo_cache_revalidates_after_authentication_and_expires(self):
+        headers = self.login()
+        image = io.BytesIO()
+        Image.new('RGB', (40, 30), '#9e7279').save(image, format='PNG')
+        image.seek(0)
+        response = self.client.post('/mizkiandkaren/api/ideas', data={
+            'data': json.dumps({'title': 'キャッシュの確認'}),
+            'idea_photo': (image, 'photo.png'),
+        }, headers=headers)
+        url = response.json['idea']['idea_photo_url']
+        original = SQLiteStore.photo
+        with patch.object(SQLiteStore, 'photo', autospec=True, side_effect=original) as download:
+            with patch('apps.mizkiandkaren.photo_cache.time.monotonic', return_value=100):
+                first = self.client.get(url)
+                self.assertEqual(first.status_code, 200)
+                etag = first.headers['ETag']
+                self.assertIn('private', first.headers['Cache-Control'])
+                self.assertIn('no-cache', first.headers['Cache-Control'])
+                second = self.client.get(url, headers={'If-None-Match': etag})
+                self.assertEqual(second.status_code, 304)
+                self.assertEqual(second.data, b'')
+                self.assertEqual(download.call_count, 1)
+                anonymous = app.test_client().get(url, headers={'If-None-Match': etag})
+                self.assertEqual(anonymous.status_code, 401)
+                self.assertIn('no-store', anonymous.headers['Cache-Control'])
+            with patch('apps.mizkiandkaren.photo_cache.time.monotonic', return_value=161):
+                self.assertEqual(self.client.get(url).status_code, 200)
+                self.assertEqual(download.call_count, 2)
+        self.client.post('/mizkiandkaren/logout', headers=headers)
+        self.assertEqual(self.client.get(url, headers={'If-None-Match': etag}).status_code, 401)
+
+    def test_cached_photo_is_invalidated_by_removal_and_storage_change(self):
+        headers = self.login()
+        image = io.BytesIO()
+        Image.new('RGB', (40, 30), '#9e7279').save(image, format='PNG')
+        image.seek(0)
+        first = self.client.post('/mizkiandkaren/api/ideas', data={
+            'data': json.dumps({'title': '保存先の確認'}),
+            'idea_photo': (image, 'photo.png'),
+        }, headers=headers).json['idea']
+        url = first['idea_photo_url']
+        original = self.client.get(url).data
+        other = str(Path(self.temp.name) / 'other-account.sqlite3')
+        image = io.BytesIO()
+        Image.new('RGB', (40, 30), '#4c6479').save(image, format='WEBP')
+        payload = {'title': '別の保存先', 'has_idea_photo': True}
+        SQLiteStore(other).save({'id': first['id'], 'payload': payload, 'deleted_at': None}, 0, {'idea': image.getvalue()})
+        app.config['MIZKI_KAREN_LOCAL_DB'] = other
+        self.assertNotEqual(self.client.get(url).data, original)
+        app.config['MIZKI_KAREN_LOCAL_DB'] = self.path
+        removed = self.client.patch(f"/mizkiandkaren/api/ideas/{first['id']}", json={'version': 1, 'remove_photos': ['idea']}, headers=headers)
+        self.assertEqual(removed.status_code, 200)
+        self.assertEqual(self.client.get(url).status_code, 404)
 
     def test_login_rate_limit(self):
         for i in range(11):

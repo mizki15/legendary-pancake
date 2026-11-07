@@ -1,25 +1,29 @@
 # Journal verification
 
-Hallmark v2.0.0 from Nutlope/hallmark was downloaded to the development environment. Its app-screen workflow, theme deal, scaffold, tokens, state guidance, render checker and independent finish review were used.
+The existing scrapbook design was updated to the user's countryside palette and layout reference, using Hallmark's app-screen checks.
 
-## Design decisions
+## Current design
 
-- Screen: a private shared date-card journal, with loading, empty, error and full states.
-- Theme: Sticker, dealt 1/3. The user's beige scrapbook palette and roman serif headings override the catalog's bright palette and heavy display face. The signal color is restrained olive.
-- Signature: actual date ideas becoming dated memories. No stock photos, generated decorative images or invented user records ship in the app.
-- Material: user-provided names and configured anniversary; the user's own optional photos. Preview screenshots contain local sample records only. The actual anniversary is not committed to the public repository.
-- Shell: two top-level destinations, inline title-only addition, compact filters and a native edit dialog. No marketing hero, page-load reveal or animation library.
+- Parchment cream surfaces, muted blush and deep plum controls; a thin double frame around the anniversary. Memories uses the exact requested `#b3a288` base with darker text and focus rings.
+- The M＆K wordmark uses the exact four paths of the supplied SVG's lower-left walking cat. The white background and the other cats are excluded.
+- A generated transparent bouquet sits upright at bottom-left, a sleeping cat at bottom-right, and a strawberry shortcake at the anniversary's top-right. The original generations remain outside the repository; the WebP assets are 209,674, 96,460 and 33,078 bytes respectively.
+- A small, static, seamless SVG texture adds parchment fibres and grain to the page, paper panels, idea cards and dialogs. It introduces no animation or external requests. The requested texture and illustrations override the skill's default preference against decorative imagery.
+- The anniversary shows its label at upper-left, days/hours/minutes/seconds in one centered row, and the configured start date at lower-right. It updates every second and suspends its timer while the page is hidden. The actual start date remains a private configuration value.
+- Requested intro copy and the footer are removed; the section headings are Anniversary, Memories and Pages.
+- Each photo preview has a keyboard-accessible X button. Saved photos can be restored before submission; a newly selected file can also be cleared. The server API contract is unchanged.
 
-## Completed checks
+## Completed verification
 
-- Python: `python -m unittest discover -s tests` passed 15 tests, including existing-site regressions, authentication, CSRF, optional fields, optimistic concurrency, two private compressed photos, archival, trash/restore, expiry, login rate limiting, passphrase rotation and anniversary privacy.
-- Apps Script: `node --test tests/google_journal.test.cjs` passed 5 tests using mocked Google services: HMAC protection, Unicode/version conflict, independent photo replacement, permanent expiry cleanup and retry after partial deletion.
-- Actual Chromium interaction: login/logout, title-only addition, optional fields, two photo slots, filters, reference links, filtered random choice, completion, trash/restore, unsaved edits, conflicting edits, offline/retry and empty states passed. Photo selection followed by removal was verified to save no image. Invalid budget ranges disable random selection.
-- Asia/Tokyo anniversary behavior was verified at the anniversary's midnight and on the following day.
-- Browser layouts were checked down to 320px, including reduced motion. Gunicorn with 4 threads and a 90-second timeout served the existing home and failed closed on an unconfigured journal.
-- Hallmark `sloplint --scope app --genre playful --render` ran for the date list, home and login across 320–1920px. Final result: **0 Floor FAIL, 0 open REFLEX, 0 WARN**. One Reflex gate (49b) is waived for real user-written titles that can occupy two clamped lines. F6's prose-selector false positive and F7's consistent app-control corners are answered in the CSS stamp.
-- Independent finish review found two usability issues: the first mobile card was too far below the toolbar, and Home's loading state lacked a row skeleton. Both were fixed. Recapture showed the first card move from about y794 to y632 at 375px; memory loading now preserves row structure.
+- Python: all 17 tests passed, including existing-site regressions and the journal's authentication, CSRF, archival, optimistic concurrency, photo compression, deletion, retention and anniversary privacy checks.
+- New photo-cache checks verified authenticated ETag/304 responses, server download reuse, TTL expiry, logout denial, invalidation on removal and separation between storage namespaces.
+- Apps Script: all 5 mocked-service tests passed; Google-side code is unchanged.
+- Chromium: the existing add/edit/filter/random/archive/trash/restore/conflict/offline workflow passed. Additional checks covered the exact requested copy removal and cat asset, every-second ticks, the anniversary's midnight, three-digit day counts in a single row at 320, 375, 768, 1280 and 1920px, photo X/undo, saved photo removal and cancellation of a newly selected file.
+- Chromium also confirmed that a warmed browser image cache returns 401 after logout.
+- Hallmark static/render checks ran for Home, Date ideas and login, with 0 Floor FAIL, 0 open REFLEX and 0 WARN. The existing waiver permits long user-entered date titles in two lines. Existing Finish answers cover prose-only selectors and consistent app-control corners.
+- The preceding palette/photo-control version received a fresh-context finish review of `ship`. The later parchment and corner-art adjustment was checked directly in desktop and phone captures, with the render checks repeated for Home, Date ideas and login; all returned zero unresolved findings. Browser assertions cover the upright bouquet, the three requested corners, exact Memories base colour, noninteractive artwork and single-row countdown from 320 to 1920px. All journal artwork requests succeeded.
 
-## Pending external setup
+## Cache behavior
 
-No sheet, folder or deployment was created in the account connected to this chat. The user chose a different Google account. That account's owner must run the provided Apps Script setup and authorize/deploy it, then configure Render. Google service tests use mocks; live cross-device persistence, account permissions and scheduled execution remain unverified until that setup is complete. Nothing has been merged or deployed to Render.
+Photos are authenticated before every response, including 304. Browser caching is private and must revalidate. The process-local server cache holds at most 48 entries and 16 MB for 60 seconds; edits invalidate the corresponding idea, list refreshes reconcile current versions, and storage configuration changes use separate namespaces. The cache does not persist photos to Render's ephemeral disk.
+
+All screenshots and interaction fixtures use local sample data. These checks did not modify live Google data, and no Apps Script redeployment or new environment variables are required for this update.

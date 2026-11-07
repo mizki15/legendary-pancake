@@ -1,39 +1,82 @@
 [
- {
-  "scope": "app",
-  "shape": "app screen",
-  "theme": "Sticker",
-  "axes": "light/roman-serif/warm",
-  "nav": "two page top bar",
-  "footer": "quiet journal colophon",
-  "imagery": "user photos only, no stand-ins",
-  "photos": [],
-  "entry": "private journal login",
-  "fingerprint": [
-   "private-app",
-   "compact-card-grid",
-   "inline-quick-add",
-   "filter-row",
-   "anniversary-spread",
-   "native-editor-dialog"
-  ],
-  "sections": [
-   "home anniversary and memories",
-   "our pages",
-   "date cards and filters"
-  ],
-  "signature": "shared date cards becoming memories",
-  "waived": [
-   "49b: user-written date titles can occupy two clamped lines"
-  ],
-  "prompt": "Private shared Mizki & Karen journal on Flask; beige scrapbook paper and roman serif English headings; Japanese controls; compact date cards, per-person budgets, two optional photos, memories, search and random choice, thirty-day trash; Google Sheets and private Drive on a separate account.",
-  "verification": {
-   "floor_failures": 0,
-   "open_reflex": 0,
-   "review": "subagent",
-   "review_findings_resolved": 2
+  {
+    "date": "2026-11-07",
+    "mode": "follow-up",
+    "scope": "app",
+    "theme": "Existing scrapbook system with parchment and taupe Memories",
+    "imagery": "upright bouquet bottom-left, sleeping cat bottom-right, shortcake top-right of anniversary",
+    "prompt": "Place the upright bouquet at bottom-left, a sleeping cat line drawing at bottom-right and shortcake at the anniversary top-right; use #b3a288 for Memories and parchment texture throughout.",
+    "verification": {
+      "python_tests": 17,
+      "apps_script_tests": 5,
+      "floor_failures": 0,
+      "open_reflex": 0,
+      "warnings": 0,
+      "review": "direct desktop and phone capture inspection; prior finish review applies to preceding version",
+      "browser": "corner placement, upright bouquet, exact Memories base colour, parchment, noninteractive art and 320–1920px countdown"
+    }
   },
-  "date": "2026-11-07",
-  "mode": "build"
- }
+  {
+    "date": "2026-11-07",
+    "mode": "redesign",
+    "depth": "restyle",
+    "scope": "app",
+    "theme": "Existing scrapbook system with user countryside palette",
+    "axes": "light/roman-serif/muted-plum",
+    "shape": "app screen",
+    "signature": "framed anniversary countdown and shared date cards",
+    "imagery": "supplied cat SVG, generated transparent bouquet, private user photos",
+    "photos": [],
+    "nav": "M＆K and walking black cat, two page top bar",
+    "footer": "removed by request",
+    "prompt": "Refresh the journal with the supplied countryside palette, transparent realistic floral art, the supplied lower-left cat SVG, a horizontal seconds countdown, photo X removal and image caching; remove the specified copy and footer.",
+    "waived": [
+      "49b: real date titles may occupy two clamped lines"
+    ],
+    "verification": {
+      "python_tests": 17,
+      "apps_script_tests": 5,
+      "floor_failures": 0,
+      "open_reflex": 0,
+      "warnings": 0,
+      "finish_review": "subagent: ship"
+    }
+  },
+  {
+    "scope": "app",
+    "shape": "app screen",
+    "theme": "Sticker",
+    "axes": "light/roman-serif/warm",
+    "nav": "two page top bar",
+    "footer": "quiet journal colophon",
+    "imagery": "user photos only, no stand-ins",
+    "photos": [],
+    "entry": "private journal login",
+    "fingerprint": [
+      "private-app",
+      "compact-card-grid",
+      "inline-quick-add",
+      "filter-row",
+      "anniversary-spread",
+      "native-editor-dialog"
+    ],
+    "sections": [
+      "home anniversary and memories",
+      "our pages",
+      "date cards and filters"
+    ],
+    "signature": "shared date cards becoming memories",
+    "waived": [
+      "49b: user-written date titles can occupy two clamped lines"
+    ],
+    "prompt": "Private shared Mizki & Karen journal on Flask; beige scrapbook paper and roman serif English headings; Japanese controls; compact date cards, per-person budgets, two optional photos, memories, search and random choice, thirty-day trash; Google Sheets and private Drive on a separate account.",
+    "verification": {
+      "floor_failures": 0,
+      "open_reflex": 0,
+      "review": "subagent",
+      "review_findings_resolved": 2
+    },
+    "date": "2026-11-07",
+    "mode": "build"
+  }
 ]
