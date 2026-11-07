@@ -1,19 +1,54 @@
 /** Server-only bridge. Add this as Supabase.gs alongside the existing Code.gs. */
 function supabaseRequest_(method, path, data) {
   const props = PropertiesService.getScriptProperties();
-  const url = String(props.getProperty('MK_SUPABASE_URL') || '').replace(/\/$/, '');
-  const key = props.getProperty('MK_SUPABASE_KEY') || '';
-  if (!/^https:\/\/[a-z0-9-]+\.supabase\.co$/.test(url) || key.length < 32) throw new Error('unavailable');
+  const url = String(props.getProperty('MK_SUPABASE_URL') || '').trim().replace(/\/$/, '');
+  const key = String(props.getProperty('MK_SUPABASE_KEY') || '').trim();
+  if (!/^https:\/\/[a-z0-9-]+\.supabase\.co$/.test(url) || key.length < 32) throw new Error('unavailable: MK_SUPABASE_URLとMK_SUPABASE_KEYの設定を確認してください。');
   const headers = { apikey: key, Accept: 'application/json' };
   if (!key.startsWith('sb_secret_')) headers.Authorization = 'Bearer ' + key;
   const options = { method: method, headers: headers, muteHttpExceptions: true, followRedirects: false };
   if (data !== undefined) { options.contentType = 'application/json'; options.payload = JSON.stringify(data); }
   let response;
   try { response = UrlFetchApp.fetch(url + '/rest/v1/' + path, options); }
-  catch (_) { throw new Error('unavailable'); }
-  if (response.getResponseCode() < 200 || response.getResponseCode() >= 300) throw new Error('unavailable');
+  catch (_) { throw new Error('unavailable: Supabaseへ通信できません。外部通信の権限・接続先・プロジェクトの稼働状態を確認してください。'); }
+  if (response.getResponseCode() < 200 || response.getResponseCode() >= 300) throw supabaseResponseError_(response);
   try { return response.getContentText() ? JSON.parse(response.getContentText()) : null; }
   catch (_) { throw new Error('unavailable'); }
+}
+
+function supabaseResponseError_(response) {
+  const status = response.getResponseCode();
+  // Only fixed, known error codes may appear in logs. Never log upstream
+  // messages, details, hints, request headers or response bodies.
+  const hints = {
+    PGRST205: 'schema.sqlを対象プロジェクトで実行し、public.mk_ideasを作成してください。',
+    '42P01': 'schema.sqlを対象プロジェクトで実行し、public.mk_ideasを作成してください。',
+    '42501': 'サーバー用キーとschema.sqlのservice_role権限を確認してください。',
+    PGRST301: 'APIキーが有効か、URLと同じプロジェクトのものか確認してください。',
+    PGRST302: 'Secret keyまたはLegacyのservice_role keyを設定してください。',
+    PGRST106: 'SupabaseのData APIでpublicスキーマが公開対象か確認してください。'
+  };
+  let code = '';
+  try {
+    const parsed = JSON.parse(response.getContentText());
+    if (Object.prototype.hasOwnProperty.call(hints, parsed.code)) code = parsed.code;
+  } catch (_) {}
+  const byStatus = {
+    401: 'キーの種類・値・対象プロジェクトを確認してください。Apps ScriptではLegacyのservice_role keyも利用できます。',
+    403: 'サーバー用キーとテーブル権限、Data APIの設定を確認してください。',
+    404: 'Project URL、Data APIの有効化、public.mk_ideasの作成を確認してください。',
+    429: '利用制限の可能性があります。少し待って再実行してください。',
+    503: 'プロジェクトの休止・起動中・一時的な障害を確認してください。'
+  };
+  return new Error('unavailable: Supabase HTTP ' + status + (code ? ' / ' + code : '')
+    + '。' + (hints[code] || byStatus[status] || 'Supabaseのプロジェクト設定と稼働状態を確認してください。'));
+}
+
+/** Read-only preflight: run this before migration, or to diagnose connection errors. */
+function checkSupabaseConnection() {
+  const rows = supabaseRequest_('get', 'mk_ideas?select=id&limit=1');
+  if (!Array.isArray(rows)) throw new Error('unavailable: Supabaseの応答形式を確認してください。');
+  console.log('Supabase接続成功。public.mk_ideasを参照できました。データは変更していません。');
 }
 
 function supabaseRows_() {
