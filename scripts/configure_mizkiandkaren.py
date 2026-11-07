@@ -13,9 +13,9 @@ def main():
     parser = argparse.ArgumentParser(description='Mizki & Karen の合言葉をハッシュ化し、ローカルの設定ファイルへ保存します。')
     parser.add_argument('--output', type=Path, default=Path('.env.mizkiandkaren'))
     args = parser.parse_args()
-    password = getpass.getpass('ふたりの合言葉（12文字以上推奨）: ')
-    if len(password) < 12:
-        raise SystemExit('12文字以上の合言葉を設定してください。')
+    password = getpass.getpass('ふたりの合言葉（4文字以上）: ')
+    if len(password) < 4:
+        raise SystemExit('4文字以上の合言葉を設定してください。')
     if password != getpass.getpass('もう一度入力: '):
         raise SystemExit('合言葉が一致しません。')
     try:
