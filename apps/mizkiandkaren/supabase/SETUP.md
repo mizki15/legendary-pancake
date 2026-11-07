@@ -38,6 +38,18 @@ Project URLはConnectやData APIの設定画面で確認できる `https://<proj
 
 ## 4. 既存データを移行する
 
+まず関数一覧から **`checkSupabaseConnection`** を実行し、「Supabase接続成功」が出ることを確認します。読み取りだけを行い、データや移行フラグを変更しません。エラーの場合は以下を確認してください。
+
+| 表示 | 確認すること |
+| --- | --- |
+| HTTP 401 | URLと同じプロジェクトのサーバー用キーか。Secret keyで失敗する場合はLegacy API Keysのservice_role keyも利用可能 |
+| HTTP 403 / 42501 | Publishable/anonではなくサーバー用キーか。schema.sqlの権限設定を実行済みか |
+| PGRST205 / 42P01 | 対象プロジェクトでschema.sqlを実行し、public.mk_ideasを作成済みか |
+| HTTP 404 | Project URLが正しいか。Data APIが有効か。テーブルがあるか |
+| HTTP 429 / 503 | 利用制限、休止や起動中の状態になっていないか |
+
+接続エラーのHTTP番号と既知のエラーコードだけを表示し、キーや応答本文はログへ出しません。問い合わせ時はこのエラー行だけを共有してください。サーバー用キーを取り直した場合は、Apps ScriptとRenderに設定する値も揃えます。
+
 2人ともサイトでの編集をいったん止め、Apps Scriptの関数一覧から **`migrateJournalToSupabase`** を選んで実行します。追加権限の承認を求められたら、保存用アカウントで許可してください。
 
 処理は次を行います。

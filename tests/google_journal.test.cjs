@@ -207,3 +207,26 @@ test('orphan collection uses Supabase references and grants fresh uploads a 24h 
   h.context.purgeExpiredJournal();
   assert.equal(h.files.has(referenced),true); assert.equal(h.files.has(orphan),false); assert.equal(h.files.has(fresh),true);
 });
+
+test('connection preflight is read-only and errors expose only status and allowlisted codes', () => {
+  const h=harness();
+  h.props.MK_SUPABASE_URL='  https://test-project.supabase.co/  ';
+  h.props.MK_SUPABASE_KEY='  '+h.props.MK_SUPABASE_KEY+'  ';
+  const propsBefore=JSON.stringify(h.props);
+  h.context.checkSupabaseConnection();
+  assert.equal(JSON.stringify(h.props),propsBefore);
+  assert.equal(h.remote.requests.length,1);
+  assert.equal(h.remote.requests[0].options.method,'get');
+  assert.match(h.remote.requests[0].url,/mk_ideas\?select=id&limit=1$/);
+  assert.equal(h.remote.requests[0].options.headers.apikey,h.props.MK_SUPABASE_KEY.trim());
+  for(const [status,code] of [[401,'UNKNOWN_PRIVATE_KEY'],[403,'42501'],[404,'PGRST205'],[503,'UNKNOWN_PRIVATE_KEY']]) {
+    h.context.UrlFetchApp.fetch=()=>({getResponseCode:()=>status,getContentText:()=>JSON.stringify({code,message:'PRIVATE_CONTENT_AND_KEY',details:'PRIVATE_CONTENT_AND_KEY',hint:'PRIVATE_CONTENT_AND_KEY'})});
+    assert.throws(()=>h.context.checkSupabaseConnection(),error=>{
+      assert.match(error.message,new RegExp('Supabase HTTP '+status));
+      assert.equal(error.message.includes('PRIVATE'),false);
+      if(code==='PGRST205'||code==='42501') assert.equal(error.message.includes(code),true);
+      return true;
+    });
+    assert.equal(JSON.stringify(h.props),propsBefore);
+  }
+});
