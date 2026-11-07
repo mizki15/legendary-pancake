@@ -1,39 +1,65 @@
 [
- {
-  "scope": "app",
-  "shape": "app screen",
-  "theme": "Sticker",
-  "axes": "light/roman-serif/warm",
-  "nav": "two page top bar",
-  "footer": "quiet journal colophon",
-  "imagery": "user photos only, no stand-ins",
-  "photos": [],
-  "entry": "private journal login",
-  "fingerprint": [
-   "private-app",
-   "compact-card-grid",
-   "inline-quick-add",
-   "filter-row",
-   "anniversary-spread",
-   "native-editor-dialog"
-  ],
-  "sections": [
-   "home anniversary and memories",
-   "our pages",
-   "date cards and filters"
-  ],
-  "signature": "shared date cards becoming memories",
-  "waived": [
-   "49b: user-written date titles can occupy two clamped lines"
-  ],
-  "prompt": "Private shared Mizki & Karen journal on Flask; beige scrapbook paper and roman serif English headings; Japanese controls; compact date cards, per-person budgets, two optional photos, memories, search and random choice, thirty-day trash; Google Sheets and private Drive on a separate account.",
-  "verification": {
-   "floor_failures": 0,
-   "open_reflex": 0,
-   "review": "subagent",
-   "review_findings_resolved": 2
+  {
+    "date": "2026-11-07",
+    "mode": "redesign",
+    "depth": "restyle",
+    "scope": "app",
+    "theme": "Existing scrapbook system with user countryside palette",
+    "axes": "light/roman-serif/muted-plum",
+    "shape": "app screen",
+    "signature": "framed anniversary countdown and shared date cards",
+    "imagery": "supplied cat SVG, generated transparent bouquet, private user photos",
+    "photos": [],
+    "nav": "M＆K and walking black cat, two page top bar",
+    "footer": "removed by request",
+    "prompt": "Refresh the journal with the supplied countryside palette, transparent realistic floral art, the supplied lower-left cat SVG, a horizontal seconds countdown, photo X removal and image caching; remove the specified copy and footer.",
+    "waived": [
+      "49b: real date titles may occupy two clamped lines"
+    ],
+    "verification": {
+      "python_tests": 17,
+      "apps_script_tests": 5,
+      "floor_failures": 0,
+      "open_reflex": 0,
+      "warnings": 0,
+      "finish_review": "subagent: ship"
+    }
   },
-  "date": "2026-11-07",
-  "mode": "build"
- }
+  {
+    "scope": "app",
+    "shape": "app screen",
+    "theme": "Sticker",
+    "axes": "light/roman-serif/warm",
+    "nav": "two page top bar",
+    "footer": "quiet journal colophon",
+    "imagery": "user photos only, no stand-ins",
+    "photos": [],
+    "entry": "private journal login",
+    "fingerprint": [
+      "private-app",
+      "compact-card-grid",
+      "inline-quick-add",
+      "filter-row",
+      "anniversary-spread",
+      "native-editor-dialog"
+    ],
+    "sections": [
+      "home anniversary and memories",
+      "our pages",
+      "date cards and filters"
+    ],
+    "signature": "shared date cards becoming memories",
+    "waived": [
+      "49b: user-written date titles can occupy two clamped lines"
+    ],
+    "prompt": "Private shared Mizki & Karen journal on Flask; beige scrapbook paper and roman serif English headings; Japanese controls; compact date cards, per-person budgets, two optional photos, memories, search and random choice, thirty-day trash; Google Sheets and private Drive on a separate account.",
+    "verification": {
+      "floor_failures": 0,
+      "open_reflex": 0,
+      "review": "subagent",
+      "review_findings_resolved": 2
+    },
+    "date": "2026-11-07",
+    "mode": "build"
+  }
 ]

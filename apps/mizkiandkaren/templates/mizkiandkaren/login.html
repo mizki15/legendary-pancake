@@ -1,8 +1,9 @@
 {% extends "mizkiandkaren/base.html" %}
-{% block title %}Our little journal | Mizki & Karen{% endblock %}
+{% block title %}ログイン | M＆K{% endblock %}
 {% block content %}
 <section class="login-layout">
-  <div class="login-intro"><h1>Our little<br>journal.</h1><p class="lead">行きたい場所も、忘れたくない一日も。<br>ふたりの手帳に、少しずつ。</p><p class="since">Mizki &amp; Karen</p></div>
+  <h1 class="visually-hidden">ログイン</h1>
+  <div class="login-intro login-art" aria-hidden="true"><img src="{{ url_for('mizkiandkaren.static', filename='images/bouquet.webp') }}" width="360" height="540" alt=""></div>
   <div class="login-sheet">
     <h2>Welcome back</h2><p class="muted">合言葉を入れて、手帳を開こう。</p>
     {% if configured %}

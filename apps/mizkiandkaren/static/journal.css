@@ -1,7 +1,7 @@
-/* Hallmark · shape: app screen · genre: playful · theme: Sticker (deal 1/3; user overrides: beige scrapbook paper, roman serif, restrained olive)
- * nav: two page top bar · signature: shared date cards becoming memories · states: loading, empty, error, full
- * finish-review: subagent, 2 findings resolved (mobile toolbar density and home loading skeleton)
- * axes: light/roman-serif/warm · posture: restrained · sticker: paper · imagery: user photos only · v2.0.0 */
+/* Hallmark · shape: app screen · genre: playful · theme: project scrapbook system, user countryside palette
+ * nav: M＆K and the supplied black cat, two page top bar · signature: anniversary clock and shared date cards
+ * states: loading, empty, error, full · imagery: supplied cat SVG, generated transparent bouquet, private user photos
+ * axes: light/roman-serif/muted-plum · posture: restrained · v2.0.0 */
 /* Hallmark · pre-emit critique: P4 H4 E4 S5 R4 V4 · weakest: R, removed decorative photo frames and kept paper edges on the actual date cards only */
 /* Hallmark · waive 49b · real user-written date titles may use two lines, capped by line-clamp · shared date cards keep the user's own title readable and open the full text in the editor */
 /* Hallmark · answered F6 · empty-state is prose rather than a numeric selector; countdown figures use tabular-nums */
@@ -193,3 +193,65 @@ body:has(dialog[open]) { overflow-y: hidden; }
 .card-title a { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 44px; }
 
 .photo-preview.is-removed img { opacity: .45; }
+
+/* Palette and ornament updated from the user's countryside swatches and bouquet request. */
+body { position: relative; isolation: isolate; }
+body::before { content: ''; position: fixed; inset: 12% -90px auto auto; width: min(42vw, 560px); height: 78vh; background: url('./images/bouquet.webp') center / contain no-repeat; opacity: .36; pointer-events: none; z-index: -1; }
+body::after { content: ''; position: fixed; inset: auto auto -170px -130px; width: min(36vw, 440px); height: 68vh; background: url('./images/bouquet.webp') center / contain no-repeat; transform: rotate(170deg); opacity: .22; pointer-events: none; z-index: -1; }
+#main { padding-bottom: var(--space-2xl); }
+.wordmark { display: inline-flex; align-items: center; gap: var(--space-sm); }
+.wordmark > span { padding: 0; }
+.brand-cat { width: 64px; height: 41px; object-fit: contain; }
+.journal-spread { display: flex; flex-direction: column; gap: var(--space-xl); padding-top: var(--space-xl); }
+.anniversary-sheet { position: relative; display: flex; flex-direction: column; min-height: 370px; padding: var(--space-lg) var(--space-xl); border: 1px solid var(--color-edge); border-radius: 2px; background: var(--color-paper-3); box-shadow: 5px 5px 0 var(--color-petal-paper); }
+.anniversary-sheet::before { content: ''; position: absolute; inset: var(--space-xs); border: 1px solid var(--color-rule); pointer-events: none; }
+.anniversary-sheet .section-line { margin-bottom: var(--space-lg); }
+.anniversary-name { display: flex; align-items: baseline; gap: var(--space-2xs); }
+#anniversary-name { font-size: var(--text-lg); }
+#anniversary-number { font: 400 var(--text-3xl)/1 var(--font-display); }
+.countdown { flex: 1; display: flex; flex-wrap: nowrap; align-items: center; justify-content: center; gap: var(--space-lg); margin: var(--space-lg) 0; min-width: 0; }
+.countdown-part { display: inline-flex; align-items: baseline; gap: var(--space-2xs); white-space: nowrap; }
+.countdown strong { font: 400 clamp(1.7rem,5vw,4rem)/1.15 var(--font-display); font-variant-numeric: tabular-nums; }
+.countdown-part > span { font-size: clamp(.875rem,2.5vw,1.7rem); }
+.anniversary-bottom { justify-content: flex-end; gap: var(--space-xs); border: 0; margin: 0; padding-top: var(--space-md); font-size: var(--text-md); }
+#anniversary-status { text-align: center; }
+.memory-space { padding: var(--space-lg); background: var(--color-memory-paper); border-radius: var(--radius-card); }
+.home-memories { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: var(--space-lg); }
+.home-memory { align-items: center; border-top: 0; padding: var(--space-xs) 0; }
+.home-memory + .home-memory { border-left: 1px solid var(--color-edge); padding-left: var(--space-lg); }
+.our-pages { margin-top: var(--space-xl); }
+.page-entry { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-lg); padding-block: var(--space-lg); }
+.photo-preview { display: block; width: fit-content; max-width: 100%; position: relative; }
+.photo-preview img { width: 180px; height: 135px; object-fit: cover; }
+.photo-remove { position: absolute; top: var(--space-2xs); right: var(--space-2xs); border: 1px solid var(--color-edge); border-radius: var(--radius-pill); background: var(--color-paper-3); }
+.photo-feedback { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-xs); color: var(--color-muted); font-size: var(--text-sm); }
+@media (max-width: 60rem) { .home-memories { grid-template-columns: minmax(0,1fr); gap: var(--space-md); } .home-memory + .home-memory { border-left: 0; border-top: 1px solid var(--color-edge); padding-left: 0; padding-top: var(--space-md); } }
+@media (max-width: 40rem) {
+  body::before { width: 75vw; right: -120px; opacity: .12; }
+  body::after { width: 65vw; left: -130px; opacity: .08; }
+  .brand-cat { width: 54px; height: 34px; }
+  .journal-spread { padding-top: var(--space-lg); gap: var(--space-lg); }
+  .anniversary-sheet { min-height: 270px; padding: var(--space-lg) var(--space-md); }
+  .anniversary-sheet h2 { font-size: var(--text-xl); }
+  .anniversary-sheet .section-line { margin-bottom: var(--space-lg); }
+  #anniversary-name { font-size: var(--text-md); }
+  #anniversary-number { font-size: var(--text-2xl); }
+  .countdown { gap: var(--space-xs); margin-block: var(--space-lg); }
+  .countdown-part { gap: var(--space-3xs); }
+  .anniversary-bottom { font-size: var(--text-sm); }
+  .memory-space { padding: var(--space-md); }
+  .page-entry { gap: var(--space-md); }
+}
+
+.anniversary-sheet { isolation: isolate; }
+.anniversary-sheet::after { content: ''; position: absolute; inset: var(--space-sm) var(--space-lg) var(--space-sm) auto; width: 30%; background: url('./images/bouquet.webp') center / contain no-repeat; opacity: .36; z-index: -1; pointer-events: none; }
+.login-art { display: grid; place-items: center; }
+.login-art img { max-height: 500px; width: auto; opacity: .85; }
+body[data-page='login']::before, body[data-page='login']::after { display: none; }
+@media (max-width: 40rem) { .anniversary-sheet::after { width: 35%; right: var(--space-md); opacity: .24; } .login-layout { position: relative; padding-block: var(--space-xl); } .login-art { position: absolute; top: var(--space-md); right: -50px; width: 60%; height: 320px; opacity: .3; z-index: -1; } .login-sheet { margin-top: var(--space-lg); } }
+
+.home-memories[data-count='0'], .home-memories[data-count='1'] { grid-template-columns: minmax(0,1fr); }
+.home-memories[data-count='2'] { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.countdown, #anniversary-number, .countdown-part > span { font-variant-numeric: tabular-nums; }
+@media (max-width: 60rem) { .home-memories[data-count] { grid-template-columns: minmax(0,1fr); } }
+@media (max-width: 40rem) { .login-art { right: 0; } }

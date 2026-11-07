@@ -18,6 +18,7 @@ from werkzeug.exceptions import RequestEntityTooLarge
 from werkzeug.security import check_password_hash
 
 from .domain import Invalid, compress_photo, validate_idea
+from .photo_cache import PhotoCache
 from .store import Conflict, GoogleStore, SQLiteStore, Unavailable, now_iso
 
 mizkiandkaren_bp = Blueprint("mizkiandkaren", __name__, url_prefix="/mizkiandkaren", template_folder="templates", static_folder="static")
@@ -26,10 +27,17 @@ LOGIN_COOKIE = "mk_login"
 PHOTO_KINDS = ("idea", "memory")
 attempts = defaultdict(list)
 attempt_lock = threading.Lock()
+photo_cache = PhotoCache()
 
 
 def config(name):
     return current_app.config.get(name, os.environ.get(name, ""))
+
+
+def photo_namespace():
+    # Never reuse a photo when the configured Google account or local database changes.
+    values = (config("MIZKI_KAREN_LOCAL_DB"), config("MIZKI_KAREN_GAS_URL"), config("MIZKI_KAREN_GAS_SECRET"), config("MIZKI_KAREN_SECRET_KEY"), os.environ.get("RENDER", ""))
+    return hashlib.sha256("\0".join(values).encode()).hexdigest()
 
 
 def signer():
@@ -100,7 +108,8 @@ def private_headers(response):
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["Content-Security-Policy"] = "default-src 'self'; img-src 'self' blob:; style-src 'self'; script-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"
     if request.endpoint != "mizkiandkaren.static":
-        response.headers["Cache-Control"] = "no-store, private"
+        if request.endpoint != "mizkiandkaren.photo" or response.status_code not in (200, 304):
+            response.headers["Cache-Control"] = "no-store, private"
         response.headers["Vary"] = "Cookie"
     return response
 
@@ -206,7 +215,9 @@ def public_record(record):
 
 @mizkiandkaren_bp.get("/api/ideas")
 def list_ideas():
-    return jsonify(ideas=[public_record(row) for row in store().list()])
+    rows = store().list()
+    photo_cache.reconcile(photo_namespace(), rows)
+    return jsonify(ideas=[public_record(row) for row in rows])
 
 
 def read_form():
@@ -245,7 +256,9 @@ def create_idea():
     for kind in PHOTO_KINDS:
         payload[f"has_{kind}_photo"] = kind in photos
     row = {"id": str(uuid.uuid4()), "payload": payload, "deleted_at": None}
-    return jsonify(idea=public_record(store().save(row, 0, photos, removes))), 201
+    saved = store().save(row, 0, photos, removes)
+    photo_cache.invalidate(photo_namespace(), row["id"])
+    return jsonify(idea=public_record(saved)), 201
 
 
 @mizkiandkaren_bp.patch("/api/ideas/<uuid:idea_id>")
@@ -262,7 +275,9 @@ def edit_idea(idea_id):
             row["payload"][f"has_{kind}_photo"] = False
         if kind in photos:
             row["payload"][f"has_{kind}_photo"] = True
-    return jsonify(idea=public_record(storage.save(row, version, photos, removes)))
+    saved = storage.save(row, version, photos, removes)
+    photo_cache.invalidate(photo_namespace(), row["id"])
+    return jsonify(idea=public_record(saved))
 
 
 @mizkiandkaren_bp.post("/api/ideas/<uuid:idea_id>/<action>")
@@ -281,18 +296,28 @@ def move_idea(idea_id, action):
         raise Conflict
     row["deleted_at"] = now_iso() if action == "trash" else None
     row["payload"]["updated_at"] = now_iso()
-    return jsonify(idea=public_record(storage.save(row, version)))
+    saved = storage.save(row, version)
+    photo_cache.invalidate(photo_namespace(), row["id"])
+    return jsonify(idea=public_record(saved))
 
 
 @mizkiandkaren_bp.get("/photos/<uuid:idea_id>/<kind>")
 def photo(idea_id, kind):
     if kind not in PHOTO_KINDS:
         return "", 404
-    storage = store()
-    data = storage.photo(str(idea_id), kind)
+    version = request.args.get("v", "")
+    key = (photo_namespace(), str(idea_id), kind, version) if re.fullmatch(r"[0-9]{1,18}", version) else None
+    data = photo_cache.get(key) if key else None
+    if data is None:
+        data = store().photo(str(idea_id), kind)
+        if data is not None and key:
+            photo_cache.put(key, data)
     if data is None:
         return "", 404
-    return send_file(io.BytesIO(data), mimetype="image/webp", download_name="memory.webp", max_age=0)
+    response = send_file(io.BytesIO(data), mimetype="image/webp", download_name="memory.webp", etag=hashlib.sha256(data).hexdigest(), conditional=True, max_age=0)
+    # A cached browser image must still pass authentication before receiving 304.
+    response.headers["Cache-Control"] = "private, no-cache, max-age=0, must-revalidate"
+    return response
 
 
 @mizkiandkaren_bp.errorhandler(Invalid)
