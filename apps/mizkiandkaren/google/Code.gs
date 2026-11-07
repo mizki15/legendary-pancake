@@ -57,6 +57,11 @@ function doPost(event) {
     const payload = JSON.parse(Utilities.newBlob(Utilities.base64Decode(envelope.payload)).getDataAsString('UTF-8'));
     lock = LockService.getScriptLock();
     if (!lock.tryLock(20000)) throw new Error('busy');
+    if (['upload_file', 'read_file'].includes(payload.action)) {
+      return output_({ ok: true, result: supabaseFileAction_(payload) });
+    }
+    // Once migration starts, the old website is read-only until Render switches.
+    if (payload.action === 'save' && PropertiesService.getScriptProperties().getProperty('MK_STORAGE_BACKEND') === 'supabase') throw new Error('unavailable');
     const sheet = journalSheet_();
     const rows = sheet.getLastRow() > 1 ? sheet.getRange(2, 1, sheet.getLastRow() - 1, 6).getValues() : [];
     let result;
@@ -167,6 +172,10 @@ function save_(sheet, rows, request) {
 function purgeExpiredJournal() {
   const lock = LockService.getScriptLock(); lock.waitLock(30000);
   try {
+    if (PropertiesService.getScriptProperties().getProperty('MK_STORAGE_BACKEND') === 'supabase') {
+      purgeSupabaseJournal_();
+      return;
+    }
     const sheet = journalSheet_();
     const rows = sheet.getLastRow() > 1 ? sheet.getRange(2, 1, sheet.getLastRow() - 1, 6).getValues() : [];
     for (let index = rows.length - 1; index >= 0; index--) if (expired_(rows[index][2])) {

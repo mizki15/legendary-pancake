@@ -20,6 +20,7 @@ from werkzeug.security import check_password_hash
 from .domain import Invalid, compress_photo, validate_idea
 from .photo_cache import PhotoCache
 from .store import Conflict, GoogleStore, SQLiteStore, Unavailable, now_iso
+from .supabase_store import SupabaseStore
 
 mizkiandkaren_bp = Blueprint("mizkiandkaren", __name__, url_prefix="/mizkiandkaren", template_folder="templates", static_folder="static")
 COOKIE = "mk_journal"
@@ -36,7 +37,7 @@ def config(name):
 
 def photo_namespace():
     # Never reuse a photo when the configured Google account or local database changes.
-    values = (config("MIZKI_KAREN_LOCAL_DB"), config("MIZKI_KAREN_GAS_URL"), config("MIZKI_KAREN_GAS_SECRET"), config("MIZKI_KAREN_SECRET_KEY"), os.environ.get("RENDER", ""))
+    values = tuple(config(name) for name in ("MIZKI_KAREN_LOCAL_DB", "MIZKI_KAREN_GAS_URL", "MIZKI_KAREN_GAS_SECRET", "MIZKI_KAREN_SECRET_KEY", "MIZKI_KAREN_STORAGE", "MIZKI_KAREN_SUPABASE_URL", "MIZKI_KAREN_SUPABASE_KEY")) + (os.environ.get("RENDER", ""),)
     return hashlib.sha256("\0".join(values).encode()).hexdigest()
 
 
@@ -196,11 +197,21 @@ def store():
     url, secret = config("MIZKI_KAREN_GAS_URL"), config("MIZKI_KAREN_GAS_SECRET")
     if not re.fullmatch(r"https://script\.google\.com/macros/s/[A-Za-z0-9_-]+/exec", url) or len(secret) < 32:
         raise Unavailable
-    return GoogleStore(url, secret)
+    google = GoogleStore(url, secret)
+    backend = config("MIZKI_KAREN_STORAGE") or "google"
+    if backend == "google":
+        return google
+    if backend != "supabase":
+        raise Unavailable
+    supabase_url = config("MIZKI_KAREN_SUPABASE_URL").rstrip("/")
+    key = config("MIZKI_KAREN_SUPABASE_KEY")
+    if not re.fullmatch(r"https://[a-z0-9-]+\.supabase\.co", supabase_url) or len(key) < 32:
+        raise Unavailable
+    return SupabaseStore(supabase_url, key, google)
 
 
 def find_record(storage, idea_id):
-    row = next((row for row in storage.list() if row["id"] == idea_id), None)
+    row = storage.get(idea_id) if hasattr(storage, "get") else next((row for row in storage.list() if row["id"] == idea_id), None)
     if not row:
         raise Invalid("このデート案は見つかりません。画面を更新してください。")
     return row

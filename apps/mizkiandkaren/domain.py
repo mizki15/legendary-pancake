@@ -1,4 +1,4 @@
-"""Validation shared by both journal storage backends."""
+"""Validation shared by the journal storage backends."""
 
 import io
 import warnings
