@@ -1,0 +1,21 @@
+{% extends "mizkiandkaren/base.html" %}
+{% block scripts %}<script type="module" src="{{ url_for('mizkiandkaren.static', filename='journal.js') }}"></script>{% endblock %}
+{% block content %}
+<section class="page-heading home-heading"><h1>Our little journal</h1><p>ふたりで行きたいところ。ふたりで過ごした時間。</p></section>
+<div class="journal-spread">
+  <section class="anniversary-sheet" aria-labelledby="anniversary-heading" data-anniversary="{{ anniversary_start.isoformat() if anniversary_start else '' }}">
+    <div class="section-line"><h2 id="anniversary-heading">Our anniversary</h2>{{ icon('heart') }}</div>
+    <p id="anniversary-name">次の周年記念日まで</p>
+    <div class="countdown"><strong id="countdown-days" class="num">…</strong><span>日</span><span class="countdown-clock num" id="countdown-clock"></span></div>
+    <p id="anniversary-date" class="muted">{% if not anniversary_start %}記念日を準備中です。{% endif %}</p>
+    <div class="anniversary-bottom"><span>いっしょに歩き始めた日</span><time {% if anniversary_start %}datetime="{{ anniversary_start.isoformat() }}"{% endif %}>{{ anniversary_start.strftime('%Y.%m.%d') if anniversary_start else '準備中' }}</time></div>
+  </section>
+  <section class="memory-space" aria-labelledby="memory-heading">
+    <div class="section-line"><h2 id="memory-heading">Little memories</h2><a class="text-link" href="{{ url_for('mizkiandkaren.date_ideas') }}?view=archive">思い出を見る</a></div>
+    <div id="home-memories" class="home-memories" aria-live="polite" aria-busy="true"><span class="visually-hidden">思い出を読み込んでいます…</span><div class="memory-loading" aria-hidden="true"><span></span><span></span></div><div class="memory-loading" aria-hidden="true"><span></span><span></span></div></div>
+  </section>
+</div>
+<section class="our-pages" aria-labelledby="pages-heading"><div class="section-line"><h2 id="pages-heading">Our pages</h2><span class="muted">ふたりの手帳の、続き。</span></div>
+  <a class="page-entry" href="{{ url_for('mizkiandkaren.date_ideas') }}"><div class="page-entry-heading">{{ icon('book') }}<h3>Date ideas</h3></div><p>「今度行こう」を、ここに集めよう。</p><span class="entry-action">デート案を開く {{ icon('plus') }}</span></a>
+</section>
+{% endblock %}

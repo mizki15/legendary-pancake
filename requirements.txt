@@ -19,3 +19,4 @@ gunicorn==21.2.0
 
 pydub
 numpy
+Pillow==13.0.0

@@ -1,0 +1,19 @@
+{
+  "scanned": "2026-11-07",
+  "findings": {
+    "framework": "Flask Blueprints, app.py:8 and new-app guide",
+    "fonts": "Existing portfolio has its own app-specific stylesheet; no journal design system",
+    "palette": "No root design.md or DESIGN.md; journal uses isolated CSS tokens",
+    "motion": "No journal motion library; CSS state feedback only"
+  },
+  "preserve": [
+    "Existing app routes and portfolio",
+    "Render hosting and Flask application"
+  ],
+  "introduce": [
+    "Private /mizkiandkaren namespace",
+    "Shared date-card journal",
+    "Beige paper and roman serif headings per user",
+    "Google Sheets and private Drive photos in a separate user-owned Google account"
+  ]
+}

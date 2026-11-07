@@ -3,3 +3,8 @@ __pycache__/
 .venv/
 .env
 .pytest_cache/
+.env.*
+instance/
+.hallmark/captures/
+.hallmark/screenshots/
+.hallmark/shots/

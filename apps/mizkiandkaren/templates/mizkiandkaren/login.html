@@ -1,0 +1,19 @@
+{% extends "mizkiandkaren/base.html" %}
+{% block title %}Our little journal | Mizki & Karen{% endblock %}
+{% block content %}
+<section class="login-layout">
+  <div class="login-intro"><h1>Our little<br>journal.</h1><p class="lead">行きたい場所も、忘れたくない一日も。<br>ふたりの手帳に、少しずつ。</p><p class="since">Mizki &amp; Karen</p></div>
+  <div class="login-sheet">
+    <h2>Welcome back</h2><p class="muted">合言葉を入れて、手帳を開こう。</p>
+    {% if configured %}
+    <form method="post" class="stack" action="{{ url_for('mizkiandkaren.login') }}">
+      <input type="hidden" name="login_token" value="{{ login_token }}"><input type="hidden" name="next" value="{{ next_path }}">
+      <label class="field">ふたりの合言葉<input type="password" name="passphrase" autocomplete="current-password" required maxlength="512" autofocus aria-describedby="login-error" {% if error %}aria-invalid="true"{% endif %}></label>
+      <label class="check-label"><input type="checkbox" name="remember">この端末で30日間ログインを保つ</label>
+      <p id="login-error" class="form-error" role="alert">{{ error }}</p>
+      <button type="submit" class="button primary">{{ icon('book') }}手帳を開く</button>
+    </form>
+    {% else %}<p class="form-error" role="status">{{ error }}</p>{% endif %}
+  </div>
+</section>
+{% endblock %}
