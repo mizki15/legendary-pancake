@@ -8,3 +8,4 @@ instance/
 .hallmark/captures/
 .hallmark/screenshots/
 .hallmark/shots/
+node_modules/
