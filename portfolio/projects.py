@@ -41,6 +41,12 @@ PROJECTS = [
                 "description": "スマホ版",
                 "image": "https://em-content.zobj.net/source/microsoft-teams/364/rocket_1f680.png",
             },
+            {
+                "endpoint": "rocket.rocket_3d",
+                "title": "月面着陸 3D🌕",
+                "description": "PC・スマホ対応",
+                "image": "https://em-content.zobj.net/source/microsoft-teams/364/rocket_1f680.png",
+            },
         ],
     },
     {

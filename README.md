@@ -25,6 +25,8 @@ python3 -m venv .venv
 
 トップページは `http://127.0.0.1:8000/` です。動作確認は `.venv/bin/python -m unittest discover -s tests` で実行できます。楽天 API を使う業務効率化ツールには `RAKUTEN_APP_ID`、`RAKUTEN_ACCESS_KEY`、`RAKUTEN_AFFILIATE_ID` が必要です。学習とテキスト保存の外部 API への通信も別途必要です。
 
+`/rocket_3d` は Three.js を使った3D版の月面着陸ゲームです（PC・スマホ対応）。コードは `apps/rocket/static/rocket3d/` にあり、物理は `physics.js`、描画は `world.js`・`shaders.js`・`rocketModel.js`、操作とHUDは `main.js` です。地球・月・大気は画像を使わずシェーダーで生成しています。Three.js（MIT ライセンス）は CDN に頼らないよう `vendor/three.bundle.min.js` に同梱しています。物理のテストは `npm test` に含まれ、自動操縦で打ち上げから着陸まで飛ばして確認します。
+
 新しいアプリの追加方法は [新しいアプリを作るとき.md](新しいアプリを作るとき.md) を参照してください。
 
 `/mizkiandkaren/` の2人用手帳は、[設定手順](apps/mizkiandkaren/README.md)に従い、保存用の別GoogleアカウントとRenderの環境変数を設定して利用します。

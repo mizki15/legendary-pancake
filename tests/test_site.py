@@ -16,7 +16,7 @@ class SiteTests(unittest.TestCase):
         paths = [
             "/", "/study", "/opt1/work_optimize1", "/opt2/work_optimize2",
             "/rocket", "/rocket_orbit", "/rocket_mobile",
-            "/rocket_mobile_orbit", "/txtstore", "/keiba",
+            "/rocket_mobile_orbit", "/rocket_3d", "/txtstore", "/keiba",
             "/mainkurafuto", "/pingpong", "/howtoimprovecrawl",
             *[f"/ut-eitan-quiz{suffix}/" for suffix in ("", "-1", "-2", "-3", "-4", "-5", "-6")],
         ]
@@ -32,6 +32,8 @@ class SiteTests(unittest.TestCase):
             "/opt2/static/css/work_optimization_style2.css",
             "/static/css/work_optimization_style.css",
             "/static/css/work_optimization_style2.css",
+            "/rocket/static/rocket3d/main.js",
+            "/rocket/static/rocket3d/vendor/three.bundle.min.js",
         ):
             with self.subTest(path=path):
                 response = self.client.get(path)
